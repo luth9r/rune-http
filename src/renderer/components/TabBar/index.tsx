@@ -6,6 +6,9 @@ import { getMethodColor } from "@/utils";
 import { sharedStyles } from "styles/shared";
 import { ConfirmCloseModal } from "../shared/ConfirmCloseModal";
 import { Button } from "../ui/button";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
 
 function TabItem({
   tab,
@@ -19,17 +22,38 @@ function TabItem({
   const { setActiveTab } = useTabsStore();
   const [hovered, setHovered] = useState(false);
 
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: tab.id });
+
+  const style: React.CSSProperties = {
+    ...styles.tab,
+    transform: CSS.Translate.toString(transform),
+    transition,
+    zIndex: isDragging ? 10 : 1,
+    opacity: isDragging ? 0.6 : 1,
+    cursor: "default",
+    ...(hovered && !isActive ? styles.tabHover : {}),
+    ...(isActive ? styles.tabActive : {}),
+  };
+
   return (
     <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
       onClick={() => setActiveTab(tab.id)}
-      onMouseDown={(e) => e.button === 1 && onClose()}
+      onMouseDown={(e) => {
+        if (e.button === 1) onClose();
+      }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={{
-        ...styles.tab,
-        ...(hovered && !isActive ? styles.tabHover : {}),
-        ...(isActive ? styles.tabActive : {}),
-      }}
     >
       <span style={{ ...styles.method, color: getMethodColor(tab.method) }}>
         {tab.method}
@@ -39,60 +63,96 @@ function TabItem({
 
       <div style={styles.tabActionGroup}>
         {tab.isDirty && <span style={styles.dirtyDot} />}
-
         {(hovered || isActive) && (
           <Button
             variant="ghost-danger"
             size="sm"
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
               onClose();
             }}
-            style={{
-              width: 18,
-              height: 18,
-              padding: 0,
-            }}
+            style={{ width: 18, height: 18, padding: 0 }}
           >
             <X size={12} />
           </Button>
         )}
-
         {!(hovered || isActive) && <div style={{ width: 18 }} />}
       </div>
     </div>
   );
 }
 
-export function TabBar() {
-  const { tabs, activeTabId, openTab, closeTab, setSaveModalOpen } =
-    useTabsStore();
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  horizontalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
+export function TabBar() {
+  const {
+    tabs,
+    activeTabId,
+    openTab,
+    closeTab,
+    setSaveModalOpen,
+    reorderTabs,
+  } = useTabsStore();
   const [tabToConfirm, setTabToConfirm] = useState<Tab | null>(null);
 
-  const handleAttemptClose = (tab: Tab) => {
-    if (tab.isDirty) {
-      setTabToConfirm(tab);
-    } else {
-      closeTab(tab.id);
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      reorderTabs(active.id as string, over.id as string);
     }
   };
 
   return (
     <div style={styles.container}>
-      {tabs.map((tab) => (
-        <TabItem
-          key={tab.id}
-          tab={tab}
-          isActive={tab.id === activeTabId}
-          onClose={() => handleAttemptClose(tab)}
-        />
-      ))}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+        modifiers={[restrictToHorizontalAxis]}
+      >
+        <SortableContext
+          items={tabs.map((t) => t.id)}
+          strategy={horizontalListSortingStrategy}
+        >
+          {tabs.map((tab) => (
+            <TabItem
+              key={tab.id}
+              tab={tab}
+              isActive={tab.id === activeTabId}
+              onClose={() => {
+                if (tab.isDirty) setTabToConfirm(tab);
+                else closeTab(tab.id);
+              }}
+            />
+          ))}
+        </SortableContext>
+      </DndContext>
 
       <Button
         variant="icon"
         onClick={() => openTab()}
-        style={{ width: 40, height: 40 }}
+        style={{ width: 40, height: 40, flexShrink: 0 }}
       >
         <Plus size={16} />
       </Button>
@@ -115,7 +175,6 @@ export function TabBar() {
     </div>
   );
 }
-
 const styles = {
   container: {
     display: "flex",

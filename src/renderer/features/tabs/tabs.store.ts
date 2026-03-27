@@ -33,6 +33,7 @@ interface TabsState {
   setActiveTab: (id: string) => void;
   updateTab: (id: string, patch: Partial<Tab>) => void;
   setTabLoading: (id: string, isLoading: boolean) => void;
+  reorderTabs: (activeId: string, overId: string) => void;
   setTabResponse: (
     id: string,
     response: Tab["response"],
@@ -110,6 +111,17 @@ export const useTabsStore = create<TabsState>()(
           if (tab) {
             tab.isLoading = isLoading;
             tab.error = null;
+          }
+        }),
+
+      reorderTabs: (activeId, overId) =>
+        set((state) => {
+          const oldIndex = state.tabs.findIndex((t) => t.id === activeId);
+          const newIndex = state.tabs.findIndex((t) => t.id === overId);
+
+          if (oldIndex !== -1 && newIndex !== -1) {
+            const [movedTab] = state.tabs.splice(oldIndex, 1);
+            state.tabs.splice(newIndex, 0, movedTab);
           }
         }),
 
