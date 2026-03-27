@@ -30,9 +30,8 @@ export function SaveRequestModal({
 
   const handleSave = () => {
     if (!selectedLocation || !tab) return;
-    const finalRequestId = uuid();
 
-    addRequest(
+    const newItemId = addRequest(
       selectedLocation.colId,
       {
         name: name.trim() || "New Request",
@@ -48,7 +47,7 @@ export function SaveRequestModal({
     );
 
     updateTab(tabId, {
-      requestId: finalRequestId,
+      requestId: newItemId,
       collectionId: selectedLocation.colId,
       name: name.trim() || "New Request",
     });

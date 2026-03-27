@@ -28,42 +28,6 @@ export function RequestPanel() {
     (state) => state.updateRequest,
   );
 
-  useEffect(() => {
-    const handleSave = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-        e.preventDefault();
-
-        if (tab && tab.isDirty) {
-          let finalBody = tab.body;
-
-          if (tab.bodyType === "json" && tab.body) {
-            try {
-              finalBody = JSON.stringify(JSON.parse(tab.body), null, 2);
-              updateTab(tab.id, { body: finalBody });
-            } catch (e) {}
-          }
-
-          if (tab.collectionId && tab.requestId) {
-            updateCollectionRequest(tab.collectionId, tab.requestId, {
-              method: tab.method,
-              url: tab.url,
-              headers: tab.headers,
-              params: tab.params,
-              body: finalBody,
-              bodyType: tab.bodyType,
-              auth: tab.auth,
-            });
-          }
-
-          markClean(tab.id);
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handleSave);
-    return () => window.removeEventListener("keydown", handleSave);
-  }, [tab, updateCollectionRequest, markClean, updateTab]);
-
   if (!tab) return <div style={styles.empty}>No active tab</div>;
 
   return (

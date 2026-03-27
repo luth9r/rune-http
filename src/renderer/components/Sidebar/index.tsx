@@ -14,6 +14,7 @@ import { getMethodColor } from "@/utils/methodColor";
 import type { Collection, CollectionItem } from "@/types";
 import { Logo } from "../shared/Logo";
 import { Button } from "../ui/button";
+import { ContextMenu } from "../shared/ContextMenu";
 
 function RequestItem({
   item,
@@ -22,15 +23,26 @@ function RequestItem({
   item: CollectionItem;
   collectionId: string;
 }) {
-  const { removeItem } = useCollectionsStore();
-  const { openTab } = useTabsStore();
+  const { removeItem, renameItem } = useCollectionsStore();
+  const { openTab, tabs, setActiveTab } = useTabsStore();
   const [hovered, setHovered] = useState(false);
+  const [menuPos, setMenuPos] = useState<{ x: number; y: number } | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(item.name);
+
+  const handleRename = () => {
+    if (editName.trim() && editName !== item.name) {
+      renameItem(collectionId, item.id, editName.trim());
+    }
+    setIsEditing(false);
+  };
 
   function handleOpen() {
     if (!item.request) return;
+
     openTab({
       requestId: item.id,
-      collectionId,
+      collectionId: collectionId,
       name: item.request.name,
       method: item.request.method,
       url: item.request.url,
@@ -43,9 +55,34 @@ function RequestItem({
     });
   }
 
+  if (isEditing) {
+    return (
+      <div style={{ padding: "2px 12px" }}>
+        <input
+          autoFocus
+          style={styles.inlineInput}
+          value={editName}
+          onChange={(e) => setEditName(e.target.value)}
+          onBlur={handleRename}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleRename();
+            if (e.key === "Escape") {
+              setIsEditing(false);
+              setEditName(item.name);
+            }
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div
-      onClick={handleOpen}
+      onClick={() => item.request && handleOpen()}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        setMenuPos({ x: e.clientX, y: e.clientY });
+      }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{ ...styles.requestItem, ...(hovered ? styles.itemHover : {}) }}
@@ -59,22 +96,23 @@ function RequestItem({
         {item.request!.method}
       </span>
       <span style={styles.itemName}>{item.name}</span>
-      <Button
-        variant="ghost-danger"
-        size="sm"
-        onClick={(e) => {
-          e.stopPropagation();
-          removeItem(collectionId, item.id);
-        }}
-        style={{ 
-          opacity: hovered ? 1 : 0,
-          width: 24,
-          height: 24,
-          padding: 0
-        }}
-      >
-        <Trash2 size={12} />
-      </Button>
+
+      {menuPos && (
+        <ContextMenu
+          x={menuPos.x}
+          y={menuPos.y}
+          onClose={() => setMenuPos(null)}
+          options={[
+            { label: "Rename", onClick: () => setIsEditing(true) },
+            { label: "Duplicate", onClick: () => console.log("Duplicate") },
+            {
+              label: "Delete",
+              onClick: () => removeItem(collectionId, item.id),
+              danger: true,
+            },
+          ]}
+        />
+      )}
     </div>
   );
 }
@@ -121,11 +159,11 @@ function FolderItem({
             e.stopPropagation();
             removeItem(collectionId, item.id);
           }}
-          style={{ 
+          style={{
             opacity: hovered ? 1 : 0,
             width: 24,
             height: 24,
-            padding: 0
+            padding: 0,
           }}
         >
           <Trash2 size={12} />

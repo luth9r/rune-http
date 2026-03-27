@@ -7,16 +7,19 @@ import { selectActiveTab, useTabsStore } from "@/features/tabs/tabs.store";
 import { EmptyState } from "@/components/EmptyState";
 import { useShortcuts } from "renderer/hooks/useShortcuts";
 import { SaveRequestModal } from "renderer/features/collections/SaveRequestModal";
+import { ActivityBar } from "renderer/components/ActivityBar";
 
 export function MainScreen() {
   useShortcuts();
   useZoom();
   useTabsStore((state) => state.openTab);
   const activeTab = useTabsStore(selectActiveTab);
-  const { isSaveModalOpen, setSaveModalOpen } = useTabsStore();
+  const isSaveModalOpen = useTabsStore((s) => s.isSaveModalOpen);
+  const setSaveModalOpen = useTabsStore((s) => s.setSaveModalOpen);
 
   return (
     <main style={styles.root}>
+      <ActivityBar />
       <Sidebar />
       <div style={styles.main}>
         <TabBar />

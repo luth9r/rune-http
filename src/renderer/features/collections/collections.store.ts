@@ -15,7 +15,8 @@ interface CollectionsState {
     collectionId: string,
     request: Omit<HttpRequest, "id">,
     parentId?: string,
-  ) => void;
+  ) => string;
+  renameItem: (collectionId: string, itemId: string, newName: string) => void;
   addFolder: (collectionId: string, name: string, parentId?: string) => void;
   removeItem: (collectionId: string, itemId: string) => void;
   toggleFolder: (collectionId: string, itemId: string) => void;
@@ -77,16 +78,16 @@ export const useCollectionsStore = create<CollectionsState>()(
         }),
 
       addRequest: (collectionId, request, parentId) => {
-        const newId = uuid();
+        const itemId = uuid();
         set((state) => {
           const col = state.collections.find((c) => c.id === collectionId);
           if (!col) return;
 
           const newRequestItem: CollectionItem = {
-            id: uuid(),
+            id: itemId,
             type: "request",
             name: request.name || "New Request",
-            request: { ...request, id: uuid() },
+            request: { ...request, id: itemId },
           };
 
           if (parentId) {
@@ -99,7 +100,17 @@ export const useCollectionsStore = create<CollectionsState>()(
           }
           col.updatedAt = Date.now();
         });
+
+        return itemId;
       },
+
+      renameItem: (collectionId, itemId, newName) =>
+        set((state) => {
+          const col = state.collections.find((c) => c.id === collectionId);
+          if (!col) return;
+          const item = findItem(col.items, itemId);
+          if (item) item.name = newName;
+        }),
 
       addFolder: (collectionId, name, parentId) =>
         set((state) => {

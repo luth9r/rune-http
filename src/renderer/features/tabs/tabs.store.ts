@@ -21,6 +21,8 @@ function createEmptyTab(overrides?: Partial<Tab>): Tab {
     error: null,
     isDirty: false,
     savedState: null,
+    requestId: undefined,
+    collectionId: undefined,
     ...overrides,
   };
 }
@@ -40,6 +42,7 @@ interface TabsState {
     error?: string | null,
   ) => void;
   markClean: (id: string) => void;
+  saveTab: (id: string, updateRequestFn: any) => void;
   isSaveModalOpen: boolean;
   setSaveModalOpen: (open: boolean) => void;
 }
@@ -59,12 +62,22 @@ const initialTab = createEmptyTab();
 
 export const useTabsStore = create<TabsState>()(
   persist(
-    immer((set) => ({
+    immer((set, get) => ({
       tabs: [initialTab],
       activeTabId: initialTab.id,
 
       openTab: (overrides) =>
         set((state) => {
+          if (overrides?.requestId) {
+            const existingTab = state.tabs.find(
+              (t) => t.requestId === overrides.requestId,
+            );
+            if (existingTab) {
+              state.activeTabId = existingTab.id;
+              return;
+            }
+          }
+
           const tab = createEmptyTab(overrides);
           tab.savedState = getCompareState(tab);
           tab.isDirty = false;
@@ -143,6 +156,61 @@ export const useTabsStore = create<TabsState>()(
             tab.savedState = getCompareState(tab);
           }
         }),
+
+      saveTab: (id, updateRequestFn) => {
+        const state = get();
+        const tab = state.tabs.find((t) => t.id === id);
+        if (!tab || !tab.isDirty) return;
+
+        let finalBody = tab.body;
+        if (tab.bodyType === "json" && tab.body) {
+          try {
+            finalBody = JSON.stringify(JSON.parse(tab.body), null, 2);
+            set((s) => {
+              const t = s.tabs.find((x) => x.id === id);
+              if (t) t.body = finalBody;
+            });
+          } catch (e) {}
+        }
+
+        if (!tab) {
+          console.error("Tab not found:", id);
+          return;
+        }
+
+        if (!tab.isDirty) {
+          console.warn("Tab is clean, nothing to save");
+          return;
+        }
+
+        if (!tab.requestId || !tab.collectionId) {
+          set((s) => {
+            s.isSaveModalOpen = true;
+          });
+          return;
+        }
+
+        console.log("Updating EXISTING tab in collection");
+        updateRequestFn(tab.collectionId, tab.requestId, {
+          method: tab.method,
+          url: tab.url,
+          headers: tab.headers,
+          params: tab.params,
+          body: finalBody,
+          bodyType: tab.bodyType,
+          auth: tab.auth,
+          name: tab.name,
+        });
+
+        set((s) => {
+          const t = s.tabs.find((item) => item.id === id);
+          if (t) {
+            t.body = finalBody;
+            t.isDirty = false;
+            t.savedState = getCompareState(t);
+          }
+        });
+      },
 
       isSaveModalOpen: false,
       setSaveModalOpen: (open) =>
