@@ -48,7 +48,6 @@ export function useShortcuts() {
 
       // Alt + Digit (Switch Tabs 1-9)
       if (e.altKey && !modifier) {
-        // Коди цифр виглядають як "Digit1", "Digit2" і т.д.
         if (e.code.startsWith("Digit")) {
           const digit = parseInt(e.code.replace("Digit", ""));
           if (digit >= 1 && digit <= 9) {

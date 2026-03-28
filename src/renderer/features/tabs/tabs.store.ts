@@ -34,6 +34,7 @@ interface TabsState {
   closeTab: (id: string) => void;
   setActiveTab: (id: string) => void;
   updateTab: (id: string, patch: Partial<Tab>) => void;
+  updateTabByRequestId: (requestId: string, patch: Partial<Tab>) => void;
   setTabLoading: (id: string, isLoading: boolean) => void;
   reorderTabs: (activeId: string, overId: string) => void;
   setTabResponse: (
@@ -101,6 +102,16 @@ export const useTabsStore = create<TabsState>()(
       setActiveTab: (id) =>
         set((state) => {
           state.activeTabId = id;
+        }),
+
+      updateTabByRequestId: (requestId, patch) =>
+        set((state) => {
+          const tab = state.tabs.find((t) => t.requestId === requestId);
+          if (tab) {
+            Object.assign(tab, patch);
+            tab.savedState = getCompareState(tab);
+            tab.isDirty = false;
+          }
         }),
 
       updateTab: (id, patch) =>

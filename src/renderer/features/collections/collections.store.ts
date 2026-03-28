@@ -5,46 +5,30 @@ import { v4 as uuid } from "uuid";
 import type { Collection, CollectionItem } from "@/types";
 import type { HttpRequest } from "@/types";
 import { electronStorage } from "renderer/lib/electronStorage";
+import { useTabsStore } from "../tabs/tabs.store";
 
 interface CollectionsState {
   collections: Collection[];
   addCollection: (name: string) => void;
   removeCollection: (id: string) => void;
   renameCollection: (id: string, name: string) => void;
+  toggleCollection: (id: string) => void;
   addRequest: (
     collectionId: string,
     request: Omit<HttpRequest, "id">,
-    parentId?: string,
   ) => string;
   renameItem: (collectionId: string, itemId: string, newName: string) => void;
-  addFolder: (collectionId: string, name: string, parentId?: string) => void;
+  moveItem: (
+    itemId: string,
+    targetId: string,
+    position: "before" | "after" | "inside",
+  ) => void;
   removeItem: (collectionId: string, itemId: string) => void;
-  toggleFolder: (collectionId: string, itemId: string) => void;
   updateRequest: (
     collectionId: string,
     itemId: string,
     patch: Partial<HttpRequest>,
   ) => void;
-}
-
-function findItem(items: CollectionItem[], id: string): CollectionItem | null {
-  for (const item of items) {
-    if (item.id === id) return item;
-    if (item.children) {
-      const found = findItem(item.children, id);
-      if (found) return found;
-    }
-  }
-  return null;
-}
-
-function findAndRemove(items: CollectionItem[], id: string): boolean {
-  const idx = items.findIndex((i) => i.id === id);
-  if (idx !== -1) {
-    items.splice(idx, 1);
-    return true;
-  }
-  return items.some((i) => i.children && findAndRemove(i.children, id));
 }
 
 export const useCollectionsStore = create<CollectionsState>()(
@@ -58,6 +42,7 @@ export const useCollectionsStore = create<CollectionsState>()(
             id: uuid(),
             name,
             items: [],
+            isOpen: true,
             createdAt: Date.now(),
             updatedAt: Date.now(),
           });
@@ -77,30 +62,25 @@ export const useCollectionsStore = create<CollectionsState>()(
           }
         }),
 
-      addRequest: (collectionId, request, parentId) => {
+      toggleCollection: (id) =>
+        set((state) => {
+          const col = state.collections.find((c) => c.id === id);
+          if (col) col.isOpen = !col.isOpen;
+        }),
+
+      addRequest: (collectionId, request) => {
         const itemId = uuid();
         set((state) => {
           const col = state.collections.find((c) => c.id === collectionId);
           if (!col) return;
-
-          const newRequestItem: CollectionItem = {
+          col.items.push({
             id: itemId,
             type: "request",
             name: request.name || "New Request",
             request: { ...request, id: itemId },
-          };
-
-          if (parentId) {
-            const parent = findItem(col.items, parentId);
-            if (parent?.children) {
-              parent.children.push(newRequestItem);
-            }
-          } else {
-            col.items.push(newRequestItem);
-          }
+          });
           col.updatedAt = Date.now();
         });
-
         return itemId;
       },
 
@@ -108,62 +88,102 @@ export const useCollectionsStore = create<CollectionsState>()(
         set((state) => {
           const col = state.collections.find((c) => c.id === collectionId);
           if (!col) return;
-          const item = findItem(col.items, itemId);
-          if (item) item.name = newName;
+          const item = col.items.find((i) => i.id === itemId);
+          if (item) {
+            item.name = newName;
+            if (item.request) item.request.name = newName;
+            useTabsStore
+              .getState()
+              .updateTabByRequestId(itemId, { name: newName });
+          }
         }),
 
-      addFolder: (collectionId, name, parentId) =>
+      moveItem: (itemId, targetId, position) =>
         set((state) => {
-          const col = state.collections.find((c) => c.id === collectionId);
-          if (!col) return;
-          const folder: CollectionItem = {
-            id: uuid(),
-            type: "folder",
-            name,
-            children: [],
-            isOpen: true,
-          };
-          if (parentId) {
-            const parent = findItem(col.items, parentId);
-            if (parent?.children) parent.children.push(folder);
-          } else {
-            col.items.push(folder);
+          const activeColIdx = state.collections.findIndex(
+            (c) => c.id === itemId,
+          );
+          if (activeColIdx !== -1) {
+            let targetColIdx = state.collections.findIndex(
+              (c) => c.id === targetId,
+            );
+
+            if (targetColIdx === -1) {
+              targetColIdx = state.collections.findIndex((c) =>
+                c.items.some((i) => i.id === targetId),
+              );
+            }
+
+            if (targetColIdx !== -1 && activeColIdx !== targetColIdx) {
+              const [movedCol] = state.collections.splice(activeColIdx, 1);
+              const finalTargetIdx = state.collections.findIndex(
+                (c) =>
+                  c.id === state.collections[targetColIdx]?.id ||
+                  c.id === targetId,
+              );
+              const insertIdx =
+                position === "after" ? finalTargetIdx + 1 : finalTargetIdx;
+              state.collections.splice(insertIdx, 0, movedCol);
+            }
+            return;
+          }
+
+          let movedItem: CollectionItem | null = null;
+
+          for (const col of state.collections) {
+            const idx = col.items.findIndex((i) => i.id === itemId);
+            if (idx !== -1) {
+              [movedItem] = col.items.splice(idx, 1);
+              col.updatedAt = Date.now();
+              break;
+            }
+          }
+
+          if (!movedItem) return;
+
+          for (const col of state.collections) {
+            if (col.id === targetId) {
+              if (position === "after") col.items.push(movedItem);
+              else col.items.unshift(movedItem);
+              col.updatedAt = Date.now();
+              return;
+            }
+
+            const targetIdx = col.items.findIndex((i) => i.id === targetId);
+            if (targetIdx !== -1) {
+              const insertIdx =
+                position === "after" ? targetIdx + 1 : targetIdx;
+              col.items.splice(insertIdx, 0, movedItem);
+              col.updatedAt = Date.now();
+              return;
+            }
           }
         }),
 
       removeItem: (collectionId, itemId) =>
         set((state) => {
           const col = state.collections.find((c) => c.id === collectionId);
-          if (col) findAndRemove(col.items, itemId);
-        }),
-
-      toggleFolder: (collectionId, itemId) =>
-        set((state) => {
-          const col = state.collections.find((c) => c.id === collectionId);
           if (!col) return;
-          const item = findItem(col.items, itemId);
-          if (item?.type === "folder") item.isOpen = !item.isOpen;
+          col.items = col.items.filter((i) => i.id !== itemId);
+          col.updatedAt = Date.now();
         }),
 
       updateRequest: (collectionId, itemId, patch) =>
         set((state) => {
           const col = state.collections.find((c) => c.id === collectionId);
           if (!col) return;
-          const item = findItem(col.items, itemId);
+          const item = col.items.find((i) => i.id === itemId);
           if (item?.request) Object.assign(item.request, patch);
         }),
     })),
     {
       name: "rune-collections",
       storage: createJSONStorage(() => electronStorage),
-      onRehydrateStorage: (state) => {
+      onRehydrateStorage: () => {
         console.log("Hydration starting...");
-        return (state, error) => {
-          if (error) {
-            console.error("An error happened during hydration", error);
-          } else {
-            console.log("Hydration finished");
-          }
+        return (_state, error) => {
+          if (error) console.error("Hydration error", error);
+          else console.log("Hydration finished");
         };
       },
     },

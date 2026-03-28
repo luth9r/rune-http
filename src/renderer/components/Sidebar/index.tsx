@@ -1,376 +1,585 @@
-import { useState } from "react";
-import {
-  Plus,
-  FolderPlus,
-  ChevronRight,
-  ChevronDown,
-  Folder,
-  FolderOpen,
-  Trash2,
-} from "lucide-react";
+import React, { useState, useMemo, useRef, useCallback } from "react";
+import { Plus, Trash2, ChevronRight, ChevronDown } from "lucide-react";
 import { useCollectionsStore } from "@/features/collections/collections.store";
 import { useTabsStore } from "@/features/tabs/tabs.store";
 import { getMethodColor } from "@/utils/methodColor";
-import type { Collection, CollectionItem } from "@/types";
+import type { CollectionItem } from "@/types";
 import { Logo } from "../shared/Logo";
 import { Button } from "../ui/button";
-import { ContextMenu } from "../shared/ContextMenu";
+import {
+  DndContext,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+  Active,
+  MeasuringStrategy,
+  pointerWithin,
+  rectIntersection,
+} from "@dnd-kit/core";
+import { useDraggable, useDroppable } from "@dnd-kit/core";
 
-function RequestItem({
+// ─── Types and Internal Components ──────────────────────────────────────────
+
+type DropIndicator =
+  | { type: "before"; id: string }
+  | { type: "after"; id: string }
+  | { type: "collection"; id: string }
+  | null;
+
+// ─── Pure UI item ─────────────────────────────────────────────────────────────
+
+interface SidebarItemProps {
+  item:
+    | CollectionItem
+    | { id: string; name: string; type: "collection"; isOpen?: boolean };
+  hovered?: boolean;
+  isDragging?: boolean;
+  isDropTarget?: boolean;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+  onClick?: () => void;
+  onRemove?: () => void;
+  onAddRequest?: () => void;
+  onToggle?: () => void;
+  style?: React.CSSProperties;
+}
+
+function SidebarItem({
   item,
-  collectionId,
-}: {
-  item: CollectionItem;
-  collectionId: string;
-}) {
-  const { removeItem, renameItem } = useCollectionsStore();
-  const { openTab, tabs, setActiveTab } = useTabsStore();
-  const [hovered, setHovered] = useState(false);
-  const [menuPos, setMenuPos] = useState<{ x: number; y: number } | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editName, setEditName] = useState(item.name);
+  hovered,
+  isDragging,
+  isDropTarget,
+  onMouseEnter,
+  onMouseLeave,
+  onClick,
+  onRemove,
+  onAddRequest,
+  onToggle,
+  style: externalStyle,
+}: SidebarItemProps) {
+  const isCollection = item.type === "collection";
 
-  const handleRename = () => {
-    if (editName.trim() && editName !== item.name) {
-      renameItem(collectionId, item.id, editName.trim());
-    }
-    setIsEditing(false);
+  const baseStyle: React.CSSProperties = {
+    ...styles.itemBase,
+    ...externalStyle,
+    opacity: 1,
+    background: isDropTarget
+      ? "color-mix(in srgb, var(--eos-accent) 12%, transparent)"
+      : hovered
+        ? "var(--eos-surface-2)"
+        : "transparent",
+    outline: isDropTarget ? "1px solid var(--eos-accent)" : "none",
+    outlineOffset: -1,
+    cursor: "pointer",
+    transition: "background 0.1s, outline 0.1s",
   };
 
-  function handleOpen() {
-    if (!item.request) return;
-
-    openTab({
-      requestId: item.id,
-      collectionId: collectionId,
-      name: item.request.name,
-      method: item.request.method,
-      url: item.request.url,
-      headers: item.request.headers,
-      params: item.request.params,
-      body: item.request.body,
-      bodyType: item.request.bodyType,
-      auth: item.request.auth,
-      isDirty: false,
-    });
-  }
-
-  if (isEditing) {
+  if (isCollection) {
     return (
-      <div style={{ padding: "2px 12px" }}>
-        <input
-          autoFocus
-          style={styles.inlineInput}
-          value={editName}
-          onChange={(e) => setEditName(e.target.value)}
-          onBlur={handleRename}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") handleRename();
-            if (e.key === "Escape") {
-              setIsEditing(false);
-              setEditName(item.name);
-            }
-          }}
-        />
+      <div
+        style={{
+          ...baseStyle,
+          fontWeight: 700,
+          fontSize: 11,
+          color: isDropTarget ? "var(--eos-accent)" : "var(--eos-muted)",
+          textTransform: "uppercase",
+          letterSpacing: "0.05em",
+        }}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        onClick={onToggle}
+      >
+        <span style={{ display: "flex", alignItems: "center", marginRight: 4 }}>
+          {item.isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+        </span>
+        <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis" }}>
+          {item.name}
+        </span>
+        <div style={{ display: "flex", gap: 2, opacity: hovered ? 1 : 0 }}>
+          <Button
+            variant="icon"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddRequest?.();
+            }}
+          >
+            <Plus size={12} />
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
     <div
-      onClick={() => item.request && handleOpen()}
-      onContextMenu={(e) => {
-        e.preventDefault();
-        setMenuPos({ x: e.clientX, y: e.clientY });
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{ ...styles.requestItem, ...(hovered ? styles.itemHover : {}) }}
+      style={baseStyle}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      onClick={onClick}
     >
       <span
         style={{
-          ...styles.methodLabel,
-          color: getMethodColor(item.request!.method),
+          ...styles.method,
+          color: getMethodColor(
+            (item as CollectionItem).request?.method || "GET",
+          ),
         }}
       >
-        {item.request!.method}
+        {(item as CollectionItem).request?.method}
       </span>
       <span style={styles.itemName}>{item.name}</span>
-
-      {menuPos && (
-        <ContextMenu
-          x={menuPos.x}
-          y={menuPos.y}
-          onClose={() => setMenuPos(null)}
-          options={[
-            { label: "Rename", onClick: () => setIsEditing(true) },
-            { label: "Duplicate", onClick: () => console.log("Duplicate") },
-            {
-              label: "Delete",
-              onClick: () => removeItem(collectionId, item.id),
-              danger: true,
-            },
-          ]}
-        />
-      )}
-    </div>
-  );
-}
-
-function FolderItem({
-  item,
-  collectionId,
-}: {
-  item: CollectionItem;
-  collectionId: string;
-}) {
-  const { toggleFolder, removeItem } = useCollectionsStore();
-  const [hovered, setHovered] = useState(false);
-
-  return (
-    <div>
-      <div
-        onClick={() => toggleFolder(collectionId, item.id)}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        style={{ ...styles.folderRow, ...(hovered ? styles.itemHover : {}) }}
-      >
-        {item.isOpen ? (
-          <ChevronDown size={12} style={styles.chevron} />
-        ) : (
-          <ChevronRight size={12} style={styles.chevron} />
-        )}
-        {item.isOpen ? (
-          <FolderOpen
-            size={13}
-            style={{ color: "var(--eos-accent)", flexShrink: 0 }}
-          />
-        ) : (
-          <Folder
-            size={13}
-            style={{ color: "var(--eos-muted)", flexShrink: 0 }}
-          />
-        )}
-        <span style={styles.itemName}>{item.name}</span>
-        <Button
-          variant="ghost-danger"
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            removeItem(collectionId, item.id);
-          }}
-          style={{
-            opacity: hovered ? 1 : 0,
-            width: 24,
-            height: 24,
-            padding: 0,
-          }}
-        >
-          <Trash2 size={12} />
-        </Button>
-      </div>
-
-      {item.isOpen && item.children && item.children.length > 0 && (
-        <div style={styles.children}>
-          {item.children.map((child) =>
-            child.type === "folder" ? (
-              <FolderItem
-                key={child.id}
-                item={child}
-                collectionId={collectionId}
-              />
-            ) : (
-              <RequestItem
-                key={child.id}
-                item={child}
-                collectionId={collectionId}
-              />
-            ),
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function CollectionBlock({ collection }: { collection: Collection }) {
-  const [isOpen, setIsOpen] = useState(true);
-  const [isAdding, setIsAdding] = useState(false);
-  const [newName, setNewName] = useState("");
-  const [hovered, setHovered] = useState(false);
-  const { addRequest, addFolder, removeCollection } = useCollectionsStore();
-
-  function handleAddRequest() {
-    if (!newName.trim()) return;
-    addRequest(collection.id, {
-      name: newName.trim(),
-      method: "GET",
-      url: "",
-      headers: [],
-      params: [],
-      body: "",
-      bodyType: "none",
-      auth: { type: "none" },
-    });
-    setNewName("");
-    setIsAdding(false);
-  }
-
-  return (
-    <div style={styles.collectionBlock}>
-      <div
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        style={{
-          ...styles.collectionHeader,
-          ...(hovered ? styles.itemHover : {}),
-        }}
-      >
-        <div onClick={() => setIsOpen(!isOpen)} style={styles.collectionTitle}>
-          {isOpen ? (
-            <ChevronDown size={13} style={styles.chevron} />
-          ) : (
-            <ChevronRight size={13} style={styles.chevron} />
-          )}
-          <span style={styles.collectionName}>{collection.name}</span>
-        </div>
-
-        <div style={{ ...styles.collectionActions, opacity: hovered ? 1 : 0 }}>
-          <Button
-            variant="icon"
-            onClick={() => setIsAdding(true)}
-            title="Add request"
-            style={{ width: 24, height: 24 }}
-          >
-            <Plus size={13} />
-          </Button>
-          <Button
-            variant="icon"
-            onClick={() => addFolder(collection.id, "New Folder")}
-            title="Add folder"
-            style={{ width: 24, height: 24 }}
-          >
-            <FolderPlus size={13} />
-          </Button>
+      <div style={{ ...styles.actions, opacity: hovered ? 1 : 0 }}>
+        {onRemove && (
           <Button
             variant="ghost-danger"
             size="sm"
-            onClick={() => removeCollection(collection.id)}
-            title="Delete collection"
-            style={{ width: 24, height: 24, padding: 0 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+            style={{ width: 22, height: 22, padding: 0 }}
           >
-            <Trash2 size={13} />
+            <Trash2 size={12} />
           </Button>
-        </div>
+        )}
       </div>
-
-      {isOpen && (
-        <div style={styles.collectionItems}>
-          {collection.items.map((item) =>
-            item.type === "folder" ? (
-              <FolderItem
-                key={item.id}
-                item={item}
-                collectionId={collection.id}
-              />
-            ) : (
-              <RequestItem
-                key={item.id}
-                item={item}
-                collectionId={collection.id}
-              />
-            ),
-          )}
-          {isAdding && (
-            <div style={{ padding: "4px 8px" }}>
-              <input
-                autoFocus
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleAddRequest();
-                  if (e.key === "Escape") {
-                    setIsAdding(false);
-                    setNewName("");
-                  }
-                }}
-                placeholder="Request name..."
-                style={styles.inlineInput}
-              />
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }
 
-export function Sidebar() {
-  const { collections, addCollection } = useCollectionsStore();
-  const [isAddingCollection, setIsAddingCollection] = useState(false);
-  const [newCollectionName, setNewCollectionName] = useState("");
+function DropLine({ indent = 24 }: { indent?: number }) {
+  return (
+    <div
+      style={{
+        position: "relative",
+        height: 0,
+        marginLeft: indent,
+        marginRight: 8,
+        zIndex: 100,
+        pointerEvents: "none",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: -1,
+          left: 0,
+          right: 0,
+          height: 2,
+          borderRadius: 1,
+          background: "var(--eos-accent)",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: -3,
+          left: -4,
+          width: 6,
+          height: 6,
+          borderRadius: "50%",
+          background: "var(--eos-accent)",
+        }}
+      />
+    </div>
+  );
+}
 
-  function handleAddCollection() {
-    if (!newCollectionName.trim()) return;
-    addCollection(newCollectionName.trim());
-    setNewCollectionName("");
-    setIsAddingCollection(false);
-  }
+// ─── Draggable row ────────────────────────────────────────────────────────────
+
+function DraggableRow({
+  id,
+  type,
+  item,
+  collectionId,
+  dropIndicator,
+}: {
+  id: string;
+  type: "collection" | "request";
+  item: any;
+  collectionId?: string;
+  dropIndicator: DropIndicator;
+}) {
+  const { removeItem, addRequest, toggleCollection } = useCollectionsStore();
+  const { openTab } = useTabsStore();
+  const [hovered, setHovered] = useState(false);
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef: setDragRef,
+    isDragging,
+  } = useDraggable({
+    id,
+    data: { type, item, collectionId },
+  });
+
+  const { setNodeRef: setDropRef } = useDroppable({
+    id,
+    data: { type, item, collectionId },
+  });
+
+  const setNodeRef = useCallback(
+    (node: HTMLElement | null) => {
+      setDragRef(node);
+      setDropRef(node);
+    },
+    [setDragRef, setDropRef],
+  );
+
+  const isCollection = type === "collection";
+  const isDropTarget =
+    dropIndicator?.type === "collection" && dropIndicator.id === id;
+  const showBefore =
+    dropIndicator?.type === "before" && dropIndicator.id === id;
+  const showAfter = dropIndicator?.type === "after" && dropIndicator.id === id;
+
+  return (
+    <>
+      {showBefore && <DropLine indent={isCollection ? 12 : 24} />}
+      <div ref={setNodeRef} {...attributes} {...listeners}>
+        <SidebarItem
+          item={isCollection ? { ...item, type: "collection" } : item}
+          hovered={hovered}
+          isDragging={isDragging}
+          isDropTarget={isDropTarget}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+          onClick={() =>
+            !isCollection &&
+            item.request &&
+            openTab({ requestId: item.id, collectionId, ...item.request })
+          }
+          onRemove={
+            !isCollection ? () => removeItem(collectionId!, item.id) : undefined
+          }
+          onAddRequest={
+            isCollection
+              ? () =>
+                  addRequest(item.id, {
+                    name: "New Request",
+                    method: "GET",
+                    url: "",
+                    headers: [],
+                    params: [],
+                    body: "",
+                    bodyType: "none",
+                    auth: { type: "none" },
+                  })
+              : undefined
+          }
+          onToggle={isCollection ? () => toggleCollection(item.id) : undefined}
+          style={{
+            paddingLeft: isCollection ? 12 : 24,
+            marginTop: isCollection ? 12 : 0,
+          }}
+        />
+      </div>
+      {showAfter && <DropLine indent={isCollection ? 12 : 24} />}
+    </>
+  );
+}
+
+function EmptyCollectionZone({
+  collectionId,
+  isActive,
+}: {
+  collectionId: string;
+  isActive: boolean;
+}) {
+  const { setNodeRef } = useDroppable({
+    id: `empty-${collectionId}`,
+    data: { type: "emptyCollection", collectionId },
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        height: isActive ? 28 : 8,
+        marginLeft: 24,
+        marginRight: 8,
+        marginBottom: 2,
+        borderRadius: "var(--radius)",
+        border: isActive
+          ? "1px dashed var(--eos-accent)"
+          : "1px dashed transparent",
+        background: isActive
+          ? "color-mix(in srgb, var(--eos-accent) 8%, transparent)"
+          : "transparent",
+        transition: "all 0.15s ease",
+      }}
+    />
+  );
+}
+
+// ─── Sidebar ──────────────────────────────────────────────────────────────────
+
+export function Sidebar() {
+  const { collections, moveItem, addCollection, toggleCollection } =
+    useCollectionsStore();
+  const [activeItem, setActiveItem] = useState<Active | null>(null);
+  const [dropIndicator, setDropIndicator] = useState<DropIndicator>(null);
+  const [isAddingCol, setIsAddingCol] = useState(false);
+  const [newColName, setNewColName] = useState("");
+  const openSnapshot = useRef<Record<string, boolean>>({});
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+  );
+
+  const idToType = useMemo(() => {
+    const map: Record<string, "collection" | "request"> = {};
+    collections.forEach((col) => {
+      map[col.id] = "collection";
+      col.items.forEach((item) => {
+        map[item.id] = "request";
+      });
+    });
+    return map;
+  }, [collections]);
+
+  const collisionDetection = useCallback((args: any) => {
+    const hits = pointerWithin(args);
+    return hits.length > 0 ? hits : rectIntersection(args);
+  }, []);
+
+  const handleDragStart = useCallback(
+    (e: DragStartEvent) => {
+      setActiveItem(e.active);
+      setDropIndicator(null);
+
+      if (idToType[e.active.id as string] === "collection") {
+        const snapshot: Record<string, boolean> = {};
+        collections.forEach((c) => {
+          snapshot[c.id] = c.isOpen ?? true;
+        });
+        openSnapshot.current = snapshot;
+        collections.forEach((c) => {
+          if (c.isOpen !== false) toggleCollection(c.id);
+        });
+      }
+    },
+    [collections, idToType, toggleCollection],
+  );
+
+  const handleDragOver = useCallback(
+    (event: DragOverEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) {
+        setDropIndicator(null);
+        return;
+      }
+
+      const draggedId = active.id as string;
+      const overId = over.id as string;
+      const draggedType = idToType[draggedId];
+      const overType = idToType[overId];
+
+      if (overId.startsWith("empty-")) {
+        const colId = overId.replace("empty-", "");
+        setDropIndicator({ type: "collection", id: colId });
+        return;
+      }
+
+      if (draggedType === "collection" && overType === "collection") {
+        const activeRect = active.rect.current.translated;
+        const overRect = over.rect;
+        if (!activeRect || !overRect) return;
+        const activeCenter = activeRect.top + activeRect.height / 2;
+        const overCenter = overRect.top + overRect.height / 2;
+        setDropIndicator({
+          type: activeCenter < overCenter ? "before" : "after",
+          id: overId,
+        });
+        return;
+      }
+
+      if (draggedType === "request") {
+        if (overType === "collection") {
+          setDropIndicator({ type: "collection", id: overId });
+          return;
+        }
+        if (overType === "request") {
+          const activeRect = active.rect.current.translated;
+          const overRect = over.rect;
+          if (!activeRect || !overRect) return;
+          const activeCenter = activeRect.top + activeRect.height / 2;
+          const overCenter = overRect.top + overRect.height / 2;
+          setDropIndicator({
+            type: activeCenter < overCenter ? "before" : "after",
+            id: overId,
+          });
+        }
+      }
+    },
+    [idToType],
+  );
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      setActiveItem(null);
+      setDropIndicator(null);
+
+      const draggedType = idToType[active.id as string];
+
+      if (over && active.id !== over.id) {
+        const overId = over.id as string;
+
+        if (overId.startsWith("empty-")) {
+          const targetColId = overId.replace("empty-", "");
+          moveItem(active.id as string, targetColId, "inside");
+        } else {
+          const overType = idToType[overId];
+
+          if (draggedType === "collection" && overType === "collection") {
+            const activeIdx = collections.findIndex((c) => c.id === active.id);
+            const overIdx = collections.findIndex((c) => c.id === overId);
+            moveItem(
+              active.id as string,
+              overId,
+              overIdx < activeIdx ? "before" : "after",
+            );
+          } else if (draggedType === "request" && overType === "collection") {
+            moveItem(active.id as string, overId, "inside");
+          } else if (draggedType === "request" && overType === "request") {
+            const activeRect = active.rect.current.translated;
+            const overRect = over.rect;
+            if (activeRect && overRect) {
+              const ac = activeRect.top + activeRect.height / 2;
+              const oc = overRect.top + overRect.height / 2;
+              moveItem(
+                active.id as string,
+                overId,
+                ac < oc ? "before" : "after",
+              );
+            }
+          }
+        }
+      }
+
+      if (draggedType === "collection") {
+        const snapshot = openSnapshot.current;
+        setTimeout(() => {
+          useCollectionsStore.getState().collections.forEach((c) => {
+            if (snapshot[c.id] && c.isOpen === false) toggleCollection(c.id);
+          });
+          openSnapshot.current = {};
+        }, 0);
+      }
+    },
+    [collections, idToType, moveItem, toggleCollection],
+  );
+
+  const activeEmptyColId = useMemo(() => {
+    if (!dropIndicator || dropIndicator.type !== "collection") return null;
+    const col = collections.find((c) => c.id === dropIndicator.id);
+    if (col && col.items.length === 0) return col.id;
+    return null;
+  }, [dropIndicator, collections]);
 
   return (
     <aside style={styles.sidebar}>
-      {/* Header */}
       <div style={styles.header}>
-        <Logo size="sm" style={{ marginBottom: 0 }} />
-        <Button
-          variant="icon"
-          onClick={() => setIsAddingCollection(true)}
-          title="New collection"
-        >
+        <Logo size="sm" />
+        <Button variant="icon" onClick={() => setIsAddingCol(true)}>
           <Plus size={16} />
         </Button>
       </div>
 
-      {/* New collection input */}
-      {isAddingCollection && (
-        <div style={styles.newCollectionWrap}>
+      {isAddingCol && (
+        <div style={styles.newColInput}>
           <input
             autoFocus
-            value={newCollectionName}
-            onChange={(e) => setNewCollectionName(e.target.value)}
+            style={styles.inlineInput}
+            value={newColName}
+            onChange={(e) => setNewColName(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") handleAddCollection();
-              if (e.key === "Escape") {
-                setIsAddingCollection(false);
-                setNewCollectionName("");
+              if (e.key === "Enter" && newColName.trim()) {
+                addCollection(newColName.trim());
+                setNewColName("");
+                setIsAddingCol(false);
               }
+              if (e.key === "Escape") setIsAddingCol(false);
             }}
             placeholder="Collection name..."
-            style={styles.inlineInput}
           />
         </div>
       )}
 
-      {/* List */}
       <div style={styles.list}>
-        {collections.length === 0 ? (
-          <div style={styles.empty}>
-            <p>No collections yet</p>
-            <p style={{ color: "var(--eos-muted-2)", marginTop: 4 }}>
-              Click + to create one
-            </p>
-          </div>
-        ) : (
-          collections.map((col) => (
-            <CollectionBlock key={col.id} collection={col} />
-          ))
-        )}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={collisionDetection}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+          measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
+        >
+          {collections.map((col) => (
+            <React.Fragment key={col.id}>
+              <DraggableRow
+                id={col.id}
+                type="collection"
+                item={col}
+                dropIndicator={dropIndicator}
+              />
+              {col.isOpen !== false && (
+                <>
+                  {col.items.map((item) => (
+                    <DraggableRow
+                      key={item.id}
+                      id={item.id}
+                      type="request"
+                      item={item}
+                      collectionId={col.id}
+                      dropIndicator={dropIndicator}
+                    />
+                  ))}
+                  {col.items.length === 0 && (
+                    <EmptyCollectionZone
+                      collectionId={col.id}
+                      isActive={activeEmptyColId === col.id}
+                    />
+                  )}
+                </>
+              )}
+            </React.Fragment>
+          ))}
+
+          <DragOverlay dropAnimation={null}>
+            {activeItem ? (
+              <SidebarItem
+                item={activeItem.data.current?.item}
+                style={{
+                  background: "var(--eos-surface-2)",
+                  boxShadow:
+                    "0 4px 16px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.3)",
+                  borderRadius: "var(--radius)",
+                  border: "1px solid var(--eos-border)",
+                  pointerEvents: "none",
+                  width: 240,
+                  paddingLeft:
+                    idToType[activeItem.id as string] === "collection"
+                      ? 12
+                      : 24,
+                  opacity: 1,
+                  cursor: "grabbing",
+                }}
+              />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
       </div>
     </aside>
   );
 }
-
-// ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = {
   sidebar: {
@@ -386,101 +595,19 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "10px 16px",
+    padding: "12px 16px",
     borderBottom: "1px solid var(--eos-border)",
     flexShrink: 0,
   },
-  logo: {
-    fontSize: 15,
-    fontWeight: 700,
-    letterSpacing: "0.05em",
-    color: "var(--eos-accent)",
-  },
-  newCollectionWrap: {
-    padding: "8px 12px",
-    borderBottom: "1px solid var(--eos-border)",
-  },
-  list: {
-    flex: 1,
-    overflowY: "auto",
-    padding: 8,
-  },
-  empty: {
-    textAlign: "center",
-    color: "var(--eos-muted)",
-    fontSize: 12,
-    paddingTop: 32,
-  },
-  collectionBlock: {
-    marginBottom: 4,
-  },
-  collectionHeader: {
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    padding: "6px 8px",
-    borderRadius: "var(--radius)",
-    cursor: "pointer",
-    transition: "background 0.1s",
-  },
-  collectionTitle: {
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    flex: 1,
-    minWidth: 0,
-  },
-  collectionName: {
-    fontSize: 11,
-    fontWeight: 600,
-    color: "var(--eos-text)",
-    textTransform: "uppercase",
-    letterSpacing: "0.08em",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-  },
-  collectionActions: {
-    display: "flex",
-    alignItems: "center",
-    gap: 2,
-    transition: "opacity 0.1s",
-  },
-  collectionItems: {
-    marginLeft: 8,
-  },
-  requestItem: {
+  list: { flex: 1, overflowY: "auto", padding: "12px 8px" },
+  itemBase: {
     display: "flex",
     alignItems: "center",
     gap: 8,
-    padding: "5px 12px",
+    padding: "6px 10px",
     borderRadius: "var(--radius)",
-    cursor: "pointer",
-    transition: "background 0.1s",
-  },
-  folderRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    padding: "5px 8px",
-    borderRadius: "var(--radius)",
-    cursor: "pointer",
-    transition: "background 0.1s",
-  },
-  itemHover: {
-    background: "var(--eos-surface-2)",
-  },
-  children: {
-    marginLeft: 16,
-    borderLeft: "1px solid var(--eos-border)",
-    paddingLeft: 4,
-  },
-  methodLabel: {
-    fontSize: 11,
-    fontWeight: 700,
-    fontFamily: "var(--font-mono)",
-    width: 48,
-    flexShrink: 0,
+    minHeight: 32,
+    margin: "1px 0",
   },
   itemName: {
     fontSize: 12,
@@ -488,20 +615,18 @@ const styles = {
     flex: 1,
     overflow: "hidden",
     textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
+    whiteSpace: "nowrap" as const,
   },
-  chevron: {
-    color: "var(--eos-muted)",
+  method: {
+    fontSize: 10,
+    fontWeight: 700,
+    fontFamily: "var(--font-mono)",
+    width: 34,
     flexShrink: 0,
   },
-  iconBtn: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "var(--eos-muted)",
-    transition: "color 0.1s",
-    padding: 2,
-    borderRadius: 4,
+  newColInput: {
+    padding: "8px 12px",
+    borderBottom: "1px solid var(--eos-border)",
   },
   inlineInput: {
     width: "100%",
@@ -511,5 +636,14 @@ const styles = {
     padding: "4px 8px",
     fontSize: 12,
     color: "var(--eos-text)",
+    outline: "none",
+  },
+  actions: {
+    display: "flex",
+    alignItems: "center",
+    gap: 2,
+    transition: "opacity 0.1s",
+    minWidth: 24,
+    justifyContent: "flex-end",
   },
 } satisfies Record<string, React.CSSProperties>;

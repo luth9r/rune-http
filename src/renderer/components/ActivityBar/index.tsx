@@ -5,7 +5,6 @@ export function ActivityBar() {
   return (
     <div style={styles.activityBar}>
       <div style={styles.topSection}>
-        {/* Кнопки перемикання розділів */}
         <Button variant="tab" active={true} style={styles.actionBtn}>
           <FolderTree size={20} />
         </Button>
