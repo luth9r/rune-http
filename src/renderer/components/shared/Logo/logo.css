@@ -1,0 +1,55 @@
+.logo-container {
+  display: flex;
+  align-items: center;
+  user-select: none;
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.logo-rune {
+  color: var(--eos-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-text {
+  color: var(--eos-text);
+  white-space: nowrap;
+}
+
+.logo-subtext {
+  color: var(--eos-muted);
+  font-weight: 400;
+}
+
+.logo-size-sm {
+  gap: 6px;
+}
+.logo-size-sm .logo-rune {
+  font-size: 18px;
+}
+.logo-size-sm .logo-text {
+  font-size: 14px;
+}
+
+.logo-size-md {
+  gap: 8px;
+}
+.logo-size-md .logo-rune {
+  font-size: 24px;
+}
+.logo-size-md .logo-text {
+  font-size: 20px;
+}
+
+.logo-size-lg {
+  gap: 12px;
+}
+.logo-size-lg .logo-rune {
+  font-size: 40px;
+}
+.logo-size-lg .logo-text {
+  font-size: 32px;
+}

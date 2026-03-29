@@ -1,0 +1,37 @@
+.activity-bar {
+  width: 48px;
+  background: var(--eos-bg);
+  border-right: 1px solid var(--eos-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px 0;
+  flex-shrink: 0;
+}
+
+.activity-bar-top,
+.activity-bar-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.activity-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 0 !important;
+  color: var(--eos-muted);
+  background: transparent;
+  border: none !important;
+}
+
+.activity-btn:hover {
+  color: var(--eos-text);
+  background: var(--eos-surface-2);
+}
+
+.activity-btn.is-active {
+  color: var(--eos-accent);
+  background: var(--eos-accent-dim);
+  box-shadow: 2px 0 0 0 var(--eos-accent) inset;
+}

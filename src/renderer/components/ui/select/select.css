@@ -1,0 +1,109 @@
+.sel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.sel__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  background: var(--eos-surface-2);
+  border: 1px solid var(--eos-border);
+  border-radius: var(--radius);
+  color: var(--eos-text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.sel__trigger:hover,
+.sel__trigger.open {
+  border-color: var(--eos-accent);
+}
+
+.sel__chevron {
+  color: var(--eos-muted);
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.sel__chevron.open {
+  transform: rotate(180deg);
+}
+
+.sel__dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 100%;
+  z-index: 100;
+  background: var(--eos-surface);
+  border: 1px solid var(--eos-border);
+  border-radius: var(--radius);
+  padding: 3px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.sel__option {
+  display: block;
+  width: 100%;
+  padding: 5px 10px;
+  font-size: 13px;
+  color: var(--eos-text);
+  background: none;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition-fast);
+}
+
+.sel__option:hover {
+  background: var(--eos-surface-2);
+}
+
+.sel__option.active {
+  background: var(--eos-accent-dim);
+  color: var(--eos-accent);
+}
+
+/* variant: method */
+.sel--method .sel__trigger,
+.sel--method .sel__option {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.sel--method {
+  min-width: 110px;
+}
+
+.sel__sizer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 0;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: inherit;
+  font-family: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.sel--method .sel__sizer {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 12px;
+}

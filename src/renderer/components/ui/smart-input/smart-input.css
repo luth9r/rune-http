@@ -1,0 +1,153 @@
+.smart-input {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  background: var(--eos-surface);
+  border: 1px solid var(--eos-border);
+  border-radius: var(--radius);
+
+  overflow: visible;
+}
+
+.smart-input:focus-within {
+  border-color: var(--eos-accent);
+}
+
+.smart-input__editor,
+.smart-input__input {
+  flex: 1;
+  width: 0;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-family: var(--font-mono);
+  color: var(--eos-text);
+  line-height: 1.4;
+  background: transparent;
+  border: none !important;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.smart-input__editor {
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.smart-input__editor::-webkit-scrollbar {
+  display: none;
+}
+
+.smart-input__editor:empty::before {
+  content: attr(data-placeholder);
+  color: var(--eos-muted);
+  pointer-events: none;
+}
+
+.smart-input__eye {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  color: var(--eos-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.smart-input__eye:hover {
+  color: var(--eos-text);
+}
+
+.smart-input__suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: var(--eos-surface);
+  border: 1px solid var(--eos-border);
+  border-radius: var(--radius);
+  padding: 3px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.smart-input__suggestion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 5px 10px;
+  gap: 12px;
+  border-radius: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.smart-input__suggestion:hover,
+.smart-input__suggestion.active {
+  background: var(--eos-surface-2);
+}
+
+.smart-input__sug-name {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--eos-accent);
+}
+
+.smart-input__sug-value {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--eos-muted);
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.si-var {
+  border-radius: 3px;
+  padding: 0 2px;
+}
+.si-var.resolved {
+  color: var(--eos-post);
+  background: rgba(74, 222, 128, 0.1);
+}
+.si-var.unresolved {
+  color: var(--eos-error);
+  background: rgba(248, 113, 113, 0.1);
+}
+
+.si-tooltip {
+  position: fixed;
+  transform: translate(-50%, -100%);
+  background: var(--eos-surface);
+  border: 1px solid var(--eos-border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--eos-text);
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.smart-input__editor::selection,
+.smart-input__input::selection {
+  background: var(--eos-accent-dim, rgba(var(--eos-accent-rgb), 0.3));
+  color: var(--eos-text);
+}
+
+.smart-input__editor,
+.smart-input__input,
+.smart-input__sug-name,
+.smart-input__sug-value {
+  font-family: var(--font-mono), monospace !important;
+}

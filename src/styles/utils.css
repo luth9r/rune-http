@@ -1,0 +1,33 @@
+.radius-sm {
+  border-radius: calc(var(--radius) - 4px);
+}
+.radius-md {
+  border-radius: calc(var(--radius) - 2px);
+}
+.radius-lg {
+  border-radius: var(--radius);
+}
+
+.dirty-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--eos-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--eos-accent);
+}
+
+.drop-line-indicator {
+  height: 2px;
+  background: var(--eos-accent);
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

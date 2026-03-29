@@ -4,23 +4,24 @@ import type {
   BodyType,
   AuthConfig,
   KeyValuePair,
-} from "./http.types";
+} from './http.types'
 
 export interface Tab {
-  id: string;
-  requestId?: string; // binding for a collection
-  collectionId?: string;
-  name: string;
-  method: HttpMethod;
-  url: string;
-  headers: KeyValuePair[];
-  params: KeyValuePair[];
-  body: string;
-  bodyType: BodyType;
-  auth: AuthConfig;
-  response: HttpResponse | null;
-  isLoading: boolean;
-  error: string | null;
-  isDirty: boolean; // has unsaved changes
-  savedState: string | null; // serialized state for undo/redo
+  id: string
+  requestId?: string // binding for a collection
+  collectionId?: string
+  name: string
+  method: HttpMethod
+  url: string
+  headers: KeyValuePair[]
+  params: KeyValuePair[]
+  body: string
+  bodyType: BodyType
+  bodies: Record<string, string>
+  auth: AuthConfig
+  response: HttpResponse | null
+  isLoading: boolean
+  error: string | null
+  isDirty: boolean // has unsaved changes
+  savedState: string | null // serialized state for undo/redo
 }

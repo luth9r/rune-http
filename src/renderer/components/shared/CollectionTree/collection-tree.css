@@ -1,0 +1,56 @@
+.collection-tree-root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 2px;
+  padding: 6px;
+}
+
+.collection-node {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: var(--radius);
+  border: none;
+  background: transparent;
+  color: var(--eos-muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.collection-node:hover {
+  background: var(--eos-surface-2);
+  color: var(--eos-text);
+}
+
+.collection-node.is-selected {
+  background: var(--eos-surface-2);
+  color: var(--eos-text);
+  box-shadow: inset 0 0 0 1px var(--eos-border);
+}
+
+.collection-node__icon {
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.collection-node.is-selected .collection-node__icon {
+  color: var(--eos-accent);
+}
+
+.collection-node__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body:has(.modal-overlay) .collection-node {
+  pointer-events: none;
+}

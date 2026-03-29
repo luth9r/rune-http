@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useTabsStore } from "@/features/tabs/tabs.store";
-import { useEnvStore } from "@/features/environments/env.store";
+import { useEnvStore } from "../features/environments/environments.store";
 
 export function useHttpRequest() {
   const { setTabLoading, setTabResponse } = useTabsStore();

@@ -1,42 +1,49 @@
 import { Database, Settings, Globe, FolderTree } from "lucide-react";
 import { Button } from "../ui/button";
+import "./activity-bar.css";
 
-export function ActivityBar() {
+export function ActivityBar({ currentView, setView }) {
   return (
-    <div style={styles.activityBar}>
-      <div style={styles.topSection}>
-        <Button variant="tab" active={true} style={styles.actionBtn}>
+    <aside className="activity-bar">
+      <div className="activity-bar-top">
+        <Button
+          active={currentView === "explorer"}
+          onClick={() => setView("explorer")}
+          variant="tab"
+          className="activity-btn"
+        >
           <FolderTree size={20} />
         </Button>
-        <Button variant="tab" style={styles.actionBtn}>
+
+        <Button
+          active={currentView === "env"}
+          onClick={() => setView("env")}
+          variant="tab"
+          className="activity-btn"
+        >
           <Globe size={20} />
         </Button>
-        <Button variant="tab" style={styles.actionBtn}>
+
+        <Button
+          active={currentView === "database"}
+          onClick={() => setView("database")}
+          variant="tab"
+          className="activity-btn"
+        >
           <Database size={20} />
         </Button>
       </div>
 
-      <div style={styles.bottomSection}>
-        <Button variant="tab" style={styles.actionBtn}>
+      <div className="activity-bar-bottom">
+        <Button
+          active={currentView === "settings"}
+          onClick={() => setView("settings")}
+          variant="tab"
+          className="activity-btn"
+        >
           <Settings size={20} />
         </Button>
       </div>
-    </div>
+    </aside>
   );
 }
-
-const styles = {
-  activityBar: {
-    width: 48,
-    background: "var(--eos-bg)",
-    borderRight: "1px solid var(--eos-border)",
-    display: "flex",
-    flexDirection: "column" as const,
-    justifyContent: "space-between",
-    padding: "12px 0",
-    flexShrink: 0,
-  },
-  topSection: { display: "flex", flexDirection: "column" as const, gap: 8 },
-  bottomSection: { display: "flex", flexDirection: "column" as const },
-  actionBtn: { width: 48, height: 48, borderRadius: 0 },
-};

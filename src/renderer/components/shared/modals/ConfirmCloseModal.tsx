@@ -1,5 +1,5 @@
-import { Modal } from "@/components/shared/Modal";
-import { Button } from "../ui/button";
+import { Modal } from "renderer/components/ui/modal";
+import { Button } from "@/components/ui/button";
 
 interface ConfirmCloseProps {
   isOpen: boolean;
@@ -25,13 +25,13 @@ export function ConfirmCloseModal({
         </p>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
           <Button
-            variant="ghost-danger"
-            style={{ padding: "8px 12px" }}
             onClick={onDiscard}
+            style={{ padding: "8px 12px" }}
+            variant="ghost-danger"
           >
             Don't Save
           </Button>
-          <Button variant="default" onClick={onSave}>
+          <Button onClick={onSave} variant="primary">
             Save Changes
           </Button>
         </div>

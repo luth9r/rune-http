@@ -4,6 +4,8 @@ import { v4 as uuid } from "uuid";
 import type { Tab } from "@/types";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { electronStorage } from "renderer/lib/electronStorage";
+import { formatJson, formatXml } from "renderer/utils/formatters";
+import { format } from "node:path/win32";
 
 function createEmptyTab(overrides?: Partial<Tab>): Tab {
   return {
@@ -15,6 +17,13 @@ function createEmptyTab(overrides?: Partial<Tab>): Tab {
     params: [],
     body: "",
     bodyType: "none",
+    bodies: {
+      json: "",
+      xml: "",
+      text: "",
+      urlencoded: "",
+      multipart: "",
+    },
     auth: { type: "none" },
     response: null,
     isLoading: false,
@@ -57,6 +66,7 @@ const getCompareState = (tab: Tab) =>
     params: tab.params,
     auth: tab.auth,
     bodyType: tab.bodyType,
+    bodies: tab.bodies,
   });
 
 const initialTab = createEmptyTab();
@@ -119,6 +129,40 @@ export const useTabsStore = create<TabsState>()(
           const tab = state.tabs.find((t) => t.id === id);
           if (!tab) return;
 
+          // Initialize bodies if missing (for older data)
+          if (!tab.bodies) {
+            tab.bodies = {
+              json: "",
+              xml: "",
+              text: "",
+              urlencoded: "",
+              multipart: "",
+            };
+            // Seed the current body into bodies
+            if (tab.bodyType !== "none" && tab.body) {
+              tab.bodies[tab.bodyType] = tab.body;
+            }
+          }
+
+          // If bodyType is changing, switch context
+          if (patch.bodyType && patch.bodyType !== tab.bodyType) {
+            // First save current body to bodies
+            if (tab.bodyType !== "none") {
+              tab.bodies[tab.bodyType] = tab.body;
+            }
+            // Then load new body from bodies
+            if (patch.bodyType !== "none") {
+              tab.body = tab.bodies[patch.bodyType] || "";
+            } else {
+              tab.body = "";
+            }
+          }
+
+          // If body is changing, save it to the current bodies slot
+          if (patch.body !== undefined && tab.bodyType !== "none") {
+            tab.bodies[tab.bodyType] = patch.body;
+          }
+
           Object.assign(tab, patch);
 
           if (!tab.requestId) {
@@ -171,27 +215,21 @@ export const useTabsStore = create<TabsState>()(
       saveTab: (id, updateRequestFn) => {
         const state = get();
         const tab = state.tabs.find((t) => t.id === id);
+
         if (!tab || !tab.isDirty) return;
 
         let finalBody = tab.body;
-        if (tab.bodyType === "json" && tab.body) {
-          try {
-            finalBody = JSON.stringify(JSON.parse(tab.body), null, 2);
-            set((s) => {
-              const t = s.tabs.find((x) => x.id === id);
-              if (t) t.body = finalBody;
-            });
-          } catch (e) {}
-        }
 
-        if (!tab) {
-          console.error("Tab not found:", id);
-          return;
-        }
-
-        if (!tab.isDirty) {
-          console.warn("Tab is clean, nothing to save");
-          return;
+        if (tab.body) {
+          if (tab.bodyType === "json") {
+            try {
+              finalBody = formatJson(tab.body);
+            } catch (e) {
+              console.warn("Invalid JSON, skipping format");
+            }
+          } else if (tab.bodyType === "xml") {
+            finalBody = formatXml(tab.body);
+          }
         }
 
         if (!tab.requestId || !tab.collectionId) {
@@ -201,7 +239,6 @@ export const useTabsStore = create<TabsState>()(
           return;
         }
 
-        console.log("Updating EXISTING tab in collection");
         updateRequestFn(tab.collectionId, tab.requestId, {
           method: tab.method,
           url: tab.url,
@@ -209,6 +246,7 @@ export const useTabsStore = create<TabsState>()(
           params: tab.params,
           body: finalBody,
           bodyType: tab.bodyType,
+          bodies: tab.bodies,
           auth: tab.auth,
           name: tab.name,
         });
@@ -218,7 +256,7 @@ export const useTabsStore = create<TabsState>()(
           if (t) {
             t.body = finalBody;
             t.isDirty = false;
-            t.savedState = getCompareState(t);
+            t.savedState = getCompareState({ ...t, body: finalBody });
           }
         });
       },

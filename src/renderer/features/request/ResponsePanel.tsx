@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
+import { Copy, Check } from "lucide-react";
 import { useTabsStore, selectActiveTab } from "@/features/tabs/tabs.store";
 import { JsonViewer } from "@/components/shared/JsonViewer";
 
@@ -14,6 +15,14 @@ function getStatusColor(status: number): string {
 export function ResponsePanel() {
   const tab = useTabsStore(selectActiveTab);
   const [activeTab, setActiveTab] = useState<ResponseTab>("Body");
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    if (!tab?.response?.body) return;
+    navigator.clipboard.writeText(tab.response.body);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [tab?.response?.body]);
 
   const parsedBody = useMemo(() => {
     if (!tab?.response?.body) return null;
@@ -90,12 +99,24 @@ export function ResponsePanel() {
       {/* Content */}
       <div style={styles.content}>
         {activeTab === "Body" && (
-          <div style={{ padding: "12px" }}>
-            {parsedBody ? (
-              <JsonViewer src={parsedBody} />
-            ) : (
-              <pre style={styles.body}>{response.body}</pre>
-            )}
+          <div style={styles.bodyWrapper}>
+            <button
+              style={{
+                ...styles.copyBtn,
+                ...(copied ? styles.copyBtnSuccess : {}),
+              }}
+              onClick={handleCopy}
+              title="Copy to clipboard"
+            >
+              {copied ? <Check size={14} /> : <Copy size={14} />}
+            </button>
+            <div style={{ padding: "12px" }}>
+              {parsedBody ? (
+                <JsonViewer src={parsedBody} />
+              ) : (
+                <pre style={styles.body}>{response.body}</pre>
+              )}
+            </div>
           </div>
         )}
 
@@ -178,7 +199,30 @@ const styles = {
     color: "var(--eos-text)",
     borderBottom: "2px solid var(--eos-accent)",
   },
-  content: { flex: 1, overflow: "auto" },
+  content: { flex: 1, overflow: "auto", position: "relative" },
+  bodyWrapper: { position: "relative", minHeight: "100%" },
+  copyBtn: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    zIndex: 10,
+    width: 28,
+    height: 28,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background: "var(--eos-surface-2)",
+    border: "1px solid var(--eos-border)",
+    borderRadius: 4,
+    color: "var(--eos-muted)",
+    cursor: "pointer",
+    opacity: 0.6,
+  },
+  copyBtnSuccess: {
+    color: "var(--eos-post)",
+    borderColor: "var(--eos-post)",
+    opacity: 1,
+  },
   body: {
     margin: 0,
     padding: 16,

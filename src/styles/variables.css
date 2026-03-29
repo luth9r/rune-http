@@ -1,0 +1,70 @@
+:root {
+  --eos-bg: #1a1c23;
+  --eos-surface: #22242e;
+  --eos-surface-2: #2a2d3a;
+  --eos-border: #2e3141;
+  --eos-border-2: #3d4259;
+  --eos-accent: #7c3aed;
+  --eos-accent-h: #9d5cf7;
+  --eos-accent-dim: rgba(124, 58, 237, 0.2); /* #7c3aed33 */
+  --eos-text: #e2e8f0;
+  --eos-muted: #8892a4;
+  --eos-muted-2: #555e73;
+  --eos-get: #22d3ee;
+  --eos-post: #4ade80;
+  --eos-put: #fbbf24;
+  --eos-delete: #f87171;
+  --eos-patch: #fb923c;
+  --eos-head: #a78bfa;
+  --eos-options: #94a3b8;
+  --eos-success: #4ade80;
+  --eos-warning: #fbbf24;
+  --eos-error: #f87171;
+
+  --json-key: var(--eos-accent);
+  --json-string: var(--eos-post);
+  --json-number: var(--eos-get);
+  --json-boolean: var(--eos-put);
+  --json-null: var(--eos-muted-2);
+
+  --background: #1a1c23;
+  --foreground: #e2e8f0;
+  --card: #22242e;
+  --card-foreground: #e2e8f0;
+  --popover: #22242e;
+  --popover-foreground: #e2e8f0;
+  --primary: #7c3aed;
+  --primary-foreground: #ffffff;
+  --secondary: #2a2d3a;
+  --secondary-foreground: #e2e8f0;
+  --muted: #2a2d3a;
+  --muted-foreground: #8892a4;
+  --accent: rgba(124, 58, 237, 0.2);
+  --accent-foreground: #e2e8f0;
+  --destructive: #f87171;
+  --destructive-foreground: #ffffff;
+  --border: #2e3141;
+  --input: #2e3141;
+  --ring: #7c3aed;
+  --radius: 0.375rem;
+
+  --sidebar: #22242e;
+  --sidebar-foreground: #e2e8f0;
+  --sidebar-primary: #7c3aed;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2a2d3a;
+  --sidebar-accent-foreground: #e2e8f0;
+  --sidebar-border: #2e3141;
+  --sidebar-ring: #7c3aed;
+
+  --font-sans: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+
+  --btn-hover-bg: var(--eos-surface-2);
+  --btn-active-bg: var(--eos-border);
+  --input-focus-border: var(--eos-accent);
+  --input-bg: var(--eos-bg);
+
+  --transition-fast: 0.1s ease;
+  --transition-normal: 0.2s ease;
+}

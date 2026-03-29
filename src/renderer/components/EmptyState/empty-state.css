@@ -1,0 +1,53 @@
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--eos-bg);
+  user-select: none;
+  height: 100%;
+}
+
+.empty-state-logo {
+  margin-bottom: 48px;
+  opacity: 0.9;
+}
+
+.empty-state-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.empty-state-btn {
+  gap: 12px;
+  padding-right: 16px;
+}
+
+.empty-state-shortcut {
+  font-size: 11px;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
+  opacity: 0.6;
+  font-weight: normal;
+  font-family: var(--font-mono);
+}
+
+.empty-state-hint {
+  color: var(--eos-muted);
+  font-size: 13px;
+}
+
+.kbd {
+  font-family: var(--font-mono);
+  background: var(--eos-surface-2);
+  padding: 2px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--eos-border);
+  font-size: 12px;
+  color: var(--eos-text);
+  margin: 0 2px;
+}

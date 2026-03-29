@@ -1,0 +1,107 @@
+.btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+  outline: none;
+}
+.btn-base:active {
+  transform: scale(0.96);
+}
+.btn-base svg {
+  flex-shrink: 0;
+  display: block;
+}
+
+/* ── Sizes ───────────────────────────────────────────────────────────────── */
+
+.btn-size-xs {
+  height: 22px;
+  padding: 0 6px;
+  font-size: 11px;
+}
+.btn-size-sm {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+.btn-size-default {
+  height: 36px;
+  padding: 0 16px;
+  font-size: 13px;
+}
+.btn-size-lg {
+  height: 48px;
+  padding: 0 24px;
+  font-size: 15px;
+}
+.btn-size-icon {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+}
+
+/* ── Variants ────────────────────────────────────────────────────────────── */
+
+.btn-primary {
+  background: var(--eos-accent);
+  color: #ffffff;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--eos-accent-h);
+}
+
+.btn-icon {
+  padding: 0 !important;
+  color: var(--eos-muted);
+  background: transparent;
+}
+.btn-icon:hover {
+  color: var(--eos-text);
+  background: var(--eos-surface-2);
+}
+
+.btn-ghost-danger {
+  color: var(--eos-muted);
+  background: transparent;
+}
+.btn-ghost-danger:hover:not(:disabled) {
+  color: var(--eos-error);
+  background: rgba(248, 113, 113, 0.08);
+  border-color: transparent;
+}
+
+.btn-danger {
+  background: var(--eos-error);
+  color: #ffffff;
+  border: none;
+}
+.btn-danger:hover:not(:disabled) {
+  background: #e05555;
+}
+
+.btn-ghost {
+  color: var(--eos-muted);
+  background: transparent;
+  border-color: var(--eos-border);
+}
+.btn-ghost:hover:not(:disabled) {
+  color: var(--eos-text);
+  background: var(--eos-surface-2);
+  border-color: var(--eos-border);
+}
+
+.btn-tab-underline {
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--eos-muted);
+}
+.btn-tab-underline.active {
+  color: var(--eos-text);
+  border-bottom-color: var(--eos-accent);
+}

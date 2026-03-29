@@ -7,7 +7,15 @@ export type HttpMethod =
   | "HEAD"
   | "OPTIONS";
 
-export type BodyType = "json" | "text" | "form-data" | "urlencoded" | "none";
+export type BodyType =
+  | "json"
+  | "xml"
+  | "text"
+  | "form-data"
+  | "urlencoded"
+  | "multipart"
+  | "binary"
+  | "none";
 
 export type AuthType = "none" | "bearer" | "basic" | "api-key";
 
@@ -16,6 +24,7 @@ export interface KeyValuePair {
   key: string;
   value: string;
   enabled: boolean;
+  type?: "text" | "file";
 }
 
 export interface AuthConfig {
@@ -37,6 +46,7 @@ export interface HttpRequest {
   params: KeyValuePair[];
   body: string;
   bodyType: BodyType;
+  bodies?: Record<string, string>;
   auth: AuthConfig;
 }
 
