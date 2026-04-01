@@ -1,27 +1,27 @@
-import { Select } from "@/components/ui/select";
-import { getMethodColor } from "@/utils/methodColor";
-import type { HttpMethod } from "@/types";
+import { Select } from '@/components/ui/select'
+import { getMethodColor } from '@/utils/methodColor'
+import type { HttpMethod } from '@/types'
 
 const METHODS: HttpMethod[] = [
-  "GET",
-  "POST",
-  "PUT",
-  "PATCH",
-  "DELETE",
-  "HEAD",
-  "OPTIONS",
-];
+  'GET',
+  'POST',
+  'PUT',
+  'PATCH',
+  'DELETE',
+  'HEAD',
+  'OPTIONS',
+]
 
-const METHOD_OPTIONS = METHODS.map((m) => ({
+const METHOD_OPTIONS = METHODS.map(m => ({
   label: m,
   value: m,
   color: getMethodColor(m),
-}));
+}))
 
 interface MethodSelectProps {
-  value: HttpMethod;
-  onChange: (method: HttpMethod) => void;
-  className?: string;
+  value: HttpMethod
+  onChange: (method: HttpMethod) => void
+  className?: string
 }
 
 export function MethodSelect({
@@ -31,11 +31,11 @@ export function MethodSelect({
 }: MethodSelectProps) {
   return (
     <Select
-      value={value}
-      options={METHOD_OPTIONS}
-      onChange={onChange}
-      variant="method"
       className={className}
+      onChange={onChange}
+      options={METHOD_OPTIONS}
+      value={value}
+      variant="method"
     />
-  );
+  )
 }

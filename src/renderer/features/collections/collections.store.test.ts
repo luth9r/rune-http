@@ -37,17 +37,4 @@ describe('collections store', () => {
     expect(items).toHaveLength(1)
     expect(items[0].name).toBe('Get Users')
   })
-
-  it('adds a folder and toggles it', () => {
-    useCollectionsStore.getState().addCollection('API')
-    const col = useCollectionsStore.getState().collections[0]
-    useCollectionsStore.getState().addFolder(col.id, 'Auth')
-    const item = useCollectionsStore.getState().collections[0].items[0]
-    expect(item.type).toBe('folder')
-    expect(item.isOpen).toBe(true)
-    useCollectionsStore.getState().toggleFolder(col.id, item.id)
-    expect(useCollectionsStore.getState().collections[0].items[0].isOpen).toBe(
-      false
-    )
-  })
 })

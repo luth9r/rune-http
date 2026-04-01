@@ -1,0 +1,6 @@
+.json-viewer-wrapper .react-json-view {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-base);
+  user-select: text;
+  background-color: transparent;
+}

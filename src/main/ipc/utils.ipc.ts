@@ -1,6 +1,6 @@
 import { ipcMain, dialog, BrowserWindow } from 'electron'
-import { exec } from 'child_process'
-import { promisify } from 'util'
+import { exec } from 'node:child_process'
+import { promisify } from 'node:util'
 
 const execAsync = promisify(exec)
 
@@ -47,12 +47,12 @@ export function registerUtilsIpc(): void {
         const { stdout } = await execAsync('fc-list : family')
         const families = stdout
           .split('\n')
-          .map((line) => line.split(',')[0].trim())
-          .filter((f) => f && !f.startsWith('.'))
-        
+          .map(line => line.split(',')[0].trim())
+          .filter(f => f && !f.startsWith('.'))
+
         return Array.from(new Set(families)).sort()
       }
-      
+
       // Fallback for other platforms
       return [
         'Inter',

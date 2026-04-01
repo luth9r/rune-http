@@ -1,56 +1,84 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px);
-  animation: fadeIn 0.15s ease-out;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
 }
 
 .modal-content {
-  background: var(--eos-surface);
-  border: 1px solid var(--eos-border);
-  border-radius: var(--radius);
-  min-width: 420px;
-  max-width: 90vw;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
+  min-width: 440px;
+  max-width: 90vw;
   overflow: hidden;
-  animation: modalSlideUp 0.2s ease-out;
+  background: var(--eos-surface);
+  border: 1px solid var(--eos-border);
+  border-radius: 12px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
 }
 
 .modal-header {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--eos-border);
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
   background: var(--eos-surface);
+  border-bottom: 1px solid var(--eos-border);
 }
 
 .modal-title {
-  font-weight: 700;
-  font-size: 11px;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--eos-text);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  opacity: 0.8;
 }
 
 .modal-body {
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   max-height: 85vh;
+  padding: 24px;
   overflow-y: auto;
+  color: var(--eos-text);
+}
+
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--eos-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.modal-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
   color: var(--eos-text);
 }
 
 .modal-body::-webkit-scrollbar {
   width: 6px;
 }
+
 .modal-body::-webkit-scrollbar-thumb {
   background: var(--eos-border-2);
   border-radius: 10px;

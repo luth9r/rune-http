@@ -1,36 +1,36 @@
 .collection-tree-root {
   display: flex;
   flex-direction: column;
-  width: 100%;
   gap: 2px;
+  width: 100%;
   padding: 6px;
 }
 
 .collection-node {
   display: flex;
+  gap: 8px;
   align-items: center;
   justify-content: flex-start;
-  gap: 8px;
   width: 100%;
   height: 32px;
   padding: 0 10px;
-  border-radius: var(--radius);
-  border: none;
-  background: transparent;
-  color: var(--eos-muted);
-  cursor: pointer;
   font-size: 12px;
   font-weight: 500;
+  color: var(--eos-muted);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius);
 }
 
 .collection-node:hover {
-  background: var(--eos-surface-2);
   color: var(--eos-text);
+  background: var(--eos-surface-2);
 }
 
 .collection-node.is-selected {
-  background: var(--eos-surface-2);
   color: var(--eos-text);
+  background: var(--eos-surface-2);
   box-shadow: inset 0 0 0 1px var(--eos-border);
 }
 

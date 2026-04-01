@@ -1,17 +1,17 @@
 .logo-container {
   display: flex;
   align-items: center;
-  user-select: none;
   font-family: var(--font-sans);
   font-weight: 800;
   letter-spacing: -0.02em;
+  user-select: none;
 }
 
 .logo-rune {
-  color: var(--eos-accent);
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--eos-accent);
 }
 
 .logo-text {
@@ -20,8 +20,8 @@
 }
 
 .logo-subtext {
-  color: var(--eos-muted);
   font-weight: 400;
+  color: var(--eos-muted);
 }
 
 .logo-size-sm {

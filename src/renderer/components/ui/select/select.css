@@ -6,20 +6,20 @@
 
 .sel__trigger {
   display: flex;
+  gap: 6px;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  gap: 6px;
   height: 32px;
   padding: 0 10px;
+  font-size: var(--font-size-base);
+  color: var(--eos-text);
+  white-space: nowrap;
+  cursor: pointer;
   background: var(--eos-surface-2);
   border: 1px solid var(--eos-border);
   border-radius: var(--radius);
-  color: var(--eos-text);
-  font-size: var(--font-size-base);
-  cursor: pointer;
   transition: border-color var(--transition-fast);
-  white-space: nowrap;
 }
 
 .sel__trigger:hover,
@@ -28,8 +28,8 @@
 }
 
 .sel__chevron {
-  color: var(--eos-muted);
   flex-shrink: 0;
+  color: var(--eos-muted);
   transition: transform var(--transition-fast);
 }
 
@@ -41,15 +41,15 @@
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
-  min-width: 100%;
   z-index: 100;
+  min-width: 100%;
+  max-height: 240px;
+  padding: 3px;
+  overflow-y: auto;
   background: var(--eos-surface);
   border: 1px solid var(--eos-border);
   border-radius: var(--radius);
-  padding: 3px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-  max-height: 240px;
-  overflow-y: auto;
 }
 
 .sel__option {
@@ -58,11 +58,11 @@
   padding: 5px 10px;
   font-size: var(--font-size-base);
   color: var(--eos-text);
+  text-align: left;
+  cursor: pointer;
   background: none;
   border: none;
   border-radius: 3px;
-  cursor: pointer;
-  text-align: left;
   transition: background var(--transition-fast);
 }
 
@@ -71,16 +71,16 @@
 }
 
 .sel__option.active {
-  background: var(--eos-accent-dim);
   color: var(--eos-accent);
+  background: var(--eos-accent-dim);
 }
 
 /* variant: method */
 .sel--method .sel__trigger,
 .sel--method .sel__option {
   font-family: var(--font-mono);
-  font-weight: 700;
   font-size: calc(var(--font-size-base) - 1px);
+  font-weight: 700;
 }
 
 .sel--method {
@@ -89,21 +89,21 @@
 
 .sel__sizer {
   display: flex;
-  align-items: center;
+  visibility: hidden;
   gap: 6px;
+  align-items: center;
   height: 0;
   padding: 0 10px;
+  overflow: hidden;
+  font-family: inherit;
   font-size: var(--font-size-base);
   font-weight: inherit;
-  font-family: inherit;
   white-space: nowrap;
-  overflow: hidden;
-  visibility: hidden;
   pointer-events: none;
 }
 
 .sel--method .sel__sizer {
   font-family: var(--font-mono);
-  font-weight: 700;
   font-size: calc(var(--font-size-base) - 1px);
+  font-weight: 700;
 }

@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { useEnvStore } from './environments.store'
-import { GLOBAL_ENV_ID } from './environments.constants'
 
 beforeEach(() => {
   useEnvStore.setState({ environments: [], activeEnvId: null })

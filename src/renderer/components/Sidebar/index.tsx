@@ -1,12 +1,9 @@
-import React, { useState, useMemo, useRef, useCallback } from "react";
-import { Plus, Trash2, ChevronRight, ChevronDown } from "lucide-react";
-import { useCollectionsStore } from "@/features/collections/collections.store";
-import { useTabsStore } from "@/features/tabs/tabs.store";
-import { getMethodColor } from "@/utils/methodColor";
-import type { CollectionItem } from "@/types";
-import { Logo } from "renderer/components/shared/Logo";
-import { ConfirmDeleteModal } from "@/components/shared/modals/ConfirmDeleteModal";
-import { Button } from "../ui/button";
+import React, { useState, useMemo, useRef, useCallback } from 'react'
+import { Plus } from 'lucide-react'
+import { useCollectionsStore } from '@/features/collections/collections.store'
+import { Logo } from 'renderer/components/shared/Logo'
+import { ConfirmDeleteModal } from '@/components/shared/modals/ConfirmDeleteModal'
+import { Button } from '../ui/button'
 import {
   DndContext,
   type DragEndEvent,
@@ -20,22 +17,22 @@ import {
   MeasuringStrategy,
   pointerWithin,
   rectIntersection,
-} from "@dnd-kit/core";
-import { useDraggable, useDroppable } from "@dnd-kit/core";
+} from '@dnd-kit/core'
 
-import { DropIndicator } from "./components/types";
-import { SidebarItem } from "./components/SidebarItem";
-import { DraggableRow } from "./components/DraggableRow";
-import { EmptyCollectionZone } from "./components/EmptyCollectionZone";
+import type { DropIndicator } from './components/types'
+import { SidebarItem } from './components/SidebarItem'
+import { DraggableRow } from './components/DraggableRow'
+import { EmptyCollectionZone } from './components/EmptyCollectionZone'
+import { Search } from './components/Search'
 
 import {
   SidebarRoot,
   SidebarHeader,
   SidebarList,
   SidebarInput,
-} from "renderer/components/Sidebar/components/SidebarLayout";
-import { useResizable } from "@/hooks/useResizable";
-import "./sidebar.css";
+} from 'renderer/components/Sidebar/components/SidebarLayout'
+import { useResizable } from '@/hooks/useResizable'
+import './sidebar.css'
 
 export function Sidebar() {
   const {
@@ -45,209 +42,238 @@ export function Sidebar() {
     toggleCollection,
     removeCollection,
     removeItem,
-  } = useCollectionsStore();
+  } = useCollectionsStore()
 
-  const {
-    size: width,
-    startResizing,
-  } = useResizable({
-    persistenceKey: "rune-sidebar-width",
+  const { size: width, startResizing } = useResizable({
+    persistenceKey: 'rune-sidebar-width',
     initialSize: 256,
     minSize: 200,
     maxSize: 400,
-  });
+    silent: true,
+  })
 
-  const [activeItem, setActiveItem] = useState<Active | null>(null);
-  const [dropIndicator, setDropIndicator] = useState<DropIndicator>(null);
-  const [isAddingCol, setIsAddingCol] = useState(false);
-  const [newColName, setNewColName] = useState("");
+  const [activeItem, setActiveItem] = useState<Active | null>(null)
+  const [dropIndicator, setDropIndicator] = useState<DropIndicator>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isAddingCol, setIsAddingCol] = useState(false)
+  const [newColName, setNewColName] = useState('')
   const [itemToDelete, setItemToDelete] = useState<{
-    id: string;
-    name: string;
-    type: "collection" | "request";
-    collectionId?: string;
-  } | null>(null);
-  const openSnapshot = useRef<Record<string, boolean>>({});
+    id: string
+    name: string
+    type: 'collection' | 'request'
+    collectionId?: string
+  } | null>(null)
+  const openSnapshot = useRef<Record<string, boolean>>({})
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-  );
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+  )
 
   const idToType = useMemo(() => {
-    const map: Record<string, "collection" | "request"> = {};
-    collections.forEach((col) => {
-      map[col.id] = "collection";
-      col.items.forEach((item) => {
-        map[item.id] = "request";
-      });
-    });
-    return map;
-  }, [collections]);
+    const map: Record<string, 'collection' | 'request'> = {}
+    collections.forEach(col => {
+      map[col.id] = 'collection'
+      col.items.forEach(item => {
+        map[item.id] = 'request'
+      })
+    })
+    return map
+  }, [collections])
+
+  const filteredCollections = useMemo(() => {
+    if (!searchQuery.trim()) return collections
+
+    const query = searchQuery.toLowerCase()
+    return collections
+      .map(col => {
+        const colMatches = col.name.toLowerCase().includes(query)
+        const matchedItems = col.items.filter(item => {
+          const itemMatches = item.name.toLowerCase().includes(query)
+          const methodMatches = item.request?.method
+            ?.toLowerCase()
+            .includes(query)
+          return itemMatches || methodMatches
+        })
+
+        if (colMatches) {
+          return { ...col, isOpen: true }
+        }
+
+        if (matchedItems.length > 0) {
+          return {
+            ...col,
+            items: matchedItems,
+            isOpen: true,
+          }
+        }
+        return null
+      })
+      .filter((c): c is NonNullable<typeof c> => c !== null)
+  }, [collections, searchQuery])
 
   const collisionDetection = useCallback((args: any) => {
-    const hits = pointerWithin(args);
-    return hits.length > 0 ? hits : rectIntersection(args);
-  }, []);
+    const hits = pointerWithin(args)
+    return hits.length > 0 ? hits : rectIntersection(args)
+  }, [])
 
   const handleDragStart = useCallback(
     (e: DragStartEvent) => {
-      setActiveItem(e.active);
-      setDropIndicator(null);
+      setActiveItem(e.active)
+      setDropIndicator(null)
 
-      if (idToType[e.active.id as string] === "collection") {
-        const snapshot: Record<string, boolean> = {};
-        collections.forEach((c) => {
-          snapshot[c.id] = c.isOpen ?? true;
-        });
-        openSnapshot.current = snapshot;
-        collections.forEach((c) => {
-          if (c.isOpen !== false) toggleCollection(c.id);
-        });
+      if (idToType[e.active.id as string] === 'collection') {
+        const snapshot: Record<string, boolean> = {}
+        collections.forEach(c => {
+          snapshot[c.id] = c.isOpen ?? true
+        })
+        openSnapshot.current = snapshot
+        collections.forEach(c => {
+          if (c.isOpen !== false) toggleCollection(c.id)
+        })
       }
     },
-    [collections, idToType, toggleCollection],
-  );
+    [collections, idToType, toggleCollection]
+  )
 
   const handleDragOver = useCallback(
     (event: DragOverEvent) => {
-      const { active, over } = event;
+      const { active, over } = event
       if (!over || active.id === over.id) {
-        setDropIndicator(null);
-        return;
+        setDropIndicator(null)
+        return
       }
 
-      const draggedId = active.id as string;
-      const overId = over.id as string;
-      const draggedType = idToType[draggedId];
-      const overType = idToType[overId];
+      const draggedId = active.id as string
+      const overId = over.id as string
+      const draggedType = idToType[draggedId]
+      const overType = idToType[overId]
 
-      if (overId.startsWith("empty-")) {
-        const colId = overId.replace("empty-", "");
-        setDropIndicator({ type: "collection", id: colId });
-        return;
+      if (overId.startsWith('empty-')) {
+        const colId = overId.replace('empty-', '')
+        setDropIndicator({ type: 'collection', id: colId })
+        return
       }
 
-      if (draggedType === "collection" && overType === "collection") {
-        const activeRect = active.rect.current.translated;
-        const overRect = over.rect;
-        if (!activeRect || !overRect) return;
-        const activeCenter = activeRect.top + activeRect.height / 2;
-        const overCenter = overRect.top + overRect.height / 2;
+      if (draggedType === 'collection' && overType === 'collection') {
+        const activeRect = active.rect.current.translated
+        const overRect = over.rect
+        if (!activeRect || !overRect) return
+        const activeCenter = activeRect.top + activeRect.height / 2
+        const overCenter = overRect.top + overRect.height / 2
         setDropIndicator({
-          type: activeCenter < overCenter ? "before" : "after",
+          type: activeCenter < overCenter ? 'before' : 'after',
           id: overId,
-        });
-        return;
+        })
+        return
       }
 
-      if (draggedType === "request") {
-        if (overType === "collection") {
-          setDropIndicator({ type: "collection", id: overId });
-          return;
+      if (draggedType === 'request') {
+        if (overType === 'collection') {
+          setDropIndicator({ type: 'collection', id: overId })
+          return
         }
-        if (overType === "request") {
-          const activeRect = active.rect.current.translated;
-          const overRect = over.rect;
-          if (!activeRect || !overRect) return;
-          const activeCenter = activeRect.top + activeRect.height / 2;
-          const overCenter = overRect.top + overRect.height / 2;
+        if (overType === 'request') {
+          const activeRect = active.rect.current.translated
+          const overRect = over.rect
+          if (!activeRect || !overRect) return
+          const activeCenter = activeRect.top + activeRect.height / 2
+          const overCenter = overRect.top + overRect.height / 2
           setDropIndicator({
-            type: activeCenter < overCenter ? "before" : "after",
+            type: activeCenter < overCenter ? 'before' : 'after',
             id: overId,
-          });
+          })
         }
       }
     },
-    [idToType],
-  );
+    [idToType]
+  )
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
-      const { active, over } = event;
-      setActiveItem(null);
-      setDropIndicator(null);
+      const { active, over } = event
+      setActiveItem(null)
+      setDropIndicator(null)
 
-      const draggedType = idToType[active.id as string];
+      const draggedType = idToType[active.id as string]
 
       if (over && active.id !== over.id) {
-        const overId = over.id as string;
+        const overId = over.id as string
 
-        if (overId.startsWith("empty-")) {
-          const targetColId = overId.replace("empty-", "");
-          moveItem(active.id as string, targetColId, "inside");
+        if (overId.startsWith('empty-')) {
+          const targetColId = overId.replace('empty-', '')
+          moveItem(active.id as string, targetColId, 'inside')
         } else {
-          const overType = idToType[overId];
+          const overType = idToType[overId]
 
-          if (draggedType === "collection" && overType === "collection") {
-            const activeIdx = collections.findIndex((c) => c.id === active.id);
-            const overIdx = collections.findIndex((c) => c.id === overId);
+          if (draggedType === 'collection' && overType === 'collection') {
+            const activeIdx = collections.findIndex(c => c.id === active.id)
+            const overIdx = collections.findIndex(c => c.id === overId)
             moveItem(
               active.id as string,
               overId,
-              overIdx < activeIdx ? "before" : "after",
-            );
-          } else if (draggedType === "request" && overType === "collection") {
-            moveItem(active.id as string, overId, "inside");
-          } else if (draggedType === "request" && overType === "request") {
-            const activeRect = active.rect.current.translated;
-            const overRect = over.rect;
+              overIdx < activeIdx ? 'before' : 'after'
+            )
+          } else if (draggedType === 'request' && overType === 'collection') {
+            moveItem(active.id as string, overId, 'inside')
+          } else if (draggedType === 'request' && overType === 'request') {
+            const activeRect = active.rect.current.translated
+            const overRect = over.rect
             if (activeRect && overRect) {
-              const ac = activeRect.top + activeRect.height / 2;
-              const oc = overRect.top + overRect.height / 2;
+              const ac = activeRect.top + activeRect.height / 2
+              const oc = overRect.top + overRect.height / 2
               moveItem(
                 active.id as string,
                 overId,
-                ac < oc ? "before" : "after",
-              );
+                ac < oc ? 'before' : 'after'
+              )
             }
           }
         }
       }
 
-      if (draggedType === "collection") {
-        const snapshot = openSnapshot.current;
+      if (draggedType === 'collection') {
+        const snapshot = openSnapshot.current
         setTimeout(() => {
-          useCollectionsStore.getState().collections.forEach((c) => {
-            if (snapshot[c.id] && c.isOpen === false) toggleCollection(c.id);
-          });
-          openSnapshot.current = {};
-        }, 0);
+          useCollectionsStore.getState().collections.forEach(c => {
+            if (snapshot[c.id] && c.isOpen === false) toggleCollection(c.id)
+          })
+          openSnapshot.current = {}
+        }, 0)
       }
     },
-    [collections, idToType, moveItem, toggleCollection],
-  );
+    [collections, idToType, moveItem, toggleCollection]
+  )
 
   const handleConfirmDelete = () => {
-    if (!itemToDelete) return;
+    if (!itemToDelete) return
 
-    if (itemToDelete.type === "collection") {
+    if (itemToDelete.type === 'collection') {
       // Assuming a removeCollection exists or needs to be added
-      useCollectionsStore.getState().removeCollection?.(itemToDelete.id);
+      useCollectionsStore.getState().removeCollection?.(itemToDelete.id)
     } else if (itemToDelete.collectionId) {
-      removeItem(itemToDelete.collectionId, itemToDelete.id);
+      removeItem(itemToDelete.collectionId, itemToDelete.id)
     }
 
-    setItemToDelete(null);
-  };
+    setItemToDelete(null)
+  }
 
   const activeEmptyColId = useMemo(() => {
-    if (!dropIndicator || dropIndicator.type !== "collection") return null;
-    const col = collections.find((c) => c.id === dropIndicator.id);
-    if (col && col.items.length === 0) return col.id;
-    return null;
-  }, [dropIndicator, collections]);
+    if (!dropIndicator || dropIndicator.type !== 'collection') return null
+    const col = collections.find(c => c.id === dropIndicator.id)
+    if (col && col.items.length === 0) return col.id
+    return null
+  }, [dropIndicator, collections])
 
   return (
-    <SidebarRoot
-      onResizeMouseDown={startResizing}
-      style={{ width }}
-    >
+    <SidebarRoot onResizeMouseDown={startResizing} style={{ width }}>
       <SidebarHeader title="">
         <Logo size="sm" />
-        <Button onClick={() => setIsAddingCol(true)} variant="icon" size="xs">
+        <Button onClick={() => setIsAddingCol(true)} size="xs" variant="icon">
           <Plus size={16} />
         </Button>
       </SidebarHeader>
+
+      <Search onChange={setSearchQuery} value={searchQuery} />
 
       {isAddingCol && (
         <SidebarInput
@@ -255,9 +281,9 @@ export function Sidebar() {
           onChange={setNewColName}
           onCommit={() => {
             if (newColName.trim()) {
-              addCollection(newColName.trim());
-              setNewColName("");
-              setIsAddingCol(false);
+              addCollection(newColName.trim())
+              setNewColName('')
+              setIsAddingCol(false)
             }
           }}
           placeholder="Collection name..."
@@ -274,7 +300,7 @@ export function Sidebar() {
           onDragStart={handleDragStart}
           sensors={sensors}
         >
-          {collections.map((col) => (
+          {filteredCollections.map(col => (
             <React.Fragment key={col.id}>
               <DraggableRow
                 dropIndicator={dropIndicator}
@@ -284,14 +310,14 @@ export function Sidebar() {
                   setItemToDelete({
                     id: col.id,
                     name: col.name,
-                    type: "collection",
+                    type: 'collection',
                   })
                 }
                 type="collection"
               />
               {col.isOpen !== false && (
                 <>
-                  {col.items.map((item) => (
+                  {col.items.map(item => (
                     <DraggableRow
                       collectionId={col.id}
                       dropIndicator={dropIndicator}
@@ -302,14 +328,14 @@ export function Sidebar() {
                         setItemToDelete({
                           id: item.id,
                           name: item.name,
-                          type: "request",
+                          type: 'request',
                           collectionId: col.id,
                         })
                       }
                       type="request"
                     />
                   ))}
-                  {col.items.length === 0 && (
+                  {col.items.length === 0 && !searchQuery.trim() && (
                     <EmptyCollectionZone
                       collectionId={col.id}
                       isActive={activeEmptyColId === col.id}
@@ -320,9 +346,15 @@ export function Sidebar() {
             </React.Fragment>
           ))}
 
+          {searchQuery.trim() && filteredCollections.length === 0 && (
+            <div className="sidebar-no-results">
+              No collections or requests found for "{searchQuery}"
+            </div>
+          )}
+
           <DragOverlay dropAnimation={null}>
-            {activeItem ? (
-              <SidebarItem item={activeItem.data.current?.item} />
+            {activeItem?.data?.current ? (
+              <SidebarItem item={activeItem.data.current.item} />
             ) : null}
           </DragOverlay>
         </DndContext>
@@ -333,9 +365,9 @@ export function Sidebar() {
           itemName={itemToDelete.name}
           onClose={() => setItemToDelete(null)}
           onConfirm={handleConfirmDelete}
-          title={`Delete ${itemToDelete.type === "collection" ? "Collection" : "Request"}`}
+          title={`Delete ${itemToDelete.type === 'collection' ? 'Collection' : 'Request'}`}
         />
       )}
     </SidebarRoot>
-  );
+  )
 }

@@ -1,61 +1,67 @@
-import React, { useState } from "react";
-import { useZoom } from "@/hooks/useZoom";
-import { useShortcuts } from "renderer/hooks/useShortcuts";
-import { useTabsStore, selectActiveTab } from "@/features/tabs/tabs.store";
-import { ActivityBar } from "@/components/ActivityBar";
-import { SaveRequestModal } from "@/components/shared/modals/SaveRequestModal";
+import { useState } from 'react'
+import { useZoom } from '@/hooks/useZoom'
+import { useShortcuts } from 'renderer/hooks/useShortcuts'
+import { useTabsStore, selectActiveTab } from '@/features/tabs/tabs.store'
+import { ActivityBar } from '@/components/ActivityBar'
+import { SaveRequestModal } from '@/components/shared/modals/SaveRequestModal'
 
-import { HttpScreen } from "./HttpScreen";
-import { EnvironmentsScreen } from "./EnvironmentsScreen";
-import { SettingsScreen } from "./SettingsScreen";
-import { FontScaleIndicator } from "../components/shared/FontScaleIndicator";
-import { useSettingsStore } from "../features/settings/settings.store";
-import { useEffect } from "react";
+import { HttpScreen } from './HttpScreen'
+import { EnvironmentsScreen } from './EnvironmentsScreen'
+import { SettingsScreen } from './SettingsScreen'
+import { FontScaleIndicator } from '../components/shared/ScaleIndicator'
+import { useSettingsStore } from '../features/settings/settings.store'
+import { useEffect } from 'react'
+import './screens.css'
 
 export function MainScreen() {
-  useShortcuts();
-  useZoom();
+  useShortcuts()
+  useZoom()
 
-  const { fontSize, fontFamily, monoFontFamily, theme } = useSettingsStore();
+  const { fontSize, fontFamily, monoFontFamily, theme } = useSettingsStore()
 
   useEffect(() => {
-    const root = document.documentElement;
-    root.style.setProperty("--user-font-size", `${fontSize}px`);
-    
+    const root = document.documentElement
+    root.style.setProperty('--user-font-size', `${fontSize}px`)
+
     // Ensure fonts are quoted if they contain spaces and have fallbacks
-    const quote = (f: string) => (f.startsWith("'") || f.startsWith("\"") ? f : `'${f}'`);
-    
-    root.style.setProperty("--user-font-sans", `${quote(fontFamily)}, sans-serif`);
-    root.style.setProperty("--user-font-mono", `${quote(monoFontFamily)}, monospace`);
-    
+    const quote = (f: string) =>
+      f.startsWith("'") || f.startsWith('"') ? f : `'${f}'`
+
+    root.style.setProperty(
+      '--user-font-sans',
+      `${quote(fontFamily)}, sans-serif`
+    )
+    root.style.setProperty(
+      '--user-font-mono',
+      `${quote(monoFontFamily)}, monospace`
+    )
+
     // Apply theme class
     if (theme === 'arch') {
-      document.body.classList.add('theme-arch');
+      document.body.classList.add('theme-arch')
     } else {
-      document.body.classList.remove('theme-arch');
+      document.body.classList.remove('theme-arch')
     }
-  }, [fontSize, fontFamily, monoFontFamily, theme]);
+  }, [fontSize, fontFamily, monoFontFamily, theme])
 
   const [currentView, setView] = useState<
-    "explorer" | "env" | "database" | "settings"
-  >("explorer");
+    'explorer' | 'env' | 'database' | 'settings'
+  >('explorer')
 
-  const activeTab = useTabsStore(selectActiveTab);
-  const isSaveModalOpen = useTabsStore((s) => s.isSaveModalOpen);
-  const setSaveModalOpen = useTabsStore((s) => s.setSaveModalOpen);
+  const activeTab = useTabsStore(selectActiveTab)
+  const isSaveModalOpen = useTabsStore(s => s.isSaveModalOpen)
+  const setSaveModalOpen = useTabsStore(s => s.setSaveModalOpen)
 
   return (
-    <main style={styles.root}>
+    <main className="screen-root">
       <ActivityBar currentView={currentView} setView={setView} />
 
-      {currentView === "explorer" && <HttpScreen />}
-      {currentView === "env" && <EnvironmentsScreen />}
-      {currentView === "database" && (
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--eos-muted)' }}>
-          Database Coming Soon
-        </div>
+      {currentView === 'explorer' && <HttpScreen />}
+      {currentView === 'env' && <EnvironmentsScreen />}
+      {currentView === 'database' && (
+        <div className="screen-coming-soon">Database Coming Soon</div>
       )}
-      {currentView === "settings" && <SettingsScreen />}
+      {currentView === 'settings' && <SettingsScreen />}
 
       {isSaveModalOpen && activeTab && (
         <SaveRequestModal
@@ -66,16 +72,5 @@ export function MainScreen() {
       )}
       <FontScaleIndicator />
     </main>
-  );
+  )
 }
-
-const styles = {
-  root: {
-    display: "flex",
-    height: "100vh",
-    width: "100vw",
-    background: "var(--eos-bg)",
-    color: "var(--eos-text)",
-    overflow: "hidden",
-  },
-} as const;

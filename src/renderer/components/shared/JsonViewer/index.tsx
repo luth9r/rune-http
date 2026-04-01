@@ -1,4 +1,5 @@
 import ReactJson from 'react-json-view'
+import './json-viewer.css'
 
 const eosJsonTheme = {
   base00: 'transparent',
@@ -35,12 +36,6 @@ export function JsonViewer({ src, collapsed = 2 }: JsonViewerProps) {
         iconStyle="triangle"
         name={null}
         src={src}
-        style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: 'var(--font-size-base)',
-          backgroundColor: 'transparent',
-          userSelect: 'text',
-        }}
         theme={eosJsonTheme}
       />
     </div>

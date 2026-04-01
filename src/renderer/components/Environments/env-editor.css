@@ -1,0 +1,106 @@
+.env-editor-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.env-editor-header {
+  display: flex;
+  flex-shrink: 0;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--eos-border);
+}
+
+.env-editor-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.env-editor-header-right {
+  display: flex;
+  flex-shrink: 0;
+  gap: 10px;
+  align-items: center;
+}
+
+.env-editor-name {
+  font-size: calc(var(--font-size-base) + 2px);
+  font-weight: 600;
+}
+
+.env-editor-hint {
+  font-size: calc(var(--font-size-base) - 1px);
+  color: var(--eos-muted);
+}
+
+.env-editor-code {
+  padding: 1px 5px;
+  font-family: var(--font-mono);
+  font-size: calc(var(--font-size-base) - 2px);
+  color: var(--eos-accent);
+  background: var(--eos-surface-2);
+  border-radius: 3px;
+}
+
+.env-editor-error-badge {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 4px 10px;
+  font-size: calc(var(--font-size-base) - 1px);
+  color: var(--eos-delete);
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--eos-delete) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--eos-delete) 20%, transparent);
+  border-radius: 6px;
+}
+
+.env-editor-dirty-badge {
+  font-size: calc(var(--font-size-base) - 2px);
+  color: var(--eos-muted);
+  white-space: nowrap;
+}
+
+.env-editor-save-btn {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  transition: all 0.15s;
+}
+
+.env-editor-save-btn:disabled {
+  cursor: not-allowed;
+  background: var(--eos-surface-2);
+  opacity: 0.4;
+}
+
+.env-editor-editor-wrap {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.env-editor-empty {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.env-editor-empty-icon {
+  margin-bottom: 12px;
+  opacity: 0.15;
+}
+
+.env-editor-empty-text {
+  font-size: var(--font-size-base);
+  color: var(--eos-muted);
+}

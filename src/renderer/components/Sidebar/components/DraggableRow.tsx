@@ -1,18 +1,18 @@
-import React, { useState, useCallback } from "react";
-import { useDraggable, useDroppable } from "@dnd-kit/core";
-import { useCollectionsStore } from "@/features/collections/collections.store";
-import { useTabsStore } from "@/features/tabs/tabs.store";
-import { SidebarItem } from "./SidebarItem";
-import { DropLine } from "./DropLine";
-import type { DropIndicator } from "./types";
+import { useState, useCallback } from 'react'
+import { useDraggable, useDroppable } from '@dnd-kit/core'
+import { useCollectionsStore } from '@/features/collections/collections.store'
+import { useTabsStore } from '@/features/tabs/tabs.store'
+import { SidebarItem } from './SidebarItem'
+import { DropLine } from './DropLine'
+import type { DropIndicator } from './types'
 
 interface DraggableRowProps {
-  id: string;
-  type: "collection" | "request";
-  item: any;
-  collectionId?: string;
-  dropIndicator: DropIndicator;
-  onRemove?: () => void;
+  id: string
+  type: 'collection' | 'request'
+  item: any
+  collectionId?: string
+  dropIndicator: DropIndicator
+  onRemove?: () => void
 }
 
 export function DraggableRow({
@@ -29,9 +29,9 @@ export function DraggableRow({
     toggleCollection,
     renameCollection,
     renameItem,
-  } = useCollectionsStore();
-  const { openTab } = useTabsStore();
-  const [hovered, setHovered] = useState(false);
+  } = useCollectionsStore()
+  const { openTab } = useTabsStore()
+  const [_hovered, _setHovered] = useState(false)
 
   const {
     attributes,
@@ -41,27 +41,26 @@ export function DraggableRow({
   } = useDraggable({
     id,
     data: { type, item, collectionId },
-  });
+  })
 
   const { setNodeRef: setDropRef } = useDroppable({
     id,
     data: { type, item, collectionId },
-  });
+  })
 
   const setNodeRef = useCallback(
     (node: HTMLElement | null) => {
-      setDragRef(node);
-      setDropRef(node);
+      setDragRef(node)
+      setDropRef(node)
     },
-    [setDragRef, setDropRef],
-  );
+    [setDragRef, setDropRef]
+  )
 
-  const isCollection = type === "collection";
+  const isCollection = type === 'collection'
   const isDropTarget =
-    dropIndicator?.type === "collection" && dropIndicator.id === id;
-  const showBefore =
-    dropIndicator?.type === "before" && dropIndicator.id === id;
-  const showAfter = dropIndicator?.type === "after" && dropIndicator.id === id;
+    dropIndicator?.type === 'collection' && dropIndicator.id === id
+  const showBefore = dropIndicator?.type === 'before' && dropIndicator.id === id
+  const showAfter = dropIndicator?.type === 'after' && dropIndicator.id === id
 
   return (
     <>
@@ -70,19 +69,20 @@ export function DraggableRow({
         <SidebarItem
           isDragging={isDragging}
           isDropTarget={isDropTarget}
-          item={isCollection ? { ...item, type: "collection" } : item}
+          item={isCollection ? { ...item, type: 'collection' } : item}
+          level={isCollection ? 0 : 1}
           onAddRequest={
             isCollection
               ? () =>
                   addRequest(item.id, {
-                    name: "New Request",
-                    method: "GET",
-                    url: "",
+                    name: 'New Request',
+                    method: 'GET',
+                    url: '',
                     headers: [],
                     params: [],
-                    body: "",
-                    bodyType: "none",
-                    auth: { type: "none" },
+                    body: '',
+                    bodyType: 'none',
+                    auth: { type: 'none' },
                   })
               : undefined
           }
@@ -92,15 +92,14 @@ export function DraggableRow({
             openTab({ requestId: item.id, collectionId, ...item.request })
           }
           onRemove={onRemove}
-          onRename={(newName) => {
-            if (isCollection) renameCollection(item.id, newName);
-            else if (collectionId) renameItem(collectionId, item.id, newName);
+          onRename={newName => {
+            if (isCollection) renameCollection(item.id, newName)
+            else if (collectionId) renameItem(collectionId, item.id, newName)
           }}
           onToggle={isCollection ? () => toggleCollection(item.id) : undefined}
-          level={isCollection ? 0 : 1}
         />
       </div>
       {showAfter && <DropLine indent={isCollection ? 12 : 24} />}
     </>
-  );
+  )
 }

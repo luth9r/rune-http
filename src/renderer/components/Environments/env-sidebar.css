@@ -1,0 +1,86 @@
+.env-sidebar-item-root {
+  position: relative;
+}
+
+.env-sidebar-item-left {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.env-sidebar-grip {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+  margin-left: -4px;
+  cursor: grab;
+}
+
+.env-sidebar-icon {
+  display: flex;
+}
+
+.env-sidebar-icon.is-global {
+  margin-left: 4px;
+}
+ 
+.env-sidebar-icon.is-activated {
+  margin-left: 2px;
+  filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.3));
+}
+
+.env-sidebar-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.env-sidebar-name.is-active {
+  font-weight: 600;
+  color: var(--eos-text);
+}
+
+.env-sidebar-name.is-inactive {
+  font-weight: 400;
+  color: var(--eos-muted);
+}
+
+.env-sidebar-rename-input {
+  flex: 1;
+  min-width: 0;
+  padding: 1px 6px;
+  font-size: 13px;
+  color: var(--eos-text);
+  outline: none;
+  background: var(--user-bg, var(--eos-bg));
+  border: 1px solid var(--eos-accent);
+  border-radius: 4px;
+}
+
+.env-sidebar-actions {
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.env-sidebar-item-root:hover .env-sidebar-actions {
+  opacity: 1;
+}
+
+.env-sidebar-more-btn {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+}
+
+.env-sidebar-drop-line {
+  height: 2px;
+  margin: 2px 8px;
+  background: var(--eos-accent);
+  border-radius: 1px;
+}

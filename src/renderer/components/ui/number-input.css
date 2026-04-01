@@ -1,0 +1,99 @@
+.number-input-group {
+  display: flex;
+  align-items: stretch;
+  height: 32px;
+  overflow: hidden;
+  background: var(--eos-surface);
+  border: 1px solid var(--eos-border);
+  border-radius: 6px;
+}
+
+.number-input-group.is-sm {
+  height: 28px;
+}
+
+.number-input-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  color: var(--eos-text);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}
+
+.number-input-group.is-sm .number-input-btn {
+  width: 28px;
+}
+
+.number-input-wrap {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  min-width: 40px;
+  padding: 0 8px;
+}
+
+.number-input-wrap.is-sm {
+  padding: 0 4px;
+}
+
+.number-input {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--eos-text);
+  text-align: center;
+  outline: none;
+  background: transparent;
+  border: none;
+}
+
+.number-input.is-sm {
+  font-size: 12px;
+}
+
+.number-input-unit {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--eos-muted);
+}
+
+.number-input-unit.is-sm {
+  font-size: 10px;
+}
+
+.hide-spinners::-webkit-outer-spin-button,
+.hide-spinners::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.hide-spinners {
+  -moz-appearance: textfield;
+}
+
+.number-input-btn:hover:not(:disabled) {
+  color: var(--eos-accent);
+  background: var(--eos-surface-2);
+}
+
+.number-input-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.number-input-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.3;
+}
+
+.number-input-btn.border-right {
+  border-right: 1px solid var(--eos-border-2);
+}
+
+.number-input-btn.border-left {
+  border-left: 1px solid var(--eos-border-2);
+}

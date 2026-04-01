@@ -1,9 +1,9 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { cn } from "@/lib/utils";
+import React from 'react'
+import { Button } from '@/components/ui/button'
+import { Plus } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
-import { Resizer } from "@/components/ui/Resizer";
+import { Resizer } from '@/components/ui/Resizer'
 
 // ─── Sidebar Root ─────────────────────────────────────────────────────────────
 export function SidebarRoot({
@@ -12,34 +12,26 @@ export function SidebarRoot({
   style,
   onResizeMouseDown,
 }: {
-  children: React.ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-  onResizeMouseDown?: (e: React.MouseEvent) => void;
+  children: React.ReactNode
+  className?: string
+  style?: React.CSSProperties
+  onResizeMouseDown?: (e: React.MouseEvent) => void
 }) {
   return (
-    <aside
-      style={{ ...style, display: "flex", flexDirection: "row" }}
-      className={cn("sidebar-root", className)}
-    >
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden" }}>
-        {children}
-      </div>
+    <aside className={cn('sidebar-root', className)} style={style}>
+      <div className="sidebar-main">{children}</div>
       {onResizeMouseDown && (
-        <Resizer
-          onMouseDown={onResizeMouseDown}
-          className="sidebar-resizer"
-        />
+        <Resizer className="sidebar-resizer" onMouseDown={onResizeMouseDown} />
       )}
     </aside>
-  );
+  )
 }
 
 // ─── Sidebar Header ───────────────────────────────────────────────────────────
 interface SidebarHeaderProps {
-  title: string;
-  onAdd?: () => void;
-  children?: React.ReactNode;
+  title: string
+  onAdd?: () => void
+  children?: React.ReactNode
 }
 
 export function SidebarHeader({ title, onAdd, children }: SidebarHeaderProps) {
@@ -49,14 +41,14 @@ export function SidebarHeader({ title, onAdd, children }: SidebarHeaderProps) {
         <>
           <span className="sidebar-title">{title}</span>
           {onAdd && (
-            <Button onClick={onAdd} variant="icon" size="xs">
+            <Button onClick={onAdd} size="xs" variant="icon">
               <Plus size={14} />
             </Button>
           )}
         </>
       )}
     </div>
-  );
+  )
 }
 
 // ─── Sidebar List ─────────────────────────────────────────────────────────────
@@ -64,10 +56,10 @@ export function SidebarList({
   children,
   className,
 }: {
-  children: React.ReactNode;
-  className?: string;
+  children: React.ReactNode
+  className?: string
 }) {
-  return <div className={cn("sidebar-list", className)}>{children}</div>;
+  return <div className={cn('sidebar-list', className)}>{children}</div>
 }
 
 // ─── Sidebar Input ────────────────────────────────────────────────────────────
@@ -83,30 +75,30 @@ export function SidebarInput({
       <input
         autoFocus
         className="sidebar-inline-input"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
         onBlur={() => (!value.trim() ? onCancel() : onCommit())}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") onCommit();
-          if (e.key === "Escape") onCancel();
+        onChange={e => onChange(e.target.value)}
+        onKeyDown={e => {
+          if (e.key === 'Enter') onCommit()
+          if (e.key === 'Escape') onCancel()
         }}
         placeholder={placeholder}
+        value={value}
       />
     </div>
-  );
+  )
 }
 
 // ─── Sidebar Item Base ────────────────────────────────────────────────────────
 interface SidebarItemBaseProps {
-  children: React.ReactNode;
-  isActive?: boolean;
-  isDragging?: boolean;
-  onClick?: () => void;
-  onContextMenu?: React.MouseEventHandler<HTMLDivElement>;
-  onMouseEnter?: React.MouseEventHandler<HTMLDivElement>;
-  onMouseLeave?: React.MouseEventHandler<HTMLDivElement>;
-  className?: string;
-  style?: React.CSSProperties;
+  children: React.ReactNode
+  isActive?: boolean
+  isDragging?: boolean
+  onClick?: () => void
+  onContextMenu?: React.MouseEventHandler<HTMLDivElement>
+  onMouseEnter?: React.MouseEventHandler<HTMLDivElement>
+  onMouseLeave?: React.MouseEventHandler<HTMLDivElement>
+  className?: string
+  style?: React.CSSProperties
 }
 
 export const SidebarItemBase = React.forwardRef<
@@ -125,30 +117,30 @@ export const SidebarItemBase = React.forwardRef<
       className,
       style,
     },
-    ref,
+    ref
   ) => {
     return (
       <div
-        ref={ref}
-        role="button"
-        tabIndex={0}
+        className={cn(
+          'sidebar-item',
+          isActive && 'is-active',
+          isDragging && 'is-dragging',
+          className
+        )}
         onClick={onClick}
         onContextMenu={onContextMenu}
+        onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onClick?.()}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
-        onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onClick?.()}
-        className={cn(
-          "sidebar-item",
-          isActive && "is-active",
-          isDragging && "is-dragging",
-          className,
-        )}
+        ref={ref}
+        role="button"
         style={style}
+        tabIndex={0}
       >
         {children}
       </div>
-    );
-  },
-);
+    )
+  }
+)
 
-SidebarItemBase.displayName = "SidebarItemBase";
+SidebarItemBase.displayName = 'SidebarItemBase'

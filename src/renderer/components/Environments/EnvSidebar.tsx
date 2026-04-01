@@ -1,6 +1,5 @@
-import type React from "react";
-import { useState, useMemo } from "react";
-import { Plus } from "lucide-react";
+import type React from 'react'
+import { useState, useMemo } from 'react'
 import {
   DndContext,
   type DragEndEvent,
@@ -12,118 +11,115 @@ import {
   DragOverlay,
   pointerWithin,
   MeasuringStrategy,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core'
 import {
   SidebarRoot,
   SidebarHeader,
   SidebarList,
   SidebarInput,
-} from "renderer/components/Sidebar/components/SidebarLayout";
-import { useResizable } from "@/hooks/useResizable";
-import { useEnvStore } from "@/features/environments/environments.store";
-import { EnvSidebarItem } from "./EnvSidebarItem";
-import type { Environment, DropPosition } from "@/types";
-import { GLOBAL_ENV_ID } from "@/features/environments/environments.constants";
-import "@/components/Sidebar/sidebar.css";
+} from 'renderer/components/Sidebar/components/SidebarLayout'
+import { useResizable } from '@/hooks/useResizable'
+import { useEnvStore } from '@/features/environments/environments.store'
+import { EnvSidebarItem } from './EnvSidebarItem'
+import type { Environment, DropPosition } from '@/types'
+import { GLOBAL_ENV_ID } from '@/features/environments/environments.constants'
+import '@/components/Sidebar/sidebar.css'
 
 interface EnvSidebarProps {
-  onDelete: (env: Environment) => void;
+  onDelete: (env: Environment) => void
 }
 
 export function EnvSidebar({ onDelete }: EnvSidebarProps) {
   const {
     environments,
     activeEnvId,
+    activatedEnvId,
     setActiveEnv,
+    setActivatedEnv,
     addEnvironment,
     renameEnvironment,
     moveEnvironment,
-  } = useEnvStore();
+  } = useEnvStore()
 
-  const {
-    size: width,
-    startResizing,
-  } = useResizable({
-    persistenceKey: "rune-sidebar-width", // Sharing same width for both sidebars for consistency
+  const { size: width, startResizing } = useResizable({
+    persistenceKey: 'rune-sidebar-width', // Sharing same width for both sidebars for consistency
     initialSize: 240,
     minSize: 200,
     maxSize: 400,
-  });
+    silent: true,
+  })
 
-  const [activeDragId, setActiveDragId] = useState<string | null>(null);
-  const [overId, setOverId] = useState<string | null>(null);
+  const [activeDragId, setActiveDragId] = useState<string | null>(null)
+  const [_overId, setOverId] = useState<string | null>(null)
   const [dropIndicator, setDropIndicator] = useState<{
-    id: string;
-    type: DropPosition;
-  } | null>(null);
+    id: string
+    type: DropPosition
+  } | null>(null)
 
-  const [isAddingMode, setIsAddingMode] = useState(false);
-  const [newEnvName, setNewEnvName] = useState("");
+  const [isAddingMode, setIsAddingMode] = useState(false)
+  const [newEnvName, setNewEnvName] = useState('')
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-  );
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  )
 
   const handleDragStart = (e: DragStartEvent) => {
-    setActiveDragId(e.active.id as string);
-  };
+    setActiveDragId(e.active.id as string)
+  }
 
   const handleDragOver = (e: DragOverEvent) => {
-    const { active, over } = e;
+    const { active, over } = e
     if (!over || active.id === over.id) {
-      setDropIndicator(null);
-      setOverId(null);
-      return;
+      setDropIndicator(null)
+      setOverId(null)
+      return
     }
 
-    setOverId(over.id as string);
+    setOverId(over.id as string)
 
-    const activeRect = active.rect.current.translated;
-    const overRect = over.rect;
-    if (!activeRect || !overRect) return;
+    const activeRect = active.rect.current.translated
+    const overRect = over.rect
+    if (!activeRect || !overRect) return
 
-    const activeCenter = activeRect.top + activeRect.height / 2;
-    const overCenter = overRect.top + overRect.height / 2;
+    const activeCenter = activeRect.top + activeRect.height / 2
+    const overCenter = overRect.top + overRect.height / 2
 
     setDropIndicator({
       id: over.id as string,
-      type: activeCenter < overCenter ? "before" : "after",
-    });
-  };
+      type: activeCenter < overCenter ? 'before' : 'after',
+    })
+  }
 
   const handleDragEnd = (e: DragEndEvent) => {
-    const { active, over } = e;
-    setActiveDragId(null);
-    setOverId(null);
-    setDropIndicator(null);
+    const { active, over } = e
+    setActiveDragId(null)
+    setOverId(null)
+    setDropIndicator(null)
 
     if (over && active.id !== over.id && dropIndicator) {
       moveEnvironment(
         active.id as string,
         over.id as string,
-        dropIndicator.type,
-      );
+        dropIndicator.type
+      )
     }
-  };
+  }
 
   const handleCommitAdd = () => {
     if (newEnvName.trim()) {
-      addEnvironment(newEnvName.trim());
-      setNewEnvName("");
-      setIsAddingMode(false);
+      addEnvironment(newEnvName.trim())
+      setNewEnvName('')
+      setIsAddingMode(false)
     }
-  };
+  }
 
   const draggedEnv = useMemo(
-    () => environments.find((e) => e.id === activeDragId),
-    [environments, activeDragId],
-  );
+    () => environments.find(e => e.id === activeDragId),
+    [environments, activeDragId]
+  )
 
   return (
-    <SidebarRoot
-      onResizeMouseDown={startResizing}
-      style={{ width }}
-    >
+    <SidebarRoot onResizeMouseDown={startResizing} style={{ width }}>
       <SidebarHeader onAdd={() => setIsAddingMode(true)} title="Environments" />
 
       {isAddingMode && (
@@ -143,12 +139,14 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
 
         {/* Always show Global at the top, undraggable */}
         {environments
-          .filter((e) => e.id === GLOBAL_ENV_ID)
-          .map((env) => (
+          .filter(e => e.id === GLOBAL_ENV_ID)
+          .map(env => (
             <EnvSidebarItem
               env={env}
               isActive={activeEnvId === env.id}
+              isActivated={activatedEnvId === env.id}
               key={env.id}
+              onActivate={setActivatedEnv}
               onDelete={onDelete}
               onRename={renameEnvironment}
               onSelect={setActiveEnv}
@@ -164,16 +162,18 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
           sensors={sensors}
         >
           {environments
-            .filter((e) => e.id !== GLOBAL_ENV_ID)
-            .map((env) => (
+            .filter(e => e.id !== GLOBAL_ENV_ID)
+            .map(env => (
               <EnvSidebarItem
                 dropIndicator={
                   dropIndicator?.id === env.id ? dropIndicator.type : null
                 }
                 env={env}
                 isActive={activeEnvId === env.id}
+                isActivated={activatedEnvId === env.id}
                 isDragging={activeDragId === env.id}
                 key={env.id}
+                onActivate={setActivatedEnv}
                 onDelete={onDelete}
                 onRename={renameEnvironment}
                 onSelect={setActiveEnv}
@@ -186,6 +186,8 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
                 <EnvSidebarItem
                   env={draggedEnv}
                   isActive={activeEnvId === draggedEnv.id}
+                  isActivated={activatedEnvId === draggedEnv.id}
+                  onActivate={() => {}}
                   onDelete={() => {}}
                   onRename={() => {}}
                   onSelect={() => {}}
@@ -196,21 +198,21 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
         </DndContext>
       </SidebarList>
     </SidebarRoot>
-  );
+  )
 }
 
 const s: Record<string, React.CSSProperties> = {
   emptyHint: {
     fontSize: 12,
-    color: "var(--eos-muted)",
-    textAlign: "center",
+    color: 'var(--eos-muted)',
+    textAlign: 'center',
     marginTop: 24,
   },
   overlayItem: {
     width: 228,
-    pointerEvents: "none",
-    boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
-    borderRadius: "var(--radius)",
-    background: "var(--eos-surface-2)",
+    pointerEvents: 'none',
+    boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+    borderRadius: 'var(--radius)',
+    background: 'var(--eos-surface-2)',
   },
-};
+}

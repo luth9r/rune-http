@@ -1,27 +1,27 @@
 .tab-bar {
   display: flex;
+  flex-shrink: 0;
   align-items: stretch;
-  border-bottom: 1px solid var(--eos-border);
-  background: var(--eos-surface);
   height: 40px;
   overflow-x: auto;
-  flex-shrink: 0;
+  background: var(--eos-surface);
+  border-bottom: 1px solid var(--eos-border);
 }
 
 .tab-item {
+  position: relative;
   display: flex;
-  align-items: center;
   gap: 8px;
-  padding: 0 12px;
-  cursor: pointer;
-  border-top: 2px solid transparent;
-  white-space: nowrap;
+  align-items: center;
   min-width: 0;
   max-width: 192px;
-  background: var(--eos-surface);
+  padding: 0 12px;
   color: var(--eos-muted);
+  white-space: nowrap;
+  cursor: pointer;
   user-select: none;
-  position: relative;
+  background: var(--eos-surface);
+  border-top: 2px solid transparent;
 }
 
 .tab-item-dragging {
@@ -30,46 +30,46 @@
 }
 
 .tab-item-hover {
-  background: var(--eos-bg);
   color: var(--eos-text);
+  background: var(--eos-bg);
 }
 
 .tab-item-active {
-  background: var(--eos-bg);
   color: var(--eos-text);
+  background: var(--eos-bg);
   border-top-color: var(--eos-accent);
 }
 
 .tab-item-method {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
   font-size: calc(var(--font-size-base) - 2px);
   font-weight: 700;
-  font-family: var(--font-mono);
-  flex-shrink: 0;
 }
 
 .tab-item-name {
-  font-size: calc(var(--font-size-base) - 1px);
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: calc(var(--font-size-base) - 1px);
   white-space: nowrap;
 }
 
 .tab-item-actions {
   display: flex;
-  align-items: center;
-  gap: 4px;
   flex-shrink: 0;
-  min-width: 18px;
+  gap: 4px;
+  align-items: center;
   justify-content: flex-end;
+  min-width: 18px;
 }
 
 .tab-item-dirty-dot {
+  z-index: 1;
   width: 6px;
   height: 6px;
-  border-radius: 50%;
   background: var(--eos-accent);
-  z-index: 1;
+  border-radius: 50%;
 }
 
 .tab-item-close {
@@ -83,9 +83,32 @@
 }
 
 .tab-bar-add {
-  width: 28px !important;
-  height: 28px !important;
-  border-radius: 4px !important;
   flex-shrink: 0;
+  width: 28px;
+  height: 28px;
   margin: 6px; /* (40 - 28) / 2 = 6px to center vertically */
+  border-radius: 4px; /* (40 - 28) / 2 = 6px to center vertically */
+}
+
+/* Method Colors */
+.tab-item-method[data-method="GET"] {
+  color: var(--eos-get);
+}
+.tab-item-method[data-method="POST"] {
+  color: var(--eos-post);
+}
+.tab-item-method[data-method="PUT"] {
+  color: var(--eos-put);
+}
+.tab-item-method[data-method="PATCH"] {
+  color: var(--eos-patch);
+}
+.tab-item-method[data-method="DELETE"] {
+  color: var(--eos-delete);
+}
+.tab-item-method[data-method="HEAD"] {
+  color: var(--eos-head);
+}
+.tab-item-method[data-method="OPTIONS"] {
+  color: var(--eos-options);
 }

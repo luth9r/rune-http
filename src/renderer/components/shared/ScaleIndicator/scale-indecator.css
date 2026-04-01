@@ -1,0 +1,35 @@
+.container {
+  position: fixed;
+  bottom: 32;
+  left: 50%;
+  z-index: 9999;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+.badge {
+  display: flex;
+  gap: 8;
+  align-items: center;
+  padding: 6px 14px;
+  color: var(--eos-text);
+  background: var(--eos-surface-2);
+  border-radius: 20;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+}
+.label {
+  font-size: 10;
+  font-weight: 700;
+  color: var(--eos-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.value {
+  min-width: 45px;
+  font-family: var(--font-mono);
+  font-size: 14;
+  font-weight: 700;
+  color: var(--eos-accent);
+  text-align: center;
+}

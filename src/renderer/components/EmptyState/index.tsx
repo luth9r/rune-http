@@ -9,14 +9,14 @@ export function EmptyState() {
 
   return (
     <div className="empty-state">
-      <Logo size="lg" className="empty-state-logo" />
+      <Logo className="empty-state-logo" size="lg" />
 
       <div className="empty-state-actions">
         <Button
-          variant="primary"
-          size="lg"
-          onClick={() => openTab()}
           className="empty-state-btn"
+          onClick={() => openTab()}
+          size="lg"
+          variant="primary"
         >
           <Plus size={18} />
           <span>New Request</span>
@@ -24,7 +24,7 @@ export function EmptyState() {
         </Button>
 
         <p className="empty-state-hint">
-          Press <kbd className="kbd">Ctrl+P</kbd> to search collections
+          Press <kbd className="kbd">Ctrl+N</kbd> to search collections
         </p>
       </div>
     </div>

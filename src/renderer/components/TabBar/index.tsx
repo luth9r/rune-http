@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { Plus, X } from "lucide-react";
-import { useTabsStore } from "@/features/tabs/tabs.store";
-import { ConfirmCloseModal } from "../shared/modals/ConfirmCloseModal";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react'
+import { Plus } from 'lucide-react'
+import { useTabsStore } from '@/features/tabs/tabs.store'
+import { ConfirmCloseModal } from '../shared/modals/ConfirmCloseModal'
+import { Button } from '@/components/ui/button'
 import {
   DndContext,
   closestCenter,
@@ -10,16 +10,15 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core'
 import {
-  arrayMove,
   SortableContext,
   horizontalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
-import { TabItem } from "./components/TabItem";
-import "./tab-bar.css";
-import { Tab } from "renderer/types";
+} from '@dnd-kit/sortable'
+import { restrictToHorizontalAxis } from '@dnd-kit/modifiers'
+import { TabItem } from './components/TabItem'
+import './tab-bar.css'
+import type { Tab } from 'renderer/types'
 
 export function TabBar() {
   const {
@@ -29,21 +28,21 @@ export function TabBar() {
     closeTab,
     setSaveModalOpen,
     reorderTabs,
-  } = useTabsStore();
-  const [tabToConfirm, setTabToConfirm] = useState<Tab | null>(null);
+  } = useTabsStore()
+  const [tabToConfirm, setTabToConfirm] = useState<Tab | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 5 },
-    }),
-  );
+    })
+  )
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+    const { active, over } = event
     if (over && active.id !== over.id) {
-      reorderTabs(active.id as string, over.id as string);
+      reorderTabs(active.id as string, over.id as string)
     }
-  };
+  }
 
   return (
     <div className="tab-bar">
@@ -54,18 +53,18 @@ export function TabBar() {
         sensors={sensors}
       >
         <SortableContext
-          items={tabs.map((t) => t.id)}
+          items={tabs.map(t => t.id)}
           strategy={horizontalListSortingStrategy}
         >
-          {tabs.map((tab) => (
+          {tabs.map(tab => (
             <TabItem
-              key={tab.id}
-              tab={tab}
               isActive={tab.id === activeTabId}
+              key={tab.id}
               onClose={() => {
-                if (tab.isDirty) setTabToConfirm(tab);
-                else closeTab(tab.id);
+                if (tab.isDirty) setTabToConfirm(tab)
+                else closeTab(tab.id)
               }}
+              tab={tab}
             />
           ))}
         </SortableContext>
@@ -73,9 +72,9 @@ export function TabBar() {
 
       <Button
         className="tab-bar-add"
-        variant="icon"
-        size="xs"
         onClick={() => openTab()}
+        size="xs"
+        variant="icon"
       >
         <Plus size={16} />
       </Button>
@@ -85,16 +84,16 @@ export function TabBar() {
           isOpen={!!tabToConfirm}
           onClose={() => setTabToConfirm(null)}
           onDiscard={() => {
-            closeTab(tabToConfirm.id);
-            setTabToConfirm(null);
+            closeTab(tabToConfirm.id)
+            setTabToConfirm(null)
           }}
           onSave={() => {
-            setTabToConfirm(null);
-            setSaveModalOpen(true);
+            setTabToConfirm(null)
+            setSaveModalOpen(true)
           }}
           tabName={tabToConfirm.name}
         />
       )}
     </div>
-  );
+  )
 }

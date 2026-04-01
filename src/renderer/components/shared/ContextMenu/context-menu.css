@@ -1,37 +1,27 @@
 .context-menu {
+  position: fixed;
+  z-index: 9999;
   min-width: 160px;
+  padding: 4px;
   background: var(--eos-surface-2);
   border: 1px solid var(--eos-border);
   border-radius: var(--radius);
-  padding: 4px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  animation: context-menu-in 100ms ease-out;
-}
-
-@keyframes context-menu-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
 }
 
 .context-menu-item {
   display: flex;
-  align-items: center;
   gap: 8px;
+  align-items: center;
   width: 100%;
   padding: 6px 10px;
+  font-size: 12px;
+  color: var(--eos-text);
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
   border: none;
   border-radius: 4px;
-  background: transparent;
-  color: var(--eos-text);
-  font-size: 12px;
-  cursor: pointer;
-  text-align: left;
 }
 
 .context-menu-item:hover:not(:disabled) {
@@ -47,8 +37,8 @@
 }
 
 .context-menu-disabled {
-  opacity: 0.4;
   cursor: not-allowed;
+  opacity: 0.4;
 }
 
 .context-menu-icon {
@@ -58,4 +48,10 @@
 
 .context-menu-label {
   flex: 1;
+}
+ 
+.context-menu-separator {
+  height: 1px;
+  margin: 4px;
+  background: var(--eos-border);
 }

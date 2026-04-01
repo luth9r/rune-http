@@ -21,17 +21,13 @@ describe('interpolate', () => {
   it('returns string unchanged if no variables present', () => {
     expect(interpolate('http://localhost/api', {})).toBe('http://localhost/api')
   })
-  
+
   it('supports dots in variable names', () => {
-    expect(
-      interpolate('{{user.name}}', { 'user.name': 'John' })
-    ).toBe('John')
+    expect(interpolate('{{user.name}}', { 'user.name': 'John' })).toBe('John')
   })
-  
+
   it('supports hyphens in variable names', () => {
-    expect(
-      interpolate('{{api-key}}', { 'api-key': 'secret' })
-    ).toBe('secret')
+    expect(interpolate('{{api-key}}', { 'api-key': 'secret' })).toBe('secret')
   })
 })
 
@@ -47,11 +43,11 @@ describe('extractVariables', () => {
   it('returns empty array if no variables', () => {
     expect(extractVariables('http://localhost')).toEqual([])
   })
-  
+
   it('extracts variables with dots and hyphens', () => {
     expect(extractVariables('{{user.name}} and {{api-key}}')).toEqual([
       'user.name',
-      'api-key'
+      'api-key',
     ])
   })
 })

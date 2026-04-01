@@ -1,0 +1,46 @@
+/* Shared Screen Styles */
+
+.screen-root {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  color: var(--eos-text);
+  background: var(--eos-bg);
+}
+
+.screen-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.screen-panels {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.screen-request-panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 300px;
+  overflow: hidden;
+  border-right: 1px solid var(--eos-border);
+}
+
+.screen-response-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.screen-coming-soon {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  color: var(--eos-muted);
+}

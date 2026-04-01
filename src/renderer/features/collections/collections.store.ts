@@ -15,11 +15,7 @@ interface CollectionsState {
   toggleCollection: (id: string) => void
   addRequest: (collectionId: string, request: Omit<HttpRequest, 'id'>) => string
   renameItem: (collectionId: string, itemId: string, newName: string) => void
-  moveItem: (
-    itemId: string,
-    targetId: string,
-    position: DropPosition
-  ) => void
+  moveItem: (itemId: string, targetId: string, position: DropPosition) => void
   removeItem: (collectionId: string, itemId: string) => void
   updateRequest: (
     collectionId: string,

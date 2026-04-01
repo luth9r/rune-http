@@ -1,12 +1,12 @@
 .activity-bar {
-  width: 48px;
-  background: var(--eos-bg);
-  border-right: 1px solid var(--eos-border);
   display: flex;
+  flex-shrink: 0;
   flex-direction: column;
   justify-content: space-between;
+  width: 48px;
   padding: 12px 0;
-  flex-shrink: 0;
+  background: var(--eos-bg);
+  border-right: 1px solid var(--eos-border);
 }
 
 .activity-bar-top,
@@ -19,10 +19,10 @@
 .activity-btn {
   width: 48px;
   height: 48px;
-  border-radius: 0 !important;
   color: var(--eos-muted);
   background: transparent;
-  border: none !important;
+  border: none;
+  border-radius: 0 !important;
 }
 
 .activity-btn:hover {

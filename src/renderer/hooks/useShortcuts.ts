@@ -49,7 +49,7 @@ export function useShortcuts() {
       // Alt + Digit (Switch Tabs 1-9)
       if (e.altKey && !modifier) {
         if (e.code.startsWith('Digit')) {
-          const digit = parseInt(e.code.replace('Digit', ''))
+          const digit = parseInt(e.code.replace('Digit', ''), 10)
           if (digit >= 1 && digit <= 9) {
             const targetTab = tabs[digit - 1]
             if (targetTab) {
@@ -58,6 +58,12 @@ export function useShortcuts() {
             }
           }
         }
+      }
+ 
+      // Ctrl + F (Focus Search)
+      if (modifier && e.code === 'KeyF') {
+        e.preventDefault()
+        document.getElementById('sidebar-search-input')?.focus()
       }
     }
 

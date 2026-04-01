@@ -1,13 +1,15 @@
 import { ipcMain, app } from 'electron'
-import { promises as fs } from 'fs'
-import path from 'path'
+import { promises as fs } from 'node:fs'
+import path from 'node:path'
 
 const DEFAULT_DATA_DIR = app.getPath('userData')
 
 function getDataDir() {
   try {
     const settingsPath = path.join(DEFAULT_DATA_DIR, 'rune-settings.json')
-    const settings = JSON.parse(require('fs').readFileSync(settingsPath, 'utf-8'))
+    const settings = JSON.parse(
+      require('node:fs').readFileSync(settingsPath, 'utf-8')
+    )
     if (settings?.dataStoragePath) {
       return settings.dataStoragePath
     }

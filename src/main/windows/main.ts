@@ -1,17 +1,17 @@
-import { app, BrowserWindow } from "electron";
-import { join } from "node:path";
+import { app, BrowserWindow } from 'electron'
+import { join } from 'node:path'
 
-import { createWindow } from "lib/electron-app/factories/windows/create";
-import { ENVIRONMENT } from "shared/constants";
-import { displayName, resources } from "~/package.json";
+import { createWindow } from 'lib/electron-app/factories/windows/create'
+import { ENVIRONMENT } from 'shared/constants'
+import { displayName, resources } from '~/package.json'
 
 const iconPath = app.isPackaged
-  ? join(process.resourcesPath, "build/icons/icon.png")
-  : join(app.getAppPath(), resources, "build/icons/icon.png");
+  ? join(process.resourcesPath, 'build/icons/icon.png')
+  : join(app.getAppPath(), resources, 'build/icons/icon.png')
 
 export async function MainWindow() {
   const window = createWindow({
-    id: "main",
+    id: 'main',
     title: displayName,
     width: 1280,
     height: 800,
@@ -23,27 +23,27 @@ export async function MainWindow() {
     resizable: true,
     alwaysOnTop: true,
     autoHideMenuBar: true,
-    backgroundColor: "#1D1F21",
+    backgroundColor: '#1D1F21',
 
     webPreferences: {
-      preload: join(__dirname, "../preload/index.js"),
+      preload: join(__dirname, '../preload/index.js'),
     },
     icon: iconPath,
-  });
+  })
 
-  window.webContents.on("did-finish-load", () => {
+  window.webContents.on('did-finish-load', () => {
     if (ENVIRONMENT.IS_DEV) {
       //window.webContents.openDevTools({ mode: "detach" });
     }
 
-    window.show();
-  });
+    window.show()
+  })
 
-  window.on("close", () => {
+  window.on('close', () => {
     for (const window of BrowserWindow.getAllWindows()) {
-      window.destroy();
+      window.destroy()
     }
-  });
+  })
 
-  return window;
+  return window
 }

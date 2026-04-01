@@ -9,6 +9,7 @@ import { GLOBAL_ENV_ID, GLOBAL_ENV_NAME } from './environments.constants'
 interface EnvState {
   environments: Environment[]
   activeEnvId: string | null
+  activatedEnvId: string | null
   addEnvironment: (name: string) => void
   removeEnvironment: (id: string) => void
   moveEnvironment: (
@@ -19,6 +20,7 @@ interface EnvState {
   updateEnvironment: (id: string, variables: Record<string, any>) => void
   renameEnvironment: (id: string, name: string) => void
   setActiveEnv: (id: string | null) => void
+  setActivatedEnv: (id: string | null) => void
   getActiveVariables: () => Record<string, any>
   setDirty: (id: string, isDirty: boolean) => void
   saveEnvironment: (id: string, variables: Record<string, any>) => void
@@ -30,6 +32,7 @@ export const useEnvStore = create<EnvState>()(
     immer((set, get) => ({
       environments: [],
       activeEnvId: null,
+      activatedEnvId: null,
 
       addEnvironment: name =>
         set(state => {
@@ -46,6 +49,7 @@ export const useEnvStore = create<EnvState>()(
           if (id === GLOBAL_ENV_ID) return
           state.environments = state.environments.filter(e => e.id !== id)
           if (state.activeEnvId === id) state.activeEnvId = null
+          if (state.activatedEnvId === id) state.activatedEnvId = null
         }),
 
       moveEnvironment: (activeId, targetId, position) =>
@@ -81,9 +85,21 @@ export const useEnvStore = create<EnvState>()(
           state.activeEnvId = id
         }),
 
+      setActivatedEnv: id =>
+        set(state => {
+          state.activatedEnvId = id
+        }),
+
       getActiveVariables: () => {
-        const { environments, activeEnvId } = get()
-        return environments.find(e => e.id === activeEnvId)?.variables ?? {}
+        const { environments, activatedEnvId } = get()
+        const globalEnv = environments.find(e => e.id === GLOBAL_ENV_ID)
+        const activeEnv = environments.find(e => e.id === activatedEnvId)
+
+        const globalVars = globalEnv?.variables ?? {}
+        const activeVars = activeEnv?.variables ?? {}
+
+        // Target active overrides global
+        return { ...globalVars, ...activeVars }
       },
 
       setDirty: (id, isDirty) =>

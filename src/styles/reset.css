@@ -37,6 +37,6 @@ body {
 }
 
 ::selection {
-  background: var(--eos-accent-dim);
   color: var(--eos-text);
+  background: var(--eos-accent-dim);
 }

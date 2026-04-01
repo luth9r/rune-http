@@ -1,0 +1,102 @@
+.settings-root {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  color: var(--eos-text);
+  background: var(--eos-bg);
+}
+
+.settings-header {
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--eos-border);
+}
+
+.settings-title {
+  margin: 0;
+  font-size: calc(var(--font-size-base) + 11px);
+  font-weight: 600;
+}
+
+.settings-content {
+  flex: 1;
+  width: 100%;
+  max-width: 800px;
+  padding: 32px;
+  margin: 0 auto;
+  overflow-y: auto;
+}
+
+.settings-section {
+  marginBottom: 48px;
+}
+
+.settings-section-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 24px;
+  color: var(--eos-accent);
+}
+
+.settings-section-title {
+  margin: 0;
+  font-size: calc(var(--font-size-base) + 5px);
+  font-weight: 600;
+}
+
+.settings-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--eos-border-2);
+}
+
+.settings-field-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settings-label {
+  font-size: calc(var(--font-size-base) + 1px);
+  font-weight: 500;
+}
+
+.settings-description {
+  font-size: calc(var(--font-size-base) - 2px);
+  color: var(--eos-muted);
+}
+
+.settings-storage-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.settings-path-display {
+  max-width: 400px;
+  padding: 6px 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-mono);
+  font-size: calc(var(--font-size-base) - 1px);
+  white-space: nowrap;
+  background: var(--eos-surface-2);
+  border-radius: 4px;
+}
+
+.settings-action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.settings-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--eos-accent);
+  cursor: pointer;
+}

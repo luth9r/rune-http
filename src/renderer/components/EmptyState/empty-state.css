@@ -1,12 +1,12 @@
 .empty-state {
-  flex: 1;
   display: flex;
+  flex: 1;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: var(--eos-bg);
-  user-select: none;
   height: 100%;
+  user-select: none;
+  background: var(--eos-bg);
 }
 
 .empty-state-logo {
@@ -17,8 +17,8 @@
 .empty-state-actions {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 24px;
+  align-items: center;
 }
 
 .empty-state-btn {
@@ -27,27 +27,27 @@
 }
 
 .empty-state-shortcut {
-  font-size: 11px;
   padding: 2px 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: normal;
   background: rgba(0, 0, 0, 0.25);
   border-radius: 4px;
   opacity: 0.6;
-  font-weight: normal;
-  font-family: var(--font-mono);
 }
 
 .empty-state-hint {
-  color: var(--eos-muted);
   font-size: 13px;
+  color: var(--eos-muted);
 }
 
 .kbd {
-  font-family: var(--font-mono);
-  background: var(--eos-surface-2);
   padding: 2px 5px;
-  border-radius: 4px;
-  border: 1px solid var(--eos-border);
+  margin: 0 2px;
+  font-family: var(--font-mono);
   font-size: 12px;
   color: var(--eos-text);
-  margin: 0 2px;
+  background: var(--eos-surface-2);
+  border: 1px solid var(--eos-border);
+  border-radius: 4px;
 }

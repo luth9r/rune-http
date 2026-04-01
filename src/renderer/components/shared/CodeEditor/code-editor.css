@@ -2,8 +2,8 @@
   flex: 1;
   height: 100%;
   overflow: hidden;
-  border-top: 1px solid var(--eos-border);
   background: var(--eos-bg);
+  border-top: 1px solid var(--eos-border);
 }
 
 .eos-code-editor .cm-editor.cm-focused {

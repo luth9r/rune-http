@@ -9,13 +9,13 @@
 }
 
 body {
-  margin: 0;
   padding: 0;
+  margin: 0;
+  overflow: hidden;
   font-family: var(--font-sans);
   font-size: var(--font-size-base);
-  background: var(--eos-bg);
   color: var(--eos-text);
-  overflow: hidden;
+  background: var(--eos-bg);
 }
 
 input,
@@ -40,9 +40,9 @@ pre {
 
 .resizer-h {
   width: 4px;
-  cursor: col-resize;
   margin-right: -2px;
   margin-left: -2px;
+  cursor: col-resize;
 }
 
 .resizer-h:hover,
@@ -53,9 +53,9 @@ pre {
 
 .resizer-v {
   height: 6px;
-  cursor: row-resize;
-  margin-bottom: -3px;
   margin-top: -3px;
+  margin-bottom: -3px;
+  cursor: row-resize;
 }
 
 .resizer-v:hover,

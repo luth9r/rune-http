@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react'
 import {
   Plus,
   ChevronRight,
@@ -6,27 +6,26 @@ import {
   Edit2,
   Trash2,
   MoreVertical,
-} from "lucide-react";
-import { SidebarItemBase } from "renderer/components/Sidebar/components/SidebarLayout";
-import { Button } from "@/components/ui/button";
-import { getMethodColor } from "@/utils/methodColor";
-import type { CollectionItem } from "@/types";
+} from 'lucide-react'
+import { SidebarItemBase } from 'renderer/components/Sidebar/components/SidebarLayout'
+import { Button } from '@/components/ui/button'
+import type { CollectionItem } from '@/types'
 import {
   ContextMenu,
   type ContextMenuItem,
-} from "@/components/shared/ContextMenu";
-import { cn } from "@/lib/utils";
+} from '@/components/shared/ContextMenu'
+import { cn } from '@/lib/utils'
 
 interface SidebarItemProps {
-  item: CollectionItem | any;
-  isDragging?: boolean;
-  isDropTarget?: boolean;
-  onClick?: () => void;
-  onRemove?: () => void;
-  onRename?: (newName: string) => void;
-  onAddRequest?: () => void;
-  onToggle?: () => void;
-  level?: number;
+  item: CollectionItem | any
+  isDragging?: boolean
+  isDropTarget?: boolean
+  onClick?: () => void
+  onRemove?: () => void
+  onRename?: (newName: string) => void
+  onAddRequest?: () => void
+  onToggle?: () => void
+  level?: number
 }
 
 export function SidebarItem({
@@ -41,85 +40,85 @@ export function SidebarItem({
   level = 0,
 }: SidebarItemProps) {
   const [contextMenu, setContextMenu] = React.useState<{
-    x: number;
-    y: number;
-  } | null>(null);
-  const [isRenaming, setIsRenaming] = React.useState(false);
-  const [tempName, setTempName] = React.useState(item.name);
-  const isCollection = item.type === "collection";
+    x: number
+    y: number
+  } | null>(null)
+  const [isRenaming, setIsRenaming] = React.useState(false)
+  const [tempName, setTempName] = React.useState(item.name)
+  const isCollection = item.type === 'collection'
 
   const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setContextMenu({ x: e.clientX, y: e.clientY });
-  };
+    e.preventDefault()
+    setContextMenu({ x: e.clientX, y: e.clientY })
+  }
 
   const handleCommitRename = () => {
     if (tempName.trim() && tempName !== item.name) {
-      onRename?.(tempName.trim());
+      onRename?.(tempName.trim())
     }
-    setIsRenaming(false);
-  };
+    setIsRenaming(false)
+  }
 
   const menuItems: ContextMenuItem[] = [
     {
-      label: "Rename",
+      label: 'Rename',
       icon: <Edit2 size={14} />,
       onClick: () => setIsRenaming(true),
     },
     {
-      label: "Delete",
+      label: 'Delete',
       icon: <Trash2 size={14} />,
       onClick: () => onRemove?.(),
-      variant: "danger",
+      variant: 'danger',
     },
-  ];
+  ]
 
   if (isRenaming) {
     return (
       <div
         className="sidebar-item is-renaming"
-        style={{ paddingLeft: `${level * 12 + 8}px` }}
+        style={{ '--level': level } as React.CSSProperties}
       >
         <input
           autoFocus
           className="sidebar-inline-input"
-          value={tempName}
-          onChange={(e) => setTempName(e.target.value)}
           onBlur={handleCommitRename}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") handleCommitRename();
-            if (e.key === "Escape") {
-              setTempName(item.name);
-              setIsRenaming(false);
+          onChange={e => setTempName(e.target.value)}
+          onClick={e => e.stopPropagation()}
+          onKeyDown={e => {
+            if (e.key === 'Enter') handleCommitRename()
+            if (e.key === 'Escape') {
+              setTempName(item.name)
+              setIsRenaming(false)
             }
           }}
-          onClick={(e) => e.stopPropagation()}
-          onPointerDown={(e) => e.stopPropagation()}
+          onPointerDown={e => e.stopPropagation()}
+          value={tempName}
         />
       </div>
-    );
+    )
   }
 
   return (
     <>
       <SidebarItemBase
+        className={cn(
+          'sidebar-item-row',
+          isCollection ? 'is-collection' : 'is-request',
+          isDropTarget && 'is-drop-target'
+        )}
         isActive={isDropTarget}
         onClick={isCollection ? onToggle : onClick}
         onContextMenu={handleContextMenu}
-        className={cn(
-          "sidebar-item-row",
-          isCollection ? "is-collection" : "is-request",
-          isDropTarget && "is-drop-target",
-        )}
-        style={{ paddingLeft: `${level * 12 + 8}px` }}
+        style={{ '--level': level } as React.CSSProperties}
       >
         <div className="sidebar-item-content">
           {isCollection && (
             <div
               className="sidebar-item-chevron"
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggle?.();
+              onClick={e => {
+                e.stopPropagation()
+                onToggle?.()
               }}
             >
               {item.isOpen ? (
@@ -133,7 +132,7 @@ export function SidebarItem({
           {!isCollection && (
             <span
               className="sidebar-item-method"
-              style={{ color: getMethodColor(item.request?.method || "GET") }}
+              data-method={item.request?.method || 'GET'}
             >
               {item.request?.method}
             </span>
@@ -145,23 +144,23 @@ export function SidebarItem({
         <div className="sidebar-item-actions">
           {isCollection && (
             <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                onAddRequest?.();
+              onClick={e => {
+                e.stopPropagation()
+                onAddRequest?.()
               }}
-              variant="icon"
               size="sm"
+              variant="icon"
             >
               <Plus size={14} />
             </Button>
           )}
           <Button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleContextMenu(e);
+            onClick={e => {
+              e.stopPropagation()
+              handleContextMenu(e)
             }}
-            variant="icon"
             size="sm"
+            variant="icon"
           >
             <MoreVertical size={14} />
           </Button>
@@ -177,5 +176,5 @@ export function SidebarItem({
         />
       )}
     </>
-  );
+  )
 }
