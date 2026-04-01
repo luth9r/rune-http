@@ -95,7 +95,7 @@ export function EnvEditor() {
     return (
       <div style={s.empty}>
         <Globe size={40} style={{ opacity: 0.15, marginBottom: 12 }} />
-        <span style={{ fontSize: 13, color: "var(--eos-muted)" }}>
+        <span style={{ fontSize: "var(--font-size-base)", color: "var(--eos-muted)" }}>
           Select an environment to edit variables
         </span>
       </div>
@@ -182,16 +182,16 @@ const s: Record<string, React.CSSProperties> = {
     flexShrink: 0,
   },
   envName: {
-    fontSize: 15,
+    fontSize: "calc(var(--font-size-base) + 2px)",
     fontWeight: 600,
   },
   envHint: {
-    fontSize: 12,
+    fontSize: "calc(var(--font-size-base) - 1px)",
     color: "var(--eos-muted)",
   },
   code: {
     fontFamily: "var(--font-mono)",
-    fontSize: 11,
+    fontSize: "calc(var(--font-size-base) - 2px)",
     background: "var(--eos-surface-2)",
     padding: "1px 5px",
     borderRadius: 3,
@@ -202,15 +202,15 @@ const s: Record<string, React.CSSProperties> = {
     alignItems: "center",
     gap: 6,
     padding: "4px 10px",
-    background: "rgba(255,70,70,0.1)",
-    border: "1px solid rgba(255,70,70,0.2)",
-    color: "#ff6060",
+    background: "color-mix(in srgb, var(--eos-error) 10%, transparent)",
+    border: "1px solid color-mix(in srgb, var(--eos-error) 20%, transparent)",
+    color: "var(--eos-error)",
     borderRadius: 6,
-    fontSize: 12,
+    fontSize: "calc(var(--font-size-base) - 1px)",
     whiteSpace: "nowrap",
   },
   dirtyBadge: {
-    fontSize: 11,
+    fontSize: "calc(var(--font-size-base) - 2px)",
     color: "var(--eos-muted)",
     whiteSpace: "nowrap",
   },

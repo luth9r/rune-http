@@ -41,14 +41,14 @@
 }
 
 .tab-item-method {
-  font-size: 11px;
+  font-size: calc(var(--font-size-base) - 2px);
   font-weight: 700;
   font-family: var(--font-mono);
   flex-shrink: 0;
 }
 
 .tab-item-name {
-  font-size: 12px;
+  font-size: calc(var(--font-size-base) - 1px);
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;

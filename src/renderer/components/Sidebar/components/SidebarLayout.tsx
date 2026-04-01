@@ -3,19 +3,34 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import { Resizer } from "@/components/ui/Resizer";
+
 // ─── Sidebar Root ─────────────────────────────────────────────────────────────
 export function SidebarRoot({
   children,
   className,
   style,
+  onResizeMouseDown,
 }: {
   children: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
+  onResizeMouseDown?: (e: React.MouseEvent) => void;
 }) {
   return (
-    <aside style={style} className={cn("sidebar-root", className)}>
-      {children}
+    <aside
+      style={{ ...style, display: "flex", flexDirection: "row" }}
+      className={cn("sidebar-root", className)}
+    >
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden" }}>
+        {children}
+      </div>
+      {onResizeMouseDown && (
+        <Resizer
+          onMouseDown={onResizeMouseDown}
+          className="sidebar-resizer"
+        />
+      )}
     </aside>
   );
 }

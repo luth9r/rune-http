@@ -11,7 +11,7 @@
   justify-content: center;
   height: 100%;
   color: var(--eos-muted);
-  font-size: 13px;
+  font-size: var(--font-size-base);
 }
 
 /* ── URL bar ── */
@@ -34,7 +34,7 @@
   flex-shrink: 0;
   height: 32px !important;
   padding: 0 12px;
-  font-size: 12px;
+  font-size: calc(var(--font-size-base) - 1px);
 }
 
 .spinner {
@@ -67,7 +67,7 @@
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
-  font-size: 12px;
+  font-size: calc(var(--font-size-base) - 1px);
   color: var(--eos-muted);
   background: none;
   border: none;
@@ -91,7 +91,7 @@
   color: var(--eos-accent);
   border-radius: 10px;
   padding: 1px 6px;
-  font-size: 10px;
+  font-size: calc(var(--font-size-base) - 3px);
   font-weight: 600;
 }
 
@@ -122,7 +122,7 @@
 }
 
 .panel-label {
-  font-size: 11px;
+  font-size: calc(var(--font-size-base) - 2px);
   color: var(--eos-muted);
   font-weight: 600;
   text-transform: uppercase;
@@ -138,7 +138,7 @@
   align-items: center;
   justify-content: center;
   color: var(--eos-muted-2);
-  font-size: 13px;
+  font-size: var(--font-size-base);
   text-align: center;
   padding: 40px;
   gap: 12px;
@@ -162,7 +162,7 @@
 }
 
 .format-btn {
-  font-size: 11px !important;
+  font-size: calc(var(--font-size-base) - 2px) !important;
   color: var(--eos-accent) !important;
 }
 
@@ -177,7 +177,7 @@
   align-items: center;
   justify-content: center;
   color: var(--eos-muted);
-  font-size: 13px;
+  font-size: var(--font-size-base);
 }
 
 /* ── Auth panel ── */
@@ -201,7 +201,7 @@
 }
 
 .auth-panel__label {
-  font-size: 12px;
+  font-size: calc(var(--font-size-base) - 1px);
   color: var(--eos-muted);
   width: 72px;
   flex-shrink: 0;
@@ -213,7 +213,7 @@
   align-items: center;
   justify-content: center;
   color: var(--eos-muted);
-  font-size: 13px;
+  font-size: var(--font-size-base);
 }
 
 /* ═══════════════════════════════════════════
@@ -223,7 +223,7 @@
 .kv {
   display: flex;
   flex-direction: column;
-  font-size: 12px;
+  font-size: calc(var(--font-size-base) - 1px);
 }
 
 .kv,
@@ -254,7 +254,7 @@
 
 .kv__col-label {
   padding: 0 10px;
-  font-size: 10px;
+  font-size: calc(var(--font-size-base) - 3px);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -290,8 +290,8 @@
   align-self: center;
   accent-color: var(--eos-accent);
   cursor: pointer;
-  width: 13px;
-  height: 13px;
+  width: calc(var(--font-size-base));
+  height: calc(var(--font-size-base));
 }
 
 .kv__cell {
@@ -317,7 +317,7 @@
   flex: 1;
   width: 0;
   padding: 6px 10px;
-  font-size: 12px;
+  font-size: calc(var(--font-size-base) - 1px);
   font-family: var(--font-mono), monospace;
   color: var(--eos-text);
   background: transparent;
@@ -344,7 +344,7 @@
   flex: 1;
   width: 0;
   padding: 6px 10px;
-  font-size: 12px;
+  font-size: calc(var(--font-size-base) - 1px);
   font-family: var(--font-mono), monospace;
   color: var(--eos-muted);
   background: transparent;
@@ -415,7 +415,7 @@
   align-items: center;
   gap: 6px;
   padding: 7px 12px;
-  font-size: 12px;
+  font-size: calc(var(--font-size-base) - 1px);
   color: var(--eos-muted);
   background: transparent;
   border: none;
@@ -467,7 +467,7 @@
 }
 
 .binary-filename {
-  font-size: 13px;
+  font-size: var(--font-size-base);
   font-weight: 500;
   color: var(--eos-text);
   overflow: hidden;
@@ -476,7 +476,7 @@
 }
 
 .binary-path {
-  font-size: 11px;
+  font-size: calc(var(--font-size-base) - 2px);
   color: var(--eos-muted);
   font-family: var(--font-mono);
   opacity: 0.6;

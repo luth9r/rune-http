@@ -150,4 +150,5 @@
 .smart-input__sug-name,
 .smart-input__sug-value {
   font-family: var(--font-mono), monospace !important;
+  font-size: var(--font-size-base) !important;
 }

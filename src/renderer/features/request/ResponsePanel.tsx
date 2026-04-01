@@ -168,7 +168,7 @@ const styles = {
     borderBottom: "1px solid var(--eos-border)",
   },
   statusBadge: {
-    fontSize: 11,
+    fontSize: "calc(var(--font-size-base) - 2px)",
     fontWeight: 700,
     fontFamily: "var(--font-mono)",
     border: "1px solid",
@@ -176,7 +176,7 @@ const styles = {
     padding: "1px 6px",
   },
   meta: {
-    fontSize: 11,
+    fontSize: "calc(var(--font-size-base) - 2px)",
     color: "var(--eos-muted)",
     fontFamily: "var(--font-mono)",
   },
@@ -189,7 +189,7 @@ const styles = {
   },
   tabBtn: {
     padding: "8px 12px",
-    fontSize: 12,
+    fontSize: "calc(var(--font-size-base) - 1px)",
     color: "var(--eos-muted)",
     background: "none",
     border: "none",
@@ -226,14 +226,14 @@ const styles = {
   body: {
     margin: 0,
     padding: 16,
-    fontSize: 13,
+    fontSize: "var(--font-size-base)",
     fontFamily: "var(--font-mono)",
     color: "var(--eos-text)",
     lineHeight: 1.5,
     whiteSpace: "pre-wrap",
   },
   headersTable: { padding: "4px 0" },
-  headerRow: { display: "flex", gap: 16, padding: "4px 16px", fontSize: 12 },
+  headerRow: { display: "flex", gap: 16, padding: "4px 16px", fontSize: "calc(var(--font-size-base) - 1px)" },
   headerKey: {
     color: "var(--eos-accent)",
     fontFamily: "var(--font-mono)",

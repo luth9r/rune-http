@@ -7,10 +7,34 @@ import { SaveRequestModal } from "@/components/shared/modals/SaveRequestModal";
 
 import { HttpScreen } from "./HttpScreen";
 import { EnvironmentsScreen } from "./EnvironmentsScreen";
+import { SettingsScreen } from "./SettingsScreen";
+import { FontScaleIndicator } from "../components/shared/FontScaleIndicator";
+import { useSettingsStore } from "../features/settings/settings.store";
+import { useEffect } from "react";
 
 export function MainScreen() {
   useShortcuts();
   useZoom();
+
+  const { fontSize, fontFamily, monoFontFamily, theme } = useSettingsStore();
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--user-font-size", `${fontSize}px`);
+    
+    // Ensure fonts are quoted if they contain spaces and have fallbacks
+    const quote = (f: string) => (f.startsWith("'") || f.startsWith("\"") ? f : `'${f}'`);
+    
+    root.style.setProperty("--user-font-sans", `${quote(fontFamily)}, sans-serif`);
+    root.style.setProperty("--user-font-mono", `${quote(monoFontFamily)}, monospace`);
+    
+    // Apply theme class
+    if (theme === 'arch') {
+      document.body.classList.add('theme-arch');
+    } else {
+      document.body.classList.remove('theme-arch');
+    }
+  }, [fontSize, fontFamily, monoFontFamily, theme]);
 
   const [currentView, setView] = useState<
     "explorer" | "env" | "database" | "settings"
@@ -27,8 +51,11 @@ export function MainScreen() {
       {currentView === "explorer" && <HttpScreen />}
       {currentView === "env" && <EnvironmentsScreen />}
       {currentView === "database" && (
-        <div style={{ flex: 1 }}>Database Coming Soon</div>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--eos-muted)' }}>
+          Database Coming Soon
+        </div>
       )}
+      {currentView === "settings" && <SettingsScreen />}
 
       {isSaveModalOpen && activeTab && (
         <SaveRequestModal
@@ -37,6 +64,7 @@ export function MainScreen() {
           tabId={activeTab.id}
         />
       )}
+      <FontScaleIndicator />
     </main>
   );
 }

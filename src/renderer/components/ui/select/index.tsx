@@ -7,6 +7,7 @@ export interface SelectOption<T extends string = string> {
   label: string;
   value: T;
   color?: string;
+  style?: React.CSSProperties;
 }
 
 interface SelectProps<T extends string = string> {
@@ -52,7 +53,7 @@ export function Select<T extends string = string>({
         className={cn("sel__trigger", isOpen && "open")}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span style={{ color: selected?.color }}>
+        <span style={{ color: selected?.color, ...selected?.style }}>
           {selected?.label ?? value}
         </span>
         <ChevronDown
@@ -68,7 +69,7 @@ export function Select<T extends string = string>({
               key={opt.value}
               type="button"
               className={cn("sel__option", opt.value === value && "active")}
-              style={{ color: opt.color }}
+              style={{ color: opt.color, ...opt.style }}
               onClick={() => {
                 onChange(opt.value);
                 setIsOpen(false);

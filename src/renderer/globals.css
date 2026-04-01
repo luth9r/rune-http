@@ -8,6 +8,16 @@
   height: 100%;
 }
 
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  background: var(--eos-bg);
+  color: var(--eos-text);
+  overflow: hidden;
+}
+
 input,
 textarea,
 select {
@@ -19,4 +29,37 @@ select {
 code,
 pre {
   font-family: var(--font-mono);
+}
+
+/* Resizer Handle */
+.resizer-handle {
+  position: relative;
+  z-index: 100;
+  background-color: transparent;
+}
+
+.resizer-h {
+  width: 4px;
+  cursor: col-resize;
+  margin-right: -2px;
+  margin-left: -2px;
+}
+
+.resizer-h:hover,
+.resizer-h:active {
+  background-color: var(--eos-accent, #3b82f6);
+  opacity: 0.5;
+}
+
+.resizer-v {
+  height: 6px;
+  cursor: row-resize;
+  margin-bottom: -3px;
+  margin-top: -3px;
+}
+
+.resizer-v:hover,
+.resizer-v:active {
+  background-color: var(--eos-accent, #3b82f6);
+  opacity: 0.5;
 }

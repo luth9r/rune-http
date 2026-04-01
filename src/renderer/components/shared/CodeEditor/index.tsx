@@ -37,7 +37,8 @@ import {
   completionStatus,
 } from "@codemirror/autocomplete";
 import { cn } from "@/lib/utils";
-import type { BodyType } from "@/types";
+import type { BodyType, Environment } from "@/types";
+import { useSettingsStore } from "@/features/settings/settings.store";
 import { useEnvStore } from "@/features/environments/environments.store";
 import { GLOBAL_ENV_ID } from "@/features/environments/environments.constants";
 import "./code-editor.css";
@@ -47,6 +48,7 @@ const VAR_RE = /\{\{([\w.-]+)\}\}/;
 const languageConf = new Compartment();
 const envDecorationsConf = new Compartment();
 const autocompleteConf = new Compartment();
+const themeConf = new Compartment();
 
 class VariableWidget extends WidgetType {
   constructor(
@@ -86,14 +88,18 @@ const eosHighlightStyle = HighlightStyle.define([
   { tag: t.comment, color: "var(--eos-muted-2)", fontStyle: "italic" },
 ]);
 
-const eosTheme = EditorView.theme({
-  "&": {
-    height: "100%",
-    fontSize: "13px",
-    fontFamily: "var(--font-mono)",
-    background: "var(--eos-bg)",
-    color: "var(--eos-text)",
-  },
+const getEosTheme = (fontSize: number, fontFamily: string) => {
+  const quote = (f: string) => (f.startsWith("'") || f.startsWith("\"") ? f : `'${f}'`);
+  const finalFont = `${quote(fontFamily)}, monospace`;
+
+  return EditorView.theme({
+    "&": {
+      height: "100%",
+      fontSize: `${fontSize}px`,
+      fontFamily: finalFont,
+      background: "var(--eos-bg)",
+      color: "var(--eos-text)",
+    },
   ".cm-content": {
     caretColor: "var(--eos-accent) !important",
     padding: "10px 0",
@@ -162,6 +168,7 @@ const eosTheme = EditorView.theme({
     background: "transparent !important",
   },
 });
+};
 
 interface CodeEditorProps {
   value: string;
@@ -178,14 +185,15 @@ export function CodeEditor({
 }: CodeEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
+  const { environments, activeEnvId } = useEnvStore();
+  const { fontSize, monoFontFamily } = useSettingsStore();
+
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
-  const { environments, activeEnvId } = useEnvStore();
-
   const vars = useMemo(() => {
-    const globalEnv = environments.find((e) => e.id === GLOBAL_ENV_ID);
-    const activeEnv = environments.find((e) => e.id === activeEnvId);
+    const globalEnv = environments.find((e: Environment) => e.id === GLOBAL_ENV_ID);
+    const activeEnv = environments.find((e: Environment) => e.id === activeEnvId);
     return { ...globalEnv?.variables, ...activeEnv?.variables };
   }, [environments, activeEnvId]);
 
@@ -279,7 +287,7 @@ export function CodeEditor({
       state: EditorState.create({
         doc: value,
         extensions: [
-          eosTheme,
+          themeConf.of(getEosTheme(fontSize, monoFontFamily)),
           syntaxHighlighting(eosHighlightStyle),
           lineNumbers(),
           highlightActiveLine(),
@@ -316,9 +324,18 @@ export function CodeEditor({
 
   useEffect(() => {
     viewRef.current?.dispatch({
-      effects: languageConf.reconfigure(getLanguage(bodyType)),
+      effects: [
+        languageConf.reconfigure(getLanguage(bodyType)),
+      ]
     });
   }, [bodyType]);
+
+  useEffect(() => {
+    if (!viewRef.current) return;
+    viewRef.current.dispatch({
+      effects: themeConf.reconfigure(getEosTheme(fontSize, monoFontFamily)),
+    });
+  }, [fontSize, monoFontFamily]);
 
   useEffect(() => {
     if (!viewRef.current) return;

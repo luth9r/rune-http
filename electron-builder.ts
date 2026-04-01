@@ -1,5 +1,5 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: <> */
-import type { Configuration } from 'electron-builder'
+import type { Configuration } from "electron-builder";
 
 import {
   main,
@@ -9,16 +9,16 @@ import {
   description,
   displayName,
   author as _author,
-} from './package.json'
+} from "./package.json";
 
-import { getDevFolder } from './src/lib/electron-app/release/utils/path'
+import { getDevFolder } from "./src/lib/electron-app/release/utils/path";
 
-const author = _author?.name ?? _author
-const currentYear = new Date().getFullYear()
-const authorInKebabCase = author.replace(/\s+/g, '-')
-const appId = `com.${authorInKebabCase}.${name}`.toLowerCase()
+const author = _author?.name ?? _author;
+const currentYear = new Date().getFullYear();
+const authorInKebabCase = author.replace(/\s+/g, "-");
+const appId = `com.${authorInKebabCase}.${name}`.toLowerCase();
 
-const artifactName = [`${name}-v${version}`, '-${os}.${ext}'].join('')
+const artifactName = [`${name}-v${version}`, "-${os}.${ext}"].join("");
 
 export default {
   appId,
@@ -33,20 +33,30 @@ export default {
   mac: {
     artifactName,
     icon: `${resources}/build/icons/icon.icns`,
-    category: 'public.app-category.utilities',
-    target: ['zip', 'dmg', 'dir'],
+    category: "public.app-category.utilities",
+    target: ["zip", "dmg", "dir"],
   },
 
   linux: {
     artifactName,
-    category: 'Utilities',
+    icon: `${resources}/build/icons/icon.png`,
+    category: "Utilities",
     synopsis: description,
-    target: ['AppImage', 'deb', 'pacman', 'freebsd', 'rpm'],
+    target: ["AppImage", "deb", "pacman", "freebsd", "rpm"],
+    desktop: {
+      entry: {
+        Name: displayName,
+        StartupWMClass: name,
+        Terminal: "false",
+        Type: "Application",
+        Icon: name,
+      },
+    },
   },
 
   win: {
     artifactName,
     icon: `${resources}/build/icons/icon.ico`,
-    target: ['zip', 'portable'],
+    target: ["zip", "portable"],
   },
-} satisfies Configuration
+} satisfies Configuration;

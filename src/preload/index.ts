@@ -29,5 +29,9 @@ contextBridge.exposeInMainWorld('api', {
   utils: {
     selectFile: (): Promise<string | null> =>
       ipcRenderer.invoke('utils:select-file'),
+    selectDirectory: (): Promise<string | null> =>
+      ipcRenderer.invoke('utils:select-directory'),
+    getSystemFonts: (): Promise<string[]> =>
+      ipcRenderer.invoke('utils:get-system-fonts'),
   },
 })

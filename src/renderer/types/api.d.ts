@@ -27,6 +27,11 @@ declare global {
         read: <T>(name: string, fallback: T) => Promise<T>
         write: (name: string, data: unknown) => Promise<void>
       }
+      utils: {
+        selectFile: () => Promise<string | null>
+        selectDirectory: () => Promise<string | null>
+        getSystemFonts: () => Promise<string[]>
+      }
     }
   }
 }

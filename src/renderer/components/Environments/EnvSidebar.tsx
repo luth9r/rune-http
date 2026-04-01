@@ -19,6 +19,7 @@ import {
   SidebarList,
   SidebarInput,
 } from "renderer/components/Sidebar/components/SidebarLayout";
+import { useResizable } from "@/hooks/useResizable";
 import { useEnvStore } from "@/features/environments/environments.store";
 import { EnvSidebarItem } from "./EnvSidebarItem";
 import type { Environment, DropPosition } from "@/types";
@@ -38,6 +39,16 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
     renameEnvironment,
     moveEnvironment,
   } = useEnvStore();
+
+  const {
+    size: width,
+    startResizing,
+  } = useResizable({
+    persistenceKey: "rune-sidebar-width", // Sharing same width for both sidebars for consistency
+    initialSize: 240,
+    minSize: 200,
+    maxSize: 400,
+  });
 
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
@@ -109,7 +120,10 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
   );
 
   return (
-    <SidebarRoot style={{ width: 240 }}>
+    <SidebarRoot
+      onResizeMouseDown={startResizing}
+      style={{ width }}
+    >
       <SidebarHeader onAdd={() => setIsAddingMode(true)} title="Environments" />
 
       {isAddingMode && (

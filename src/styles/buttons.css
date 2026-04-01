@@ -72,7 +72,7 @@
 }
 .btn-ghost-danger:hover:not(:disabled) {
   color: var(--eos-error);
-  background: rgba(248, 113, 113, 0.08);
+  background: color-mix(in srgb, var(--eos-error) 8%, transparent);
   border-color: transparent;
 }
 
@@ -82,7 +82,7 @@
   border: none;
 }
 .btn-danger:hover:not(:disabled) {
-  background: #e05555;
+  background: color-mix(in srgb, var(--eos-error) 90%, white);
 }
 
 .btn-ghost {

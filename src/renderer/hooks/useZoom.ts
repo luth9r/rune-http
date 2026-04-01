@@ -1,16 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { useSettingsStore } from '@/features/settings/settings.store'
 
 export function useZoom() {
-  const [zoomLevel, setZoomLevel] = useState(() => {
-    const saved = localStorage.getItem('rune-zoom')
-    return saved ? parseFloat(saved) : 1.0
-  })
+  const { zoomLevel, setZoomLevel } = useSettingsStore()
 
   useEffect(() => {
     if (window.api?.webFrame) {
       window.api.webFrame.setZoomFactor(zoomLevel)
     }
-  }, [])
+  }, [zoomLevel]) // Re-apply whenever zoomLevel changes
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -32,7 +30,6 @@ export function useZoom() {
 
         if (newZoom !== zoomLevel) {
           setZoomLevel(newZoom)
-          localStorage.setItem('rune-zoom', newZoom.toString())
           if (window.api?.webFrame) {
             window.api.webFrame.setZoomFactor(newZoom)
           }
@@ -42,7 +39,7 @@ export function useZoom() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [zoomLevel])
+  }, [zoomLevel, setZoomLevel])
 
   return zoomLevel
 }

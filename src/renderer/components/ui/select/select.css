@@ -16,7 +16,7 @@
   border: 1px solid var(--eos-border);
   border-radius: var(--radius);
   color: var(--eos-text);
-  font-size: 13px;
+  font-size: var(--font-size-base);
   cursor: pointer;
   transition: border-color var(--transition-fast);
   white-space: nowrap;
@@ -56,7 +56,7 @@
   display: block;
   width: 100%;
   padding: 5px 10px;
-  font-size: 13px;
+  font-size: var(--font-size-base);
   color: var(--eos-text);
   background: none;
   border: none;
@@ -80,7 +80,7 @@
 .sel--method .sel__option {
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 12px;
+  font-size: calc(var(--font-size-base) - 1px);
 }
 
 .sel--method {
@@ -93,7 +93,7 @@
   gap: 6px;
   height: 0;
   padding: 0 10px;
-  font-size: 13px;
+  font-size: var(--font-size-base);
   font-weight: inherit;
   font-family: inherit;
   white-space: nowrap;
@@ -105,5 +105,5 @@
 .sel--method .sel__sizer {
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 12px;
+  font-size: calc(var(--font-size-base) - 1px);
 }

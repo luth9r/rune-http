@@ -37,7 +37,7 @@ export function JsonViewer({ src, collapsed = 2 }: JsonViewerProps) {
         src={src}
         style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: '13px',
+          fontSize: 'var(--font-size-base)',
           backgroundColor: 'transparent',
           userSelect: 'text',
         }}

@@ -34,6 +34,7 @@ import {
   SidebarList,
   SidebarInput,
 } from "renderer/components/Sidebar/components/SidebarLayout";
+import { useResizable } from "@/hooks/useResizable";
 import "./sidebar.css";
 
 export function Sidebar() {
@@ -45,6 +46,17 @@ export function Sidebar() {
     removeCollection,
     removeItem,
   } = useCollectionsStore();
+
+  const {
+    size: width,
+    startResizing,
+  } = useResizable({
+    persistenceKey: "rune-sidebar-width",
+    initialSize: 256,
+    minSize: 200,
+    maxSize: 400,
+  });
+
   const [activeItem, setActiveItem] = useState<Active | null>(null);
   const [dropIndicator, setDropIndicator] = useState<DropIndicator>(null);
   const [isAddingCol, setIsAddingCol] = useState(false);
@@ -226,7 +238,10 @@ export function Sidebar() {
   }, [dropIndicator, collections]);
 
   return (
-    <SidebarRoot>
+    <SidebarRoot
+      onResizeMouseDown={startResizing}
+      style={{ width }}
+    >
       <SidebarHeader title="">
         <Logo size="sm" />
         <Button onClick={() => setIsAddingCol(true)} variant="icon" size="xs">
