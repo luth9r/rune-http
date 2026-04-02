@@ -17,6 +17,9 @@ interface CollectionsState {
   renameItem: (collectionId: string, itemId: string, newName: string) => void
   moveItem: (itemId: string, targetId: string, position: DropPosition) => void
   removeItem: (collectionId: string, itemId: string) => void
+  duplicateCollection: (id: string) => void
+  duplicateRequest: (collectionId: string, requestId: string) => void
+  importCollection: (collection: Collection) => void
   updateRequest: (
     collectionId: string,
     itemId: string,
@@ -155,6 +158,70 @@ export const useCollectionsStore = create<CollectionsState>()(
           const col = state.collections.find(c => c.id === collectionId)
           if (!col) return
           col.items = col.items.filter(i => i.id !== itemId)
+          col.updatedAt = Date.now()
+        }),
+
+      importCollection: collection =>
+        set(state => {
+          state.collections.push(collection)
+        }),
+
+      duplicateCollection: id =>
+        set(state => {
+          const original = state.collections.find(c => c.id === id)
+          if (!original) return
+
+          const newId = uuid()
+          const newCollection: Collection = {
+            ...original,
+            id: newId,
+            name: `${original.name} Copy`,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            items: original.items.map(item => {
+              const newItemId = uuid()
+              return {
+                ...item,
+                id: newItemId,
+                request: item.request
+                  ? {
+                      ...item.request,
+                      id: newItemId,
+                      name: item.request.name, // Keep original request name inside
+                    }
+                  : undefined,
+              }
+            }),
+          }
+
+          const index = state.collections.findIndex(c => c.id === id)
+          state.collections.splice(index + 1, 0, newCollection)
+        }),
+
+      duplicateRequest: (collectionId, requestId) =>
+        set(state => {
+          const col = state.collections.find(c => c.id === collectionId)
+          if (!col) return
+
+          const originalIndex = col.items.findIndex(i => i.id === requestId)
+          if (originalIndex === -1) return
+
+          const original = col.items[originalIndex]
+          const newId = uuid()
+          const newItem: CollectionItem = {
+            ...original,
+            id: newId,
+            name: `${original.name} Copy`,
+            request: original.request
+              ? {
+                  ...original.request,
+                  id: newId,
+                  name: `${original.request.name} Copy`,
+                }
+              : undefined,
+          }
+
+          col.items.splice(originalIndex + 1, 0, newItem)
           col.updatedAt = Date.now()
         }),
 

@@ -108,13 +108,14 @@
 .sidebar-item-content {
   display: flex;
   flex: 1;
-  gap: 6px;
+  gap: 12px;
   align-items: center;
   min-width: 0;
   height: 100%;
 }
 
 .sidebar-item-name {
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: calc(var(--font-size-base) - 1px);

@@ -6,6 +6,8 @@ import {
   Edit2,
   Trash2,
   MoreVertical,
+  Copy,
+  Download,
 } from 'lucide-react'
 import { SidebarItemBase } from 'renderer/components/Sidebar/components/SidebarLayout'
 import { Button } from '@/components/ui/button'
@@ -22,6 +24,8 @@ interface SidebarItemProps {
   isDropTarget?: boolean
   onClick?: () => void
   onRemove?: () => void
+  onDuplicate?: () => void
+  onExport?: (format: 'json' | 'openapi') => void
   onRename?: (newName: string) => void
   onAddRequest?: () => void
   onToggle?: () => void
@@ -34,6 +38,8 @@ export function SidebarItem({
   isDropTarget,
   onClick,
   onRemove,
+  onDuplicate,
+  onExport,
   onRename,
   onAddRequest,
   onToggle,
@@ -65,6 +71,25 @@ export function SidebarItem({
       icon: <Edit2 size={14} />,
       onClick: () => setIsRenaming(true),
     },
+    {
+      label: 'Duplicate',
+      icon: <Copy size={14} />,
+      onClick: () => onDuplicate?.(),
+    },
+    ...(isCollection
+      ? [
+          {
+            label: 'Export as JSON',
+            icon: <Download size={14} />,
+            onClick: () => onExport?.('json'),
+          },
+          {
+            label: 'Export as OpenAPI',
+            icon: <Download size={14} />,
+            onClick: () => onExport?.('openapi'),
+          },
+        ]
+      : []),
     {
       label: 'Delete',
       icon: <Trash2 size={14} />,

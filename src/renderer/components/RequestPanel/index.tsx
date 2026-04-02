@@ -18,6 +18,8 @@ import {
   getCount,
   parseFormBody,
   serializeFormBody,
+  parseUrlParams,
+  updateUrlWithParams,
 } from './utils/utils'
 import './request-panel.css'
 
@@ -68,7 +70,10 @@ export function RequestPanel() {
         />
         <SmartInput
           className="request-panel-url-input"
-          onChange={val => updateTab(tab.id, { url: val })}
+          onChange={val => {
+            const newParams = parseUrlParams(val)
+            updateTab(tab.id, { url: val, params: newParams })
+          }}
           placeholder="http://localhost:3000/api"
           value={tab.url}
         />
@@ -117,7 +122,10 @@ export function RequestPanel() {
         {activeTab === 'Params' && (
           <KeyValueEditor
             data={tab.params}
-            onChange={params => updateTab(tab.id, { params })}
+            onChange={params => {
+              const newUrl = updateUrlWithParams(tab.url, params)
+              updateTab(tab.id, { params, url: newUrl })
+            }}
             placeholder={{ key: 'parameter', value: 'value' }}
           />
         )}

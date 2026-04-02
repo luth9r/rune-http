@@ -8,6 +8,8 @@ export const UTILS_CHANNELS = {
   SELECT_FILE: 'utils:select-file',
   SELECT_DIRECTORY: 'utils:select-directory',
   GET_SYSTEM_FONTS: 'utils:get-system-fonts',
+  SAVE_FILE: 'utils:save-file',
+  READ_FILE: 'utils:read-file',
 } as const
 
 export function registerUtilsIpc(): void {
@@ -67,5 +69,29 @@ export function registerUtilsIpc(): void {
       console.error('Failed to get system fonts:', error)
       return ['Inter', 'monospace']
     }
+  })
+
+  ipcMain.handle(
+    UTILS_CHANNELS.SAVE_FILE,
+    async (_event, content: string, defaultPath?: string) => {
+      const window = BrowserWindow.getAllWindows()[0]
+      if (!window) return null
+
+      const { canceled, filePath } = await dialog.showSaveDialog(window, {
+        defaultPath,
+        filters: [{ name: 'JSON', extensions: ['json'] }],
+      })
+
+      if (canceled || !filePath) return null
+
+      const fs = await import('node:fs/promises')
+      await fs.writeFile(filePath, content, 'utf-8')
+      return filePath
+    }
+  )
+
+  ipcMain.handle(UTILS_CHANNELS.READ_FILE, async (_event, filePath: string) => {
+    const fs = await import('node:fs/promises')
+    return fs.readFile(filePath, 'utf-8')
   })
 }

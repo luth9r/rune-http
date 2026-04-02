@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useCallback } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, Upload } from 'lucide-react'
 import { useCollectionsStore } from '@/features/collections/collections.store'
+import { detectAndImport } from '@/features/collections/importers'
 import { Logo } from 'renderer/components/shared/Logo'
 import { ConfirmDeleteModal } from '@/components/shared/modals/ConfirmDeleteModal'
 import { Button } from '../ui/button'
@@ -42,6 +43,7 @@ export function Sidebar() {
     toggleCollection,
     removeCollection,
     removeItem,
+    importCollection,
   } = useCollectionsStore()
 
   const { size: width, startResizing } = useResizable({
@@ -158,10 +160,9 @@ export function Sidebar() {
         const activeRect = active.rect.current.translated
         const overRect = over.rect
         if (!activeRect || !overRect) return
-        const activeCenter = activeRect.top + activeRect.height / 2
         const overCenter = overRect.top + overRect.height / 2
         setDropIndicator({
-          type: activeCenter < overCenter ? 'before' : 'after',
+          type: activeRect.top < overCenter ? 'before' : 'after',
           id: overId,
         })
         return
@@ -176,10 +177,9 @@ export function Sidebar() {
           const activeRect = active.rect.current.translated
           const overRect = over.rect
           if (!activeRect || !overRect) return
-          const activeCenter = activeRect.top + activeRect.height / 2
           const overCenter = overRect.top + overRect.height / 2
           setDropIndicator({
-            type: activeCenter < overCenter ? 'before' : 'after',
+            type: activeRect.top < overCenter ? 'before' : 'after',
             id: overId,
           })
         }
@@ -219,12 +219,11 @@ export function Sidebar() {
             const activeRect = active.rect.current.translated
             const overRect = over.rect
             if (activeRect && overRect) {
-              const ac = activeRect.top + activeRect.height / 2
               const oc = overRect.top + overRect.height / 2
               moveItem(
                 active.id as string,
                 overId,
-                ac < oc ? 'before' : 'after'
+                activeRect.top < oc ? 'before' : 'after'
               )
             }
           }
@@ -257,6 +256,25 @@ export function Sidebar() {
     setItemToDelete(null)
   }
 
+  const handleImport = async () => {
+    const path = await window.api.utils.selectFile()
+    if (!path) return
+
+    try {
+      const content = await window.api.utils.readFile(path)
+      const collection = detectAndImport(content)
+
+      if (collection) {
+        importCollection(collection)
+      } else {
+        // Maybe show an error toast? For now console.error
+        console.error('Invalid collection format')
+      }
+    } catch (e) {
+      console.error('Failed to import collection', e)
+    }
+  }
+
   const activeEmptyColId = useMemo(() => {
     if (!dropIndicator || dropIndicator.type !== 'collection') return null
     const col = collections.find(c => c.id === dropIndicator.id)
@@ -268,9 +286,14 @@ export function Sidebar() {
     <SidebarRoot onResizeMouseDown={startResizing} style={{ width }}>
       <SidebarHeader title="">
         <Logo size="sm" />
-        <Button onClick={() => setIsAddingCol(true)} size="xs" variant="icon">
-          <Plus size={16} />
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button onClick={handleImport} size="xs" variant="icon">
+            <Upload size={14} />
+          </Button>
+          <Button onClick={() => setIsAddingCol(true)} size="xs" variant="icon">
+            <Plus size={16} />
+          </Button>
+        </div>
       </SidebarHeader>
 
       <Search onChange={setSearchQuery} value={searchQuery} />

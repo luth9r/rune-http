@@ -29,7 +29,7 @@
 }
 
 .settings-section {
-  marginBottom: 48px;
+  margin-bottom: 48px;
 }
 
 .settings-section-header {
@@ -50,7 +50,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 0;
+  padding: 16px 0;
   border-bottom: 1px solid var(--eos-border-2);
 }
 

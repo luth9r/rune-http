@@ -31,6 +31,8 @@ declare global {
         selectFile: () => Promise<string | null>
         selectDirectory: () => Promise<string | null>
         getSystemFonts: () => Promise<string[]>
+        saveFile: (content: string, defaultPath?: string) => Promise<string | null>
+        readFile: (filePath: string) => Promise<string>
       }
     }
   }
