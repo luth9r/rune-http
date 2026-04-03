@@ -3,6 +3,7 @@ import { Copy, Check } from 'lucide-react'
 import { useTabsStore, selectActiveTab } from '@/features/tabs/tabs.store'
 import { JsonViewer } from '@/components/shared/JsonViewer'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/i18n'
 import './response-panel.css'
 
 const RESPONSE_TABS = ['Body', 'Headers'] as const
@@ -15,6 +16,7 @@ function getStatusColor(status: number): string {
 }
 
 export function ResponsePanel() {
+  const { t } = useTranslation()
   const tab = useTabsStore(selectActiveTab)
   const [activeTab, setActiveTab] = useState<ResponseTab>('Body')
   const [copied, setCopied] = useState(false)
@@ -41,7 +43,7 @@ export function ResponsePanel() {
     return (
       <div className="rp-centered">
         <div className="rp-spinner" />
-        <span className="rp-hint">Sending request...</span>
+        <span className="rp-hint">{t('response.sending')}</span>
       </div>
     )
   }
@@ -53,7 +55,7 @@ export function ResponsePanel() {
           className="rp-hint"
           style={tab.error ? { color: 'var(--eos-delete)' } : undefined}
         >
-          {tab.error || 'Send a request to see the response'}
+          {tab.error || t('response.empty_hint')}
         </span>
       </div>
     )
@@ -79,15 +81,14 @@ export function ResponsePanel() {
         <span className="rp-meta">{response.size} B</span>
       </div>
 
-      {/* Tabs */}
       <div className="rp-tabs-bar">
-        {RESPONSE_TABS.map(t => (
+        {RESPONSE_TABS.map(t_name => (
           <button
-            className={cn('rp-tab-btn', activeTab === t && 'active')}
-            key={t}
-            onClick={() => setActiveTab(t)}
+            className={cn('rp-tab-btn', activeTab === t_name && 'active')}
+            key={t_name}
+            onClick={() => setActiveTab(t_name)}
           >
-            {t}
+            {t(`response.${t_name.toLowerCase()}` as any)}
           </button>
         ))}
       </div>
@@ -99,7 +100,7 @@ export function ResponsePanel() {
             <button
               className={cn('rp-copy-btn', copied && 'success')}
               onClick={handleCopy}
-              title="Copy to clipboard"
+              title={t('response.copy')}
             >
               {copied ? <Check size={14} /> : <Copy size={14} />}
             </button>

@@ -12,7 +12,12 @@ interface SettingsState {
   zoomLevel: number
   resizingValue: string | null
   dataStoragePath: string | null
+  language: 'en' | 'ua'
+  sidebarVisible: boolean
+  responsePanelVisible: boolean
+  shortcuts: Record<string, string>
   setTheme: (theme: SettingsState['theme']) => void
+  setLanguage: (lang: SettingsState['language']) => void
   setFontSize: (size: number) => void
   setFontFamily: (family: string) => void
   setMonoFontFamily: (family: string) => void
@@ -20,6 +25,9 @@ interface SettingsState {
   setZoomLevel: (zoom: number) => void
   setResizingValue: (value: string | null) => void
   setDataStoragePath: (path: string | null) => void
+  setSidebarVisible: (visible: boolean) => void
+  setResponsePanelVisible: (visible: boolean) => void
+  setShortcut: (action: string, shortcut: string) => void
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -33,10 +41,16 @@ export const useSettingsStore = create<SettingsState>()(
       zoomLevel: 1.0,
       resizingValue: null,
       dataStoragePath: null,
+      language: 'en',
 
       setTheme: theme =>
         set(state => {
           state.theme = theme
+        }),
+
+      setLanguage: lang =>
+        set(state => {
+          state.language = lang
         }),
 
       setFontSize: size =>
@@ -72,6 +86,33 @@ export const useSettingsStore = create<SettingsState>()(
       setDataStoragePath: path =>
         set(state => {
           state.dataStoragePath = path
+        }),
+
+      sidebarVisible: true,
+      responsePanelVisible: true,
+      shortcuts: {
+        toggleSidebar: 'CommandOrControl+\\',
+        toggleResponsePanel: 'CommandOrControl+J',
+        sendRequest: 'CommandOrControl+Enter',
+        saveRequest: 'CommandOrControl+S',
+        newTab: 'CommandOrControl+N',
+        closeTab: 'CommandOrControl+W',
+        focusSearch: 'CommandOrControl+F',
+      },
+
+      setSidebarVisible: visible =>
+        set(state => {
+          state.sidebarVisible = visible
+        }),
+
+      setResponsePanelVisible: visible =>
+        set(state => {
+          state.responsePanelVisible = visible
+        }),
+
+      setShortcut: (action, shortcut) =>
+        set(state => {
+          state.shortcuts[action] = shortcut
         }),
     })),
     {

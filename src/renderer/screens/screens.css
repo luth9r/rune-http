@@ -1,6 +1,7 @@
 /* Shared Screen Styles */
 
 .screen-root {
+  position: relative;
   display: flex;
   width: 100vw;
   height: 100vh;
@@ -43,4 +44,38 @@
   align-items: center;
   justify-content: center;
   color: var(--eos-muted);
+}
+
+/* Expand Panel Buttons */
+.expand-panel-btn {
+  position: absolute;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--white);
+  background: var(--eos-accent);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px var(--black-40);
+  opacity: 0.6;
+}
+
+.expand-panel-btn:hover {
+  opacity: 1;
+  box-shadow: 0 6px 16px var(--black-60);
+}
+
+.expand-panel-btn-left {
+  top: 50%;
+  left: 8px;
+}
+
+.expand-panel-btn-right {
+  top: 50%;
+  right: 8px;
 }

@@ -73,8 +73,8 @@
 }
 
 .tab-item-close {
-  width: 18px;
-  height: 18px;
+  width: 18px !important;
+  height: 18px !important;
   padding: 0;
 }
 
@@ -83,11 +83,12 @@
 }
 
 .tab-bar-add {
+  align-self: center;
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
-  margin: 6px; /* (40 - 28) / 2 = 6px to center vertically */
-  border-radius: 4px; /* (40 - 28) / 2 = 6px to center vertically */
+  width: 28px !important;
+  height: 28px !important;
+  margin-left: 6px;
+  border-radius: 4px;
 }
 
 /* Method Colors */

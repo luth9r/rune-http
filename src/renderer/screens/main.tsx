@@ -14,7 +14,11 @@ import { useEffect } from 'react'
 import './screens.css'
 
 export function MainScreen() {
-  useShortcuts()
+  const [currentView, setView] = useState<
+    'explorer' | 'env' | 'database' | 'settings'
+  >('explorer')
+
+  useShortcuts(currentView)
   useZoom()
 
   const { fontSize, fontFamily, monoFontFamily, theme } = useSettingsStore()
@@ -44,17 +48,16 @@ export function MainScreen() {
     }
   }, [fontSize, fontFamily, monoFontFamily, theme])
 
-  const [currentView, setView] = useState<
-    'explorer' | 'env' | 'database' | 'settings'
-  >('explorer')
-
   const activeTab = useTabsStore(selectActiveTab)
   const isSaveModalOpen = useTabsStore(s => s.isSaveModalOpen)
   const setSaveModalOpen = useTabsStore(s => s.setSaveModalOpen)
 
   return (
     <main className="screen-root">
-      <ActivityBar currentView={currentView} setView={setView} />
+      <ActivityBar
+        currentView={currentView}
+        setView={val => setView(val as any)}
+      />
 
       {currentView === 'explorer' && <HttpScreen />}
       {currentView === 'env' && <EnvironmentsScreen />}

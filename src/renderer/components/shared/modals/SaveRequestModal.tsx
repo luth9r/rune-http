@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useTabsStore } from '@/features/tabs/tabs.store'
 import { useCollectionsStore } from '@/features/collections/collections.store'
+import { useTranslation } from '@/i18n'
 import './save-request-modal.css'
 
 export function SaveRequestModal({
@@ -20,6 +21,7 @@ export function SaveRequestModal({
   const collections = useCollectionsStore(s => s.collections)
   const addRequest = useCollectionsStore(s => s.addRequest)
   const { tabs, markClean, updateTab } = useTabsStore()
+  const { t } = useTranslation()
 
   const tab = tabs.find(t => t.id === tabId)
   const [name, setName] = useState(tab?.name || '')
@@ -32,8 +34,9 @@ export function SaveRequestModal({
   const handleSave = () => {
     if (!selectedLocation || !tab) return
 
+    const defaultName = t('common.new_request') || 'New Request'
     const newItemId = addRequest(selectedLocation.colId, {
-      name: name.trim() || 'New Request',
+      name: name.trim() || defaultName,
       method: tab.method,
       url: tab.url,
       headers: tab.headers,
@@ -46,7 +49,7 @@ export function SaveRequestModal({
     updateTab(tabId, {
       requestId: newItemId,
       collectionId: selectedLocation.colId,
-      name: name.trim() || 'New Request',
+      name: name.trim() || defaultName,
     })
 
     markClean(tabId)
@@ -57,23 +60,23 @@ export function SaveRequestModal({
     selectedLocation?.colId === colId && !selectedLocation.folderId
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Save Request">
+    <Modal isOpen={isOpen} onClose={onClose} title={t('modal.save_request_title')}>
       <div className="save-modal-container">
         {/* Name */}
         <div className="modal-field">
-          <label className="modal-label">Request Name</label>
+          <label className="modal-label">{t('modal.request_name_label')}</label>
           <input
             className="save-modal-input"
             onChange={e => setName(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSave()}
-            placeholder="e.g. Get User Profile"
+            placeholder={t('modal.request_name_placeholder')}
             value={name}
           />
         </div>
 
         {/* Location */}
         <div className="modal-field">
-          <label className="modal-label">Select Location</label>
+          <label className="modal-label">{t('modal.select_location_label')}</label>
           <div className="save-modal-tree-box">
             {collections.map(col => (
               <div className="save-modal-col-group" key={col.id}>
@@ -109,14 +112,14 @@ export function SaveRequestModal({
 
         <div className="modal-footer">
           <Button onClick={onClose} variant="ghost">
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             disabled={!selectedLocation}
             onClick={handleSave}
             variant="primary"
           >
-            Save Request
+            {t('modal.save_request_btn')}
           </Button>
         </div>
       </div>

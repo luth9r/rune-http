@@ -1,5 +1,6 @@
 import { Modal } from 'renderer/components/ui/modal'
 import { Button } from '@/components/ui/button'
+import { useTranslation } from '@/i18n'
 interface ConfirmDeleteProps {
   isOpen: boolean
   title: string
@@ -15,18 +16,18 @@ export function ConfirmDeleteModal({
   onClose,
   onConfirm,
 }: ConfirmDeleteProps) {
+  const { t } = useTranslation()
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
       <p className="modal-text">
-        Are you sure you want to delete <strong>{itemName}</strong>? This action
-        cannot be undone.
+        {t('common.delete_confirm')} <strong>{itemName}</strong>? {t('common.delete_warning')}
       </p>
       <div className="modal-footer">
         <Button onClick={onClose} variant="ghost">
-          Cancel
+          {t('common.cancel')}
         </Button>
         <Button onClick={onConfirm} variant="danger">
-          Delete
+          {t('sidebar.delete') || 'Delete'}
         </Button>
       </div>
     </Modal>

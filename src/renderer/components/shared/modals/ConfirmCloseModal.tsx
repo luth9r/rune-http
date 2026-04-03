@@ -1,5 +1,6 @@
 import { Modal } from 'renderer/components/ui/modal'
 import { Button } from '@/components/ui/button'
+import { useTranslation } from '@/i18n'
 
 interface ConfirmCloseProps {
   isOpen: boolean
@@ -16,18 +17,18 @@ export function ConfirmCloseModal({
   onDiscard,
   onSave,
 }: ConfirmCloseProps) {
+  const { t } = useTranslation()
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Unsaved Changes">
+    <Modal isOpen={isOpen} onClose={onClose} title={t('modal.close_unsaved_title')}>
       <p className="modal-text">
-        Request <strong>{tabName || 'New Request'}</strong> has unsaved changes.
-        Do you want to save them?
+        {t('modal.close_unsaved_desc').replace('{{name}}', tabName || t('common.new_request'))}
       </p>
       <div className="modal-footer">
         <Button onClick={onDiscard} variant="ghost-danger">
-          Don't Save
+          {t('modal.close_unsaved_discard')}
         </Button>
         <Button onClick={onSave} variant="primary">
-          Save Changes
+          {t('modal.close_unsaved_save')}
         </Button>
       </div>
     </Modal>

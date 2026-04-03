@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import type { Environment, DropPosition } from '@/types'
 import { ContextMenu } from 'renderer/components/shared/ContextMenu'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/i18n'
 import './env-sidebar.css'
 
 interface EnvSidebarItemProps {
@@ -44,6 +45,7 @@ export function EnvSidebarItem({
   onDelete,
   onRename,
 }: EnvSidebarItemProps) {
+  const { t } = useTranslation()
   const [_isHovered, setIsHovered] = useState(false)
   const [isRenaming, setIsRenaming] = useState(false)
   const [renameValue, setRenameValue] = useState(env.name)
@@ -149,7 +151,7 @@ export function EnvSidebarItem({
                 setIsRenaming(true)
               }}
             >
-              {env.name}
+              {isGlobal ? t('env.global') : env.name}
             </span>
           )}
         </div>
@@ -174,7 +176,7 @@ export function EnvSidebarItem({
               ...(!isGlobal
                 ? ([
                     {
-                      label: isActivated ? 'Deactivate' : 'Set as Active',
+                      label: isActivated ? t('common.deactivate') : t('common.activate'),
                       icon: <Check size={14} />,
                       onClick: () => onActivate?.(isActivated ? null : env.id),
                     },
@@ -182,13 +184,13 @@ export function EnvSidebarItem({
                   ] as const)
                 : []),
               {
-                label: 'Rename',
+                label: t('sidebar.rename'),
                 icon: <Edit2 size={14} />,
                 onClick: () => setIsRenaming(true),
                 disabled: isGlobal,
               },
               {
-                label: 'Delete',
+                label: t('sidebar.delete'),
                 icon: <Trash2 size={14} />,
                 onClick: () => onDelete(env),
                 variant: 'danger',

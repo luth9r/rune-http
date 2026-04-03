@@ -33,9 +33,11 @@ import {
   SidebarInput,
 } from 'renderer/components/Sidebar/components/SidebarLayout'
 import { useResizable } from '@/hooks/useResizable'
+import { useTranslation } from '@/i18n'
 import './sidebar.css'
 
 export function Sidebar() {
+  const { t } = useTranslation()
   const {
     collections,
     moveItem,
@@ -309,7 +311,7 @@ export function Sidebar() {
               setIsAddingCol(false)
             }
           }}
-          placeholder="Collection name..."
+          placeholder={t('sidebar.new_collection_placeholder')}
           value={newColName}
         />
       )}
@@ -371,7 +373,7 @@ export function Sidebar() {
 
           {searchQuery.trim() && filteredCollections.length === 0 && (
             <div className="sidebar-no-results">
-              No collections or requests found for "{searchQuery}"
+              {t('sidebar.no_results')} "{searchQuery}"
             </div>
           )}
 
@@ -388,7 +390,7 @@ export function Sidebar() {
           itemName={itemToDelete.name}
           onClose={() => setItemToDelete(null)}
           onConfirm={handleConfirmDelete}
-          title={`Delete ${itemToDelete.type === 'collection' ? 'Collection' : 'Request'}`}
+          title={`${t('sidebar.delete')} ${itemToDelete.type === 'collection' ? t('sidebar.collection_item') || 'Collection' : t('sidebar.request_item') || 'Request'}`}
         />
       )}
     </SidebarRoot>

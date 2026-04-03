@@ -1,13 +1,17 @@
-import type React from 'react'
 import { useState, useCallback } from 'react'
+import { ChevronRight } from 'lucide-react'
 import { useEnvStore } from '@/features/environments/environments.store'
+import { useSettingsStore } from '@/features/settings/settings.store'
 import { EnvSidebar } from '@/components/Environments/EnvSidebar'
 import { EnvEditor } from '@/components/Environments/EnvEditor'
 import { ConfirmDeleteModal } from '@/components/shared/modals/ConfirmDeleteModal'
+import { useTranslation } from '@/i18n'
 import type { Environment } from '@/types'
 
 export function EnvironmentsScreen() {
+  const { t } = useTranslation()
   const { removeEnvironment } = useEnvStore()
+  const { sidebarVisible, setSidebarVisible } = useSettingsStore()
   const [envToDelete, setEnvToDelete] = useState<Environment | null>(null)
 
   const handleDeleteConfirm = useCallback(() => {
@@ -19,7 +23,17 @@ export function EnvironmentsScreen() {
 
   return (
     <div style={s.root}>
-      <EnvSidebar onDelete={setEnvToDelete} />
+      {!sidebarVisible && (
+        <button
+          className="expand-panel-btn expand-panel-btn-left"
+          onClick={() => setSidebarVisible(true)}
+          title="Show Sidebar"
+        >
+          <ChevronRight size={20} />
+        </button>
+      )}
+
+      {sidebarVisible && <EnvSidebar onDelete={setEnvToDelete} />}
       <EnvEditor />
 
       <ConfirmDeleteModal
@@ -27,7 +41,7 @@ export function EnvironmentsScreen() {
         itemName={envToDelete?.name || ''}
         onClose={() => setEnvToDelete(null)}
         onConfirm={handleDeleteConfirm}
-        title="Delete Environment"
+        title={`${t('sidebar.delete')} ${t('sidebar.environment_item') || 'Environment'}`}
       />
     </div>
   )

@@ -1,5 +1,6 @@
 import { Search as SearchIcon, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/i18n'
 
 interface SearchProps {
   value: string
@@ -11,9 +12,11 @@ interface SearchProps {
 export function Search({
   value,
   onChange,
-  placeholder = 'Search...',
+  placeholder,
   className,
 }: SearchProps) {
+  const { t } = useTranslation()
+  const displayPlaceholder = placeholder || t('sidebar.search')
   return (
     <div className={cn('sidebar-search-container', className)}>
       <div className="sidebar-search-wrapper">
@@ -22,14 +25,14 @@ export function Search({
           className="sidebar-search-input"
           id="sidebar-search-input"
           onChange={e => onChange(e.target.value)}
-          placeholder={placeholder}
+          placeholder={displayPlaceholder}
           spellCheck={false}
           type="text"
           value={value}
         />
         {value && (
           <button
-            aria-label="Clear search"
+            aria-label={t('common.clear_search') || 'Clear search'}
             className="sidebar-search-clear"
             onClick={() => onChange('')}
             type="button"

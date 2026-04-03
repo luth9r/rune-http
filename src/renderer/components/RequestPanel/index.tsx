@@ -21,9 +21,12 @@ import {
   parseUrlParams,
   updateUrlWithParams,
 } from './utils/utils'
+import { useResizable } from '@/hooks/useResizable'
+import { useTranslation } from '@/i18n'
 import './request-panel.css'
 
 export function RequestPanel() {
+  const { t } = useTranslation()
   const { sendRequest } = useHttpRequest()
   const [activeTab, setActiveTab] = useState<RequestTab>('Body')
   const tab = useTabsStore(selectActiveTab)
@@ -47,7 +50,7 @@ export function RequestPanel() {
     }
   }, [tab?.id, tab?.bodyType])
 
-  if (!tab) return <div className="request-panel__empty">No active tab</div>
+  if (!tab) return <div className="request-panel__empty">{t('request.no_active_tab') || 'No active tab'}</div>
 
   const handleFormDataChange = (data: KeyValuePair[]) => {
     setFormData(data)
@@ -74,7 +77,7 @@ export function RequestPanel() {
             const newParams = parseUrlParams(val)
             updateTab(tab.id, { url: val, params: newParams })
           }}
-          placeholder="http://localhost:3000/api"
+          placeholder={t('request.url_placeholder')}
           value={tab.url}
         />
         <Button
@@ -88,7 +91,7 @@ export function RequestPanel() {
           ) : (
             <>
               <Send size={14} />
-              <span>Send</span>
+              <span>{t('request.send')}</span>
             </>
           )}
         </Button>
@@ -96,19 +99,19 @@ export function RequestPanel() {
 
       {/* Tab bar */}
       <div className="request-panel__tabs-bar">
-        {REQUEST_TABS.map(t => (
+        {REQUEST_TABS.map(tabName => (
           <button
-            className={`request-panel__tab-btn${activeTab === t ? ' active' : ''}`}
-            key={t}
-            onClick={() => setActiveTab(t)}
+            className={`request-panel__tab-btn${activeTab === tabName ? ' active' : ''}`}
+            key={tabName}
+            onClick={() => setActiveTab(tabName)}
           >
-            {t}
-            {t === 'Params' && getCount(tab.params) > 0 && (
+            {t(`request.${tabName.toLowerCase()}` as any)}
+            {tabName === 'Params' && getCount(tab.params) > 0 && (
               <span className="request-panel__badge">
                 {getCount(tab.params)}
               </span>
             )}
-            {t === 'Headers' && getCount(tab.headers) > 0 && (
+            {tabName === 'Headers' && getCount(tab.headers) > 0 && (
               <span className="request-panel__badge">
                 {getCount(tab.headers)}
               </span>
@@ -142,7 +145,7 @@ export function RequestPanel() {
           <div className="body-panel">
             <div className="panel-header">
               <div className="panel-selector">
-                <span className="panel-label">Content Type</span>
+                <span className="panel-label">{t('request.content_type')}</span>
                 <Select
                   onChange={val =>
                     updateTab(tab.id, { bodyType: val as BodyType })
@@ -158,7 +161,7 @@ export function RequestPanel() {
                   size="xs"
                   variant="ghost"
                 >
-                  Prettify
+                  {t('request.prettify')}
                 </Button>
               )}
             </div>
@@ -166,7 +169,7 @@ export function RequestPanel() {
             <div className="body-panel__content">
               {tab.bodyType === 'none' && (
                 <div className="panel-empty">
-                  <p>This request does not have a body</p>
+                  <p>{t('request.no_body')}</p>
                 </div>
               )}
 
@@ -190,10 +193,10 @@ export function RequestPanel() {
                       <span className="binary-filename">
                         {tab.body
                           ? tab.body.split(/[/\\]/).pop()
-                          : 'No file selected'}
+                          : t('request.no_file_selected')}
                       </span>
                       <span className="binary-path">
-                        {tab.body || 'Please select a file to send as body'}
+                        {tab.body || t('request.file_body_desc')}
                       </span>
                     </div>
                   </div>
@@ -213,7 +216,7 @@ export function RequestPanel() {
                     variant="secondary"
                   >
                     <FolderOpen className="mr-2" size={14} />
-                    {tab.body ? 'Change File' : 'Select File'}
+                    {tab.body ? t('request.change_file') : t('request.select_file')}
                   </Button>
                 </div>
               )}

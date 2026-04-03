@@ -22,6 +22,7 @@ import { useResizable } from '@/hooks/useResizable'
 import { useEnvStore } from '@/features/environments/environments.store'
 import { EnvSidebarItem } from './EnvSidebarItem'
 import type { Environment, DropPosition } from '@/types'
+import { useTranslation } from '@/i18n'
 import { GLOBAL_ENV_ID } from '@/features/environments/environments.constants'
 import '@/components/Sidebar/sidebar.css'
 
@@ -30,6 +31,7 @@ interface EnvSidebarProps {
 }
 
 export function EnvSidebar({ onDelete }: EnvSidebarProps) {
+  const { t } = useTranslation()
   const {
     environments,
     activeEnvId,
@@ -120,21 +122,21 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
 
   return (
     <SidebarRoot onResizeMouseDown={startResizing} style={{ width }}>
-      <SidebarHeader onAdd={() => setIsAddingMode(true)} title="Environments" />
+      <SidebarHeader onAdd={() => setIsAddingMode(true)} title={t('env.title')} />
 
       {isAddingMode && (
         <SidebarInput
           onCancel={() => setIsAddingMode(false)}
           onChange={setNewEnvName}
           onCommit={handleCommitAdd}
-          placeholder="Environment name..."
+          placeholder={t('env.name_placeholder')}
           value={newEnvName}
         />
       )}
 
       <SidebarList>
         {environments.length === 0 && !isAddingMode && (
-          <p style={s.emptyHint}>No environments yet</p>
+          <p style={s.emptyHint}>{t('env.no_envs')}</p>
         )}
 
         {/* Always show Global at the top, undraggable */}

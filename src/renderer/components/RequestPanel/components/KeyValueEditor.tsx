@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid'
 import { cn } from '@/lib/utils'
 import type { KeyValuePair } from '@/types'
 import { SmartInput } from '@/components/ui/smart-input'
+import { useTranslation } from '@/i18n'
 
 interface Props {
   data: KeyValuePair[]
@@ -17,6 +18,7 @@ export function KeyValueEditor({
   placeholder,
   allowFileSelection,
 }: Props) {
+  const { t } = useTranslation()
   function addRow() {
     onChange([...data, { id: uuid(), key: '', value: '', enabled: true }])
   }
@@ -33,9 +35,9 @@ export function KeyValueEditor({
     <div className={cn('kv', allowFileSelection && 'kv--multipart')}>
       <div className="kv__header">
         <div className="kv__col-toggle" />
-        <span className="kv__col-label">Key</span>
-        <span className="kv__col-label">Value</span>
-        {allowFileSelection && <span className="kv__col-label">Type</span>}
+        <span className="kv__col-label">{t('request.key')}</span>
+        <span className="kv__col-label">{t('request.value')}</span>
+        {allowFileSelection && <span className="kv__col-label">{t('request.type') || 'Type'}</span>}
         <div className="kv__col-action" />
       </div>
 
@@ -54,7 +56,7 @@ export function KeyValueEditor({
 
       <button className="kv__add" onClick={addRow}>
         <Plus size={13} />
-        <span>Add</span>
+        <span>{t('common.add') || 'Add'}</span>
       </button>
     </div>
   )
@@ -75,6 +77,7 @@ function KeyValueRow({
   onChange: (patch: Partial<KeyValuePair>) => void
   onRemove: () => void
 }) {
+  const { t } = useTranslation()
   const isFileType = row.type === 'file'
 
   async function handleFileSelect() {
@@ -117,7 +120,7 @@ function KeyValueRow({
             <input
               className="kv__input--file-path"
               onClick={handleFileSelect}
-              placeholder="No file selected"
+              placeholder={t('request.no_file_selected')}
               readOnly
               value={row.value || ''}
             />

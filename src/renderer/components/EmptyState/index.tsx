@@ -2,9 +2,11 @@ import { Plus } from "lucide-react";
 import { useTabsStore } from "@/features/tabs/tabs.store";
 import { Logo } from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/i18n";
 import "./empty-state.css";
 
 export function EmptyState() {
+  const { t } = useTranslation();
   const openTab = useTabsStore((state) => state.openTab);
 
   return (
@@ -19,12 +21,14 @@ export function EmptyState() {
           variant="primary"
         >
           <Plus size={18} />
-          <span>New Request</span>
+          <span>{t('empty.new_request')}</span>
           <span className="empty-state-shortcut">Ctrl+N</span>
         </Button>
 
         <p className="empty-state-hint">
-          Press <kbd className="kbd">Ctrl+N</kbd> to search collections
+          {t('empty.search_hint').split('{{shortcut}}')[0]}
+          <kbd className="kbd">Ctrl+F</kbd>
+          {t('empty.search_hint').split('{{shortcut}}')[1]}
         </p>
       </div>
     </div>

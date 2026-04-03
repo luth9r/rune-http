@@ -1,6 +1,7 @@
 import type { AuthConfig, AuthType } from '@/types'
 import { Select } from '@/components/ui/select'
 import { SmartInput } from '@/components/ui/smart-input'
+import { useTranslation } from '@/i18n'
 
 export function AuthPanel({
   auth,
@@ -9,18 +10,19 @@ export function AuthPanel({
   auth: AuthConfig
   onChange: (auth: AuthConfig) => void
 }) {
+  const { t } = useTranslation()
   return (
     <div className="auth-panel">
       <div className="panel-header">
         <div className="panel-selector">
-          <span className="panel-label">Auth Type</span>
+          <span className="panel-label">{t('request.auth_type')}</span>
           <Select
             onChange={type => onChange({ type: type as AuthType })}
             options={[
-              { label: 'No Auth', value: 'none' },
-              { label: 'Bearer Token', value: 'bearer' },
-              { label: 'Basic Auth', value: 'basic' },
-              { label: 'API Key', value: 'api-key' },
+              { label: t('request.no_auth'), value: 'none' },
+              { label: t('request.bearer_token'), value: 'bearer' },
+              { label: t('request.basic_auth'), value: 'basic' },
+              { label: t('request.api_key'), value: 'api-key' },
             ]}
             value={auth.type}
           />
@@ -30,10 +32,10 @@ export function AuthPanel({
       <div className="auth-panel__content">
         {auth.type === 'bearer' && (
           <div className="auth-panel__field">
-            <span className="auth-panel__label">Token</span>
+            <span className="auth-panel__label">{t('request.token')}</span>
             <SmartInput
               onChange={v => onChange({ ...auth, token: v })}
-              placeholder="Bearer token..."
+              placeholder={`${t('request.bearer_token')}...`}
               type="password"
               value={auth.token ?? ''}
             />
@@ -43,18 +45,18 @@ export function AuthPanel({
         {auth.type === 'basic' && (
           <>
             <div className="auth-panel__field">
-              <span className="auth-panel__label">Username</span>
+              <span className="auth-panel__label">{t('request.username')}</span>
               <SmartInput
                 onChange={v => onChange({ ...auth, username: v })}
-                placeholder="username"
+                placeholder={t('request.username').toLowerCase()}
                 value={auth.username ?? ''}
               />
             </div>
             <div className="auth-panel__field">
-              <span className="auth-panel__label">Password</span>
+              <span className="auth-panel__label">{t('request.password')}</span>
               <SmartInput
                 onChange={v => onChange({ ...auth, password: v })}
-                placeholder="password"
+                placeholder={t('request.password').toLowerCase()}
                 type="password"
                 value={auth.password ?? ''}
               />
@@ -65,7 +67,7 @@ export function AuthPanel({
         {auth.type === 'api-key' && (
           <>
             <div className="auth-panel__field">
-              <span className="auth-panel__label">Key</span>
+              <span className="auth-panel__label">{t('request.key')}</span>
               <SmartInput
                 onChange={v => onChange({ ...auth, apiKey: v })}
                 placeholder="X-API-Key"
@@ -73,7 +75,7 @@ export function AuthPanel({
               />
             </div>
             <div className="auth-panel__field">
-              <span className="auth-panel__label">Value</span>
+              <span className="auth-panel__label">{t('request.value')}</span>
               <SmartInput
                 onChange={v => onChange({ ...auth, apiValue: v })}
                 placeholder="api-key-value"
@@ -82,14 +84,14 @@ export function AuthPanel({
               />
             </div>
             <div className="auth-panel__field">
-              <span className="auth-panel__label">Add to</span>
+              <span className="auth-panel__label">{t('request.add_to')}</span>
               <Select
                 onChange={v =>
                   onChange({ ...auth, apiKeyIn: v as 'header' | 'query' })
                 }
                 options={[
-                  { label: 'Header', value: 'header' },
-                  { label: 'Query Param', value: 'query' },
+                  { label: t('request.header'), value: 'header' },
+                  { label: t('request.query_param'), value: 'query' },
                 ]}
                 value={auth.apiKeyIn ?? 'header'}
               />
@@ -99,7 +101,7 @@ export function AuthPanel({
 
         {auth.type === 'none' && (
           <div className="panel-empty">
-            <p>This request does not use authentication</p>
+            <p>{t('request.no_auth_desc')}</p>
           </div>
         )}
       </div>

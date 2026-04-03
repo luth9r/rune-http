@@ -3,9 +3,11 @@ import { Info, Save, Globe } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CodeEditor } from 'renderer/components/shared/CodeEditor'
 import { useEnvStore } from '@/features/environments/environments.store'
+import { useTranslation } from '@/i18n'
 import './env-editor.css'
 
 export function EnvEditor() {
+  const { t } = useTranslation()
   const { environments, activeEnvId, saveEnvironment, updateDraft } =
     useEnvStore()
 
@@ -34,7 +36,7 @@ export function EnvEditor() {
         JSON.parse(initialValue)
         setError(null)
       } catch {
-        setError('Invalid JSON')
+        setError(t('env.invalid_json'))
       }
     }
   }, [activeEnvId, activeEnv?.id]) // Only reset when ID changes or mount
@@ -56,7 +58,7 @@ export function EnvEditor() {
         JSON.parse(value)
         setError(null)
       } catch {
-        setError('Invalid JSON')
+        setError(t('env.invalid_json'))
       }
     },
     [activeEnv, updateDraft]
@@ -72,9 +74,9 @@ export function EnvEditor() {
       setIsDirty(false)
       setError(null)
     } catch {
-      setError('Invalid JSON')
+      setError(t('env.invalid_json'))
     }
-  }, [activeEnv, localValue, error, saveEnvironment])
+  }, [activeEnv, localValue, error, saveEnvironment, t])
 
   // Cmd/Ctrl+S
   useEffect(() => {
@@ -95,7 +97,7 @@ export function EnvEditor() {
       <div className="env-editor-empty">
         <Globe className="env-editor-empty-icon" size={40} />
         <span className="env-editor-empty-text">
-          Select an environment to edit variables
+          {t('env.select_hint')}
         </span>
       </div>
     )
@@ -107,9 +109,7 @@ export function EnvEditor() {
         <div className="env-editor-header-left">
           <div className="env-editor-name">{activeEnv.name}</div>
           <div className="env-editor-hint">
-            Flat JSON object — use as{' '}
-            <code className="env-editor-code">{'{{variable_name}}'}</code> in
-            requests
+            {t('env.json_hint')}
           </div>
         </div>
 
@@ -121,7 +121,7 @@ export function EnvEditor() {
             </div>
           )}
           {isDirty && !error && (
-            <div className="env-editor-dirty-badge">Unsaved changes</div>
+            <div className="env-editor-dirty-badge">{t('env.unsaved_changes')}</div>
           )}
           <Button
             className="env-editor-save-btn"
@@ -131,7 +131,7 @@ export function EnvEditor() {
             variant="primary"
           >
             <Save size={13} />
-            Save
+            {t('env.save')}
           </Button>
         </div>
       </div>

@@ -17,6 +17,7 @@ import {
   type ContextMenuItem,
 } from '@/components/shared/ContextMenu'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/i18n'
 
 interface SidebarItemProps {
   item: CollectionItem | any
@@ -45,6 +46,7 @@ export function SidebarItem({
   onToggle,
   level = 0,
 }: SidebarItemProps) {
+  const { t } = useTranslation()
   const [contextMenu, setContextMenu] = React.useState<{
     x: number
     y: number
@@ -67,31 +69,31 @@ export function SidebarItem({
 
   const menuItems: ContextMenuItem[] = [
     {
-      label: 'Rename',
+      label: t('sidebar.rename'),
       icon: <Edit2 size={14} />,
       onClick: () => setIsRenaming(true),
     },
     {
-      label: 'Duplicate',
+      label: t('sidebar.duplicate'),
       icon: <Copy size={14} />,
       onClick: () => onDuplicate?.(),
     },
     ...(isCollection
       ? [
           {
-            label: 'Export as JSON',
+            label: t('sidebar.export_json'),
             icon: <Download size={14} />,
             onClick: () => onExport?.('json'),
           },
           {
-            label: 'Export as OpenAPI',
+            label: t('sidebar.export_openapi'),
             icon: <Download size={14} />,
             onClick: () => onExport?.('openapi'),
           },
         ]
       : []),
     {
-      label: 'Delete',
+      label: t('sidebar.delete'),
       icon: <Trash2 size={14} />,
       onClick: () => onRemove?.(),
       variant: 'danger',
