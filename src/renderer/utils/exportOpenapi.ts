@@ -17,7 +17,6 @@ export function exportToOpenApi(collection: Collection): string {
     const req = item.request;
     const { urlPath, baseUrl } = parseUrl(req.url);
 
-    // Добавляем сервер, если он еще не указан
     if (
       baseUrl &&
       (!openapi.servers || !openapi.servers.find((s: any) => s.url === baseUrl))
@@ -26,14 +25,12 @@ export function exportToOpenApi(collection: Collection): string {
       openapi.servers.push({ url: baseUrl });
     }
 
-    // Инициализируем путь в объекте paths
     if (!openapi.paths[urlPath]) {
       openapi.paths[urlPath] = {};
     }
 
     const method = req.method.toLowerCase();
 
-    // Формируем операцию (запрос)
     openapi.paths[urlPath][method] = {
       summary: req.name || item.name,
       operationId: item.id.replace(/-/g, "_"),
@@ -46,7 +43,6 @@ export function exportToOpenApi(collection: Collection): string {
       },
     };
 
-    // Обработка тела запроса (RequestBody)
     if (req.body && req.method !== "GET") {
       const contentType = mapBodyTypeToContentType(req.bodyType);
       openapi.paths[urlPath][method].requestBody = {

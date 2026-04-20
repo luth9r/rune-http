@@ -2,6 +2,7 @@
   --eos-bg: #1d1f21;
   --eos-surface: #24272e;
   --eos-surface-2: #2a2d3a;
+  --eos-surface-3: #2f3344;
   --eos-border: #2e3141;
   --eos-border-2: #3d4259;
   --eos-accent: #7f3fbf;
@@ -78,6 +79,7 @@
   --eos-bg: #1d1f21;
   --eos-surface: #242424;
   --eos-surface-2: #2a2a2a;
+  --eos-surface-3: #2d2d2d;
   --eos-border: #333333;
   --eos-border-2: #454545;
   --eos-accent: #1793d1;
@@ -86,4 +88,39 @@
   --eos-text: #f3f4f6;
   --eos-muted: #8892a4;
   --eos-muted-2: #555e73;
+}
+
+.theme-light {
+  --eos-bg: #ffffff;
+  --eos-surface: #f3f4f6;
+  --eos-surface-2: #e5e7eb;
+  --eos-surface-3: #d1d5db;
+  --eos-border: #e5e7eb;
+  --eos-border-2: #d1d5db;
+  --eos-accent: #7c3aed;
+  --eos-accent-h: #9b4de0;
+  --eos-accent-dim: rgba(124, 58, 237, 0.1);
+  --eos-text: #1f2937;
+  --eos-muted: #6b7280;
+  --eos-muted-2: #9ca3af;
+
+  --primary-foreground: #ffffff;
+  --sidebar: #f8fafc;
+  --sidebar-foreground: #334155;
+  --sidebar-primary: #7c3aed;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+
+  --input-bg: #ffffff;
+  --btn-hover-bg: #f1f5f9;
+  --btn-active-bg: #e2e8f0;
+
+  /* Syntax Highlighting overrides for light mode */
+  --eos-get: #015891; /* Darker blue */
+  --eos-post: #157e3d; /* Darker green */
+  --eos-put: #b45309; /* Darker orange */
+  --eos-delete: #be123c; /* Darker red */
+  --eos-patch: #c2410c; /* Darker orange-red */
+  --eos-head: #6d28d9; /* Darker purple */
 }

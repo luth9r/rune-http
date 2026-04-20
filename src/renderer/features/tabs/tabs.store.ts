@@ -84,11 +84,12 @@ export const useTabsStore = create<TabsState>()(
             )
             if (existingTab) {
               state.activeTabId = existingTab.id
+              existingTab.error = null // Clear error when opening from sidebar
               return
             }
           }
 
-          const tab = createEmptyTab(overrides)
+          const tab = createEmptyTab({ ...overrides, error: null })
           tab.savedState = getCompareState(tab)
           tab.isDirty = false
 
@@ -160,6 +161,12 @@ export const useTabsStore = create<TabsState>()(
           // If body is changing, save it to the current bodies slot
           if (patch.body !== undefined && tab.bodyType !== 'none') {
             tab.bodies[tab.bodyType] = patch.body
+          }
+
+          // Clear error when request data changes
+          const requestFields = ['url', 'method', 'params', 'headers', 'body', 'bodyType', 'auth']
+          if (requestFields.some(field => field in patch)) {
+            tab.error = null
           }
 
           Object.assign(tab, patch)

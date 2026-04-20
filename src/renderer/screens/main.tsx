@@ -41,10 +41,34 @@ export function MainScreen() {
     )
 
     // Apply theme class
-    if (theme === 'arch') {
-      document.body.classList.add('theme-arch')
-    } else {
-      document.body.classList.remove('theme-arch')
+    const updateTheme = () => {
+      if (theme === 'arch') {
+        document.body.classList.add('theme-arch')
+        document.body.classList.remove('theme-light')
+      } else if (theme === 'light') {
+        document.body.classList.add('theme-light')
+        document.body.classList.remove('theme-arch')
+      } else if (theme === 'system') {
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (isDark) {
+          document.body.classList.remove('theme-arch', 'theme-light')
+        } else {
+          document.body.classList.add('theme-light')
+          document.body.classList.remove('theme-arch')
+        }
+      } else {
+        // Default dark (EndeavourOS)
+        document.body.classList.remove('theme-arch', 'theme-light')
+      }
+    }
+
+    updateTheme()
+
+    if (theme === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+      const handler = () => updateTheme()
+      mediaQuery.addEventListener('change', handler)
+      return () => mediaQuery.removeEventListener('change', handler)
     }
   }, [fontSize, fontFamily, monoFontFamily, theme])
 

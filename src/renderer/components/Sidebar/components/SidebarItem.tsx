@@ -26,7 +26,7 @@ interface SidebarItemProps {
   onClick?: () => void
   onRemove?: () => void
   onDuplicate?: () => void
-  onExport?: (format: 'json' | 'openapi') => void
+  onExport?: (format: 'json' | 'postman' | 'insomnia') => void
   onRename?: (newName: string) => void
   onAddRequest?: () => void
   onToggle?: () => void
@@ -78,20 +78,21 @@ export function SidebarItem({
       icon: <Copy size={14} />,
       onClick: () => onDuplicate?.(),
     },
-    ...(isCollection
-      ? [
-          {
-            label: t('sidebar.export_json'),
-            icon: <Download size={14} />,
-            onClick: () => onExport?.('json'),
-          },
-          {
-            label: t('sidebar.export_openapi'),
-            icon: <Download size={14} />,
-            onClick: () => onExport?.('openapi'),
-          },
-        ]
-      : []),
+    {
+      label: t('sidebar.export_json'),
+      icon: <Download size={14} />,
+      onClick: () => onExport?.('json'),
+    },
+    {
+      label: t('sidebar.export_postman'),
+      icon: <Download size={14} />,
+      onClick: () => onExport?.('postman'),
+    },
+    {
+      label: t('sidebar.export_insomnia'),
+      icon: <Download size={14} />,
+      onClick: () => onExport?.('insomnia'),
+    },
     {
       label: t('sidebar.delete'),
       icon: <Trash2 size={14} />,

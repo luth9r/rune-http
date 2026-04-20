@@ -74,13 +74,13 @@
 
 .tab-item-close {
   width: 18px !important;
+  min-width: 18px !important;
   height: 18px !important;
-  padding: 0;
+  padding: 0 !important;
+  border-radius: 4px;
 }
 
-.tab-item-spacer {
-  width: 18px;
-}
+
 
 .tab-bar-add {
   align-self: center;

@@ -29,11 +29,11 @@
 }
 
 .context-menu-danger {
-  color: #ff6060;
+  color: var(--eos-error);
 }
 
 .context-menu-danger:hover:not(:disabled) {
-  background: rgba(255, 96, 96, 0.1);
+  background: color-mix(in srgb, var(--eos-error) 10%, transparent);
 }
 
 .context-menu-disabled {

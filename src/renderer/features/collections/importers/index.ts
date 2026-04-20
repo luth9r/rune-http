@@ -1,7 +1,7 @@
 import { importPostman } from "./postman";
 import { importInsomnia } from "./insomnia";
-import { importOpenApi } from "./openApi";
 import type { Collection } from "@/types";
+import { v4 as uuid } from 'uuid';
 
 export function detectAndImport(content: string): Collection | null {
   try {
@@ -23,13 +23,26 @@ export function detectAndImport(content: string): Collection | null {
       return importInsomnia(data);
     }
 
-    if (data.openapi && data.openapi.startsWith("3.")) {
-      return importOpenApi(data);
-    }
-
-    // Native Rune Detection (fallback or explicit check)
+    // Native Rune Collection Detection
     if (data.id && Array.isArray(data.items)) {
       return data as Collection;
+    }
+
+    // Single Request Detection (Rune/Generic)
+    if (data.method && data.url) {
+      const id = uuid();
+      return {
+        id: uuid(),
+        name: data.name || 'Imported Request',
+        items: [{
+          id,
+          type: 'request',
+          name: data.name || 'Imported Request',
+          request: { ...data, id }
+        }],
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      } as Collection;
     }
 
     return null;

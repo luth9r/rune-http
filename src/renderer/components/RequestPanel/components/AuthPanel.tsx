@@ -1,6 +1,7 @@
 import type { AuthConfig, AuthType } from '@/types'
 import { Select } from '@/components/ui/select'
 import { SmartInput } from '@/components/ui/smart-input'
+import { ShieldOff } from 'lucide-react'
 import { useTranslation } from '@/i18n'
 
 export function AuthPanel({
@@ -70,7 +71,7 @@ export function AuthPanel({
               <span className="auth-panel__label">{t('request.key')}</span>
               <SmartInput
                 onChange={v => onChange({ ...auth, apiKey: v })}
-                placeholder="X-API-Key"
+                placeholder={t('request.key_placeholder')}
                 value={auth.apiKey ?? ''}
               />
             </div>
@@ -78,7 +79,7 @@ export function AuthPanel({
               <span className="auth-panel__label">{t('request.value')}</span>
               <SmartInput
                 onChange={v => onChange({ ...auth, apiValue: v })}
-                placeholder="api-key-value"
+                placeholder={t('request.value_placeholder')}
                 type="password"
                 value={auth.apiValue ?? ''}
               />
@@ -101,7 +102,11 @@ export function AuthPanel({
 
         {auth.type === 'none' && (
           <div className="panel-empty">
-            <p>{t('request.no_auth_desc')}</p>
+            <div className="panel-empty__icon-wrap">
+              <ShieldOff className="panel-empty__icon" size={40} />
+            </div>
+            <h3 className="panel-empty__title">{t('request.no_auth_title')}</h3>
+            <p className="panel-empty__desc">{t('request.no_auth_desc')}</p>
           </div>
         )}
       </div>

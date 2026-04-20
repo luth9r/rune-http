@@ -52,21 +52,21 @@ export function TabItem({ tab, isActive, onClose }: TabItemProps) {
 
       <div className="tab-item-actions">
         {tab.isDirty && <span className="tab-item-dirty-dot" />}
-        {(hovered || isActive) && (
-          <Button
-            className="tab-item-close"
-            onClick={e => {
-              e.stopPropagation()
-              onClose()
-            }}
-            onPointerDown={e => e.stopPropagation()}
-            size="sm"
-            variant="ghost-danger"
-          >
-            <X size={12} />
-          </Button>
-        )}
-        {!(hovered || isActive) && <div className="tab-item-spacer" />}
+        <Button
+          className={cn(
+            'tab-item-close',
+            !(hovered || isActive) && 'tab-item-close-hidden'
+          )}
+          onClick={e => {
+            e.stopPropagation()
+            onClose()
+          }}
+          onPointerDown={e => e.stopPropagation()}
+          size="sm"
+          variant="ghost-danger"
+        >
+          <X size={12} />
+        </Button>
       </div>
     </div>
   )

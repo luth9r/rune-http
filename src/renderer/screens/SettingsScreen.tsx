@@ -370,9 +370,10 @@ export function SettingsScreen() {
                   <Select
                     onChange={val => setTheme(val as any)}
                     options={[
+                      { label: t('settings.theme_auto'), value: 'system' },
                       { label: 'EndeavourOS (Dark)', value: 'dark' },
                       { label: 'Arch Linux', value: 'arch' },
-                      { label: 'Light (Coming Soon)', value: 'light' },
+                      { label: t('settings.theme_light'), value: 'light' },
                     ]}
                     value={theme}
                   />

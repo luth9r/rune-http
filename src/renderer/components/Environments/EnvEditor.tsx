@@ -139,6 +139,7 @@ export function EnvEditor() {
       <div className="env-editor-editor-wrap">
         <CodeEditor
           bodyType="json"
+          key={activeEnvId}
           onChange={handleEditorChange}
           value={localValue}
         />

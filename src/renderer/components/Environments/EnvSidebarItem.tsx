@@ -116,7 +116,7 @@ export function EnvSidebarItem({
             )}
           >
             {isActivated ? (
-              <Check color="var(--eos-success, #10b981)" size={13} strokeWidth={3} />
+              <Check color="var(--eos-success)" size={13} strokeWidth={3} />
             ) : isGlobal ? (
               <Globe color="var(--eos-accent)" size={13} />
             ) : (

@@ -109,7 +109,7 @@ function KeyValueRow({
       <div className="kv__cell">
         <SmartInput
           onChange={val => onChange({ key: val })}
-          placeholder={placeholder?.key ?? 'key'}
+          placeholder={placeholder?.key ?? t('request.key_placeholder')}
           value={row.key}
         />
       </div>
@@ -142,7 +142,7 @@ function KeyValueRow({
         ) : (
           <SmartInput
             onChange={val => onChange({ value: val })}
-            placeholder={placeholder?.value ?? 'value'}
+            placeholder={placeholder?.value ?? t('request.value_placeholder')}
             value={row.value}
           />
         )}

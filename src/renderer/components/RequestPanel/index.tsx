@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Send, File as FileIcon, FolderOpen } from 'lucide-react'
+import { Send, FileIcon, FolderOpen, Search, X, AlertCircle, FileX } from 'lucide-react'
 import { useTabsStore, selectActiveTab } from '@/features/tabs/tabs.store'
 import { useHttpRequest } from '@/hooks/useHttpRequest'
 import { MethodSelect } from './components/MethodSelect'
@@ -73,6 +73,7 @@ export function RequestPanel() {
         />
         <SmartInput
           className="request-panel-url-input"
+          key={tab.id}
           onChange={val => {
             const newParams = parseUrlParams(val)
             updateTab(tab.id, { url: val, params: newParams })
@@ -125,19 +126,27 @@ export function RequestPanel() {
         {activeTab === 'Params' && (
           <KeyValueEditor
             data={tab.params}
+            key={`${tab.id}-params`}
             onChange={params => {
               const newUrl = updateUrlWithParams(tab.url, params)
               updateTab(tab.id, { params, url: newUrl })
             }}
-            placeholder={{ key: 'parameter', value: 'value' }}
+            placeholder={{ 
+              key: t('request.param_placeholder'), 
+              value: t('request.value_placeholder') 
+            }}
           />
         )}
 
         {activeTab === 'Headers' && (
           <KeyValueEditor
             data={tab.headers}
+            key={`${tab.id}-headers`}
             onChange={headers => updateTab(tab.id, { headers })}
-            placeholder={{ key: 'header', value: 'value' }}
+            placeholder={{ 
+              key: t('request.header').toLowerCase(), 
+              value: t('request.value_placeholder') 
+            }}
           />
         )}
 
@@ -150,7 +159,10 @@ export function RequestPanel() {
                   onChange={val =>
                     updateTab(tab.id, { bodyType: val as BodyType })
                   }
-                  options={BODY_OPTIONS}
+                  options={BODY_OPTIONS.map(opt => ({
+                    ...opt,
+                    label: t(`request.body_${opt.value}` as any)
+                  }))}
                   value={tab.bodyType}
                 />
               </div>
@@ -169,7 +181,11 @@ export function RequestPanel() {
             <div className="body-panel__content">
               {tab.bodyType === 'none' && (
                 <div className="panel-empty">
-                  <p>{t('request.no_body')}</p>
+                  <div className="panel-empty__icon-wrap">
+                    <FileX className="panel-empty__icon" size={40} />
+                  </div>
+                  <h3 className="panel-empty__title">{t('request.no_body_title')}</h3>
+                  <p className="panel-empty__desc">{t('request.no_body')}</p>
                 </div>
               )}
 
@@ -179,8 +195,12 @@ export function RequestPanel() {
                   <KeyValueEditor
                     allowFileSelection={tab.bodyType === 'multipart'}
                     data={formData}
+                    key={`${tab.id}-body-form`}
                     onChange={handleFormDataChange}
-                    placeholder={{ key: 'field', value: 'value' }}
+                    placeholder={{ 
+                      key: t('request.field_placeholder'), 
+                      value: t('request.value_placeholder') 
+                    }}
                   />
                 </div>
               )}
@@ -224,6 +244,7 @@ export function RequestPanel() {
               {['json', 'xml', 'text'].includes(tab.bodyType) && (
                 <CodeEditor
                   bodyType={tab.bodyType as any}
+                  key={`${tab.id}-body-code`}
                   onChange={body => updateTab(tab.id, { body })}
                   value={tab.body}
                 />
@@ -235,6 +256,7 @@ export function RequestPanel() {
         {activeTab === 'Auth' && (
           <AuthPanel
             auth={tab.auth}
+            key={`${tab.id}-auth`}
             onChange={auth => updateTab(tab.id, { auth })}
           />
         )}

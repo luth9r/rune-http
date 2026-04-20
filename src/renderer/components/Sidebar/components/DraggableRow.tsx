@@ -4,7 +4,7 @@ import { useCollectionsStore } from '@/features/collections/collections.store'
 import { useTabsStore } from '@/features/tabs/tabs.store'
 import { SidebarItem } from './SidebarItem'
 import { DropLine } from './DropLine'
-import { exportCollection } from '@/features/collections/exporters'
+import { exportCollection, exportRequest } from '@/features/collections/exporters'
 import type { DropIndicator } from './types'
 
 interface DraggableRowProps {
@@ -100,11 +100,11 @@ export function DraggableRow({
             else if (collectionId) duplicateRequest(collectionId, item.id)
           }}
           onExport={format => {
-            if (isCollection) {
-              const content = exportCollection(item, format)
-              const fileName = `${item.name}.${format === 'openapi' ? 'openapi.json' : 'json'}`
-              window.api.utils.saveFile(content, fileName)
-            }
+            const content = isCollection
+              ? exportCollection(item, format)
+              : exportRequest(item, format)
+            const fileName = `${item.name}.${format === 'json' ? 'json' : format + '.json'}`
+            window.api.utils.saveFile(content, fileName)
           }}
           onRename={newName => {
             if (isCollection) renameCollection(item.id, newName)
