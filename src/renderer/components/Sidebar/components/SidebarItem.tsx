@@ -8,10 +8,13 @@ import {
   MoreVertical,
   Copy,
   Download,
+  Upload,
 } from 'lucide-react'
 import { SidebarItemBase } from 'renderer/components/Sidebar/components/SidebarLayout'
 import { Button } from '@/components/ui/button'
+import { useCollectionsStore } from '@/features/collections/collections.store'
 import type { CollectionItem } from '@/types'
+import { detectAndImport } from '@/features/collections/importers'
 import {
   ContextMenu,
   type ContextMenuItem,
@@ -47,6 +50,7 @@ export function SidebarItem({
   level = 0,
 }: SidebarItemProps) {
   const { t } = useTranslation()
+  const { importIntoCollection } = useCollectionsStore()
   const [contextMenu, setContextMenu] = React.useState<{
     x: number
     y: number
@@ -54,6 +58,7 @@ export function SidebarItem({
   const [isRenaming, setIsRenaming] = React.useState(false)
   const [tempName, setTempName] = React.useState(item.name)
   const isCollection = item.type === 'collection'
+  const collectionId = level === 0 ? item.id : (item as any).collectionId
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -67,6 +72,22 @@ export function SidebarItem({
     setIsRenaming(false)
   }
 
+  const handleImportToCollection = async () => {
+    try {
+      const path = await window.api.utils.selectFile()
+      if (!path) return
+
+      const content = await window.api.utils.readFile(path)
+      const imported = detectAndImport(content)
+
+      if (imported) {
+        importIntoCollection(item.id, imported.items)
+      }
+    } catch (e) {
+      console.error('Failed to import into collection', e)
+    }
+  }
+
   const menuItems: ContextMenuItem[] = [
     {
       label: t('sidebar.rename'),
@@ -78,20 +99,33 @@ export function SidebarItem({
       icon: <Copy size={14} />,
       onClick: () => onDuplicate?.(),
     },
+    ...(isCollection ? ([
+      {
+        label: t('sidebar.import'),
+        icon: <Upload size={14} />,
+        onClick: handleImportToCollection,
+      }
+    ] as ContextMenuItem[]) : []),
     {
-      label: t('sidebar.export_json'),
+      label: t('sidebar.export'),
       icon: <Download size={14} />,
-      onClick: () => onExport?.('json'),
+      submenu: [
+        {
+          label: 'JSON',
+          onClick: () => onExport?.('json'),
+        },
+        {
+          label: 'Postman',
+          onClick: () => onExport?.('postman'),
+        },
+        {
+          label: 'Insomnia',
+          onClick: () => onExport?.('insomnia'),
+        },
+      ],
     },
     {
-      label: t('sidebar.export_postman'),
-      icon: <Download size={14} />,
-      onClick: () => onExport?.('postman'),
-    },
-    {
-      label: t('sidebar.export_insomnia'),
-      icon: <Download size={14} />,
-      onClick: () => onExport?.('insomnia'),
+      type: 'separator',
     },
     {
       label: t('sidebar.delete'),

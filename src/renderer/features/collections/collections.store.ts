@@ -25,6 +25,7 @@ interface CollectionsState {
     itemId: string,
     patch: Partial<HttpRequest>
   ) => void
+  importIntoCollection: (collectionId: string, items: CollectionItem[]) => void
 }
 
 export const useCollectionsStore = create<CollectionsState>()(
@@ -231,6 +232,13 @@ export const useCollectionsStore = create<CollectionsState>()(
           if (!col) return
           const item = col.items.find(i => i.id === itemId)
           if (item?.request) Object.assign(item.request, patch)
+        }),
+      importIntoCollection: (collectionId, items) =>
+        set(state => {
+          const col = state.collections.find(c => c.id === collectionId)
+          if (!col) return
+          col.items.push(...items)
+          col.updatedAt = Date.now()
         }),
     })),
     {

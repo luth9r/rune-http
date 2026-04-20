@@ -18,12 +18,18 @@ body {
   background: var(--eos-bg);
 }
 
+*:focus,
+*:focus-visible {
+  outline: none !important;
+}
+
 input,
 textarea,
-select {
+select,
+button {
   font-family: inherit;
   font-size: inherit;
-  outline: none;
+  outline: none !important;
 }
 
 code,
