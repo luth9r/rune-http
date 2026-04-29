@@ -42,13 +42,13 @@ import { useSettingsStore } from '@/features/settings/settings.store'
 import { useEnvStore } from '@/features/environments/environments.store'
 import { GLOBAL_ENV_ID } from '@/features/environments/environments.constants'
 import './code-editor.css'
-
-const VAR_RE = /\{\{([\w.-]+)\}\}/
+import { VAR_INCOMPLETE, VAR_PATTERN } from 'renderer/utils/varPattern'
 
 const languageConf = new Compartment()
 const envDecorationsConf = new Compartment()
 const autocompleteConf = new Compartment()
 const themeConf = new Compartment()
+const varHoverConf = new Compartment()
 
 class VariableWidget extends WidgetType {
   constructor(
@@ -186,7 +186,7 @@ export function CodeEditor({
 }: CodeEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
-  const { environments, activeEnvId } = useEnvStore()
+  const { environments, activatedEnvId } = useEnvStore()
   const { fontSize, monoFontFamily } = useSettingsStore()
 
   const onChangeRef = useRef(onChange)
@@ -197,14 +197,14 @@ export function CodeEditor({
       (e: Environment) => e.id === GLOBAL_ENV_ID
     )
     const activeEnv = environments.find(
-      (e: Environment) => e.id === activeEnvId
+      (e: Environment) => e.id === activatedEnvId
     )
     return { ...globalEnv?.variables, ...activeEnv?.variables }
-  }, [environments, activeEnvId])
+  }, [environments, activatedEnvId])
 
   const varCompletion = useCallback(
     (context: CompletionContext): CompletionResult | null => {
-      const word = context.matchBefore(/\{\{[\w.-]*/)
+      const word = context.matchBefore(VAR_INCOMPLETE)
       if (!word) return null
       if (word.from === word.to && !context.explicit) return null
       return {
@@ -237,7 +237,7 @@ export function CodeEditor({
       hoverTooltip(
         (view, pos) => {
           const line = view.state.doc.lineAt(pos)
-          const matches = line.text.matchAll(new RegExp(VAR_RE.source, 'g'))
+          const matches = line.text.matchAll(new RegExp(VAR_PATTERN.source, 'g'))
           for (const m of matches) {
             const start = line.from + m.index!
             const end = start + m[0].length
@@ -267,7 +267,7 @@ export function CodeEditor({
 
   const varPlugin = useMemo(() => {
     const decorator = new MatchDecorator({
-      regexp: new RegExp(VAR_RE.source, 'g'),
+      regexp: new RegExp(VAR_PATTERN.source, 'g'),
       decoration: match =>
         Decoration.replace({
           widget: new VariableWidget(match[1], match[1] in vars),
@@ -303,7 +303,7 @@ export function CodeEditor({
           languageConf.of(getLanguage(bodyType)),
           envDecorationsConf.of(varPlugin),
           autocompleteConf.of(autocompletion({ override: [varCompletion] })),
-          varHover,
+          varHoverConf.of(varHover),
           keymap.of([
             {
               key: 'Tab',
@@ -349,9 +349,10 @@ export function CodeEditor({
         autocompleteConf.reconfigure(
           autocompletion({ override: [varCompletion] })
         ),
+        varHoverConf.reconfigure(varHover),
       ],
     })
-  }, [varPlugin, varCompletion])
+  }, [varPlugin, varCompletion, varHover])
 
   useEffect(() => {
     const view = viewRef.current

@@ -58,7 +58,6 @@ export function exportToOpenApi(collection: Collection): string {
   return JSON.stringify(openapi, null, 2);
 }
 
-// Хелпер для разделения URL на Base и Path
 function parseUrl(fullUrl: string) {
   try {
     const url = new URL(
@@ -73,7 +72,6 @@ function parseUrl(fullUrl: string) {
   }
 }
 
-// Хелпер для параметров (query/header)
 function mapParameters(list: KeyValuePair[], location: "query" | "header") {
   return list
     .filter((p) => p.enabled && p.key)
@@ -85,7 +83,6 @@ function mapParameters(list: KeyValuePair[], location: "query" | "header") {
     }));
 }
 
-// Маппинг твоих типов тела в стандартные MIME-типы
 function mapBodyTypeToContentType(type: string): string {
   switch (type) {
     case "json":

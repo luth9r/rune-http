@@ -33,11 +33,7 @@ export function matchShortcut(e: KeyboardEvent | React.KeyboardEvent, shortcut: 
   const { key, modifiers } = parseShortcut(shortcut)
 
   const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
-  
-  // Normalize key comparison
-  // e.code is usually 'KeyN', 'Digit1', 'Enter', 'Backslash'
-  // shortcut key might be 'N', '1', 'Enter', '\', 'Enter'
-  
+
   let eventKey = e.key.toUpperCase()
   if (e.code.startsWith('Key')) {
     eventKey = e.code.replace('Key', '')
@@ -48,8 +44,8 @@ export function matchShortcut(e: KeyboardEvent | React.KeyboardEvent, shortcut: 
   }
 
   const targetKey = key.toUpperCase()
-  
-  const mMatch = 
+
+  const mMatch =
     !!e.ctrlKey === !!modifiers.control &&
     !!e.shiftKey === !!modifiers.shift &&
     !!e.altKey === !!modifiers.alt &&

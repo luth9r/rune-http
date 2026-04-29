@@ -20,6 +20,7 @@ interface SmartInputProps {
 function useEnvVars(): Record<string, string> {
   const environments = useEnvStore(s => s.environments)
   const activatedEnvId = useEnvStore(s => s.activatedEnvId)
+  
   const globalEnv = environments.find(e => e.id === GLOBAL_ENV_ID)
   const activeEnv = environments.find(e => e.id === activatedEnvId)
   return { ...DYNAMIC_VAR_HINTS,...globalEnv?.variables, ...activeEnv?.variables }

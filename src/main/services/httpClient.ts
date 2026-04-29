@@ -129,7 +129,6 @@ export async function executeRequest(
 
   const url = urlObj.toString()
 
-  // 3. Body — только если метод позволяет и есть body
   let body: any
   const hasBody =
     !['GET', 'HEAD', 'OPTIONS'].includes(request.method) &&
@@ -139,7 +138,6 @@ export async function executeRequest(
     if (request.bodyType === 'multipart') {
       const formData = new FormData()
 
-      // ✅ Парсим как массив
       let fields: KeyValuePair[] = []
       try {
         fields = JSON.parse(request.body)
@@ -150,7 +148,6 @@ export async function executeRequest(
         .forEach(kv => {
           const resolved = resolveKV(kv, envVars)
           if (kv.type === 'file' && resolved.value) {
-            // ⚠️ resolved.value уже интерполирован, не нужен повторный interpolate
             const resolvedPath = resolved.value
             if (fs.existsSync(resolvedPath)) {
               const buffer = fs.readFileSync(resolvedPath)
@@ -169,7 +166,6 @@ export async function executeRequest(
       try {
         fields = JSON.parse(request.body)
       } catch {
-        // fallback для raw строки key=value&...
         new URLSearchParams(request.body).forEach((v, k) => formData.append(k, v))
       }
 

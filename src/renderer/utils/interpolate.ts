@@ -1,4 +1,3 @@
-// src/renderer/utils/interpolate.ts
 import { VAR_PATTERN, VAR_EXACT } from './varPattern'
 
 const DYNAMIC_VARS: Record<string, (param?: string) => any> = {
@@ -39,7 +38,6 @@ export function interpolate(str: string, variables: Record<string, any>): string
     if (val !== undefined) return typeof val === 'string' ? val : JSON.stringify(val, null, 2)
   }
 
-  // Inline replacement — создаём новый RegExp чтобы сбросить lastIndex
   return str.replace(new RegExp(VAR_PATTERN.source, 'g'), (match, key) => {
     const dyn = resolveDynamic(key)
     if (dyn.hit) return dyn.value

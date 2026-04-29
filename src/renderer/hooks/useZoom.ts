@@ -15,13 +15,13 @@ export function useZoom() {
       if (e.ctrlKey || e.metaKey) {
         let newZoom = zoomLevel
 
-        if (e.key === '+' || e.key === '=') {
+        if (e.code === 'Equal' || e.code === 'NumpadAdd') {
           e.preventDefault()
           newZoom = Math.min(zoomLevel + 0.1, 2.0)
-        } else if (e.key === '-' || e.key === '_') {
+        } else if (e.code === 'Minus' || e.code === 'NumpadSubtract') {
           e.preventDefault()
           newZoom = Math.max(zoomLevel - 0.1, 0.5)
-        } else if (e.key === '0') {
+        } else if (e.code === 'Digit0' || e.code === 'Numpad0') {
           e.preventDefault()
           newZoom = 1.0
         } else {

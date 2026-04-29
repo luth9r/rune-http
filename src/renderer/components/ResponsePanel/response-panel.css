@@ -215,6 +215,7 @@
   color: var(--eos-accent);
   overflow: hidden;
   text-overflow: ellipsis;
+  user-select: text;
 }
 
 .rp-header-value {
@@ -222,4 +223,5 @@
   color: var(--eos-text);
   word-break: break-all;
   opacity: 0.9;
+  user-select: text;
 }
