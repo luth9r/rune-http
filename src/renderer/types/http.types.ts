@@ -44,6 +44,7 @@ export interface HttpRequest {
   url: string
   headers: KeyValuePair[]
   params: KeyValuePair[]
+  cookies?: KeyValuePair[]
   body: string
   bodyType: BodyType
   bodies?: Record<string, string>
@@ -54,6 +55,7 @@ export interface HttpResponse {
   status: number
   statusText: string
   headers: Record<string, string>
+  cookies?: Record<string, string>
   body: string
   size: number // bytes
   duration: number // ms

@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 import "./response-panel.css";
 
-const RESPONSE_TABS = ["Body", "Headers"] as const;
+const RESPONSE_TABS = ["Body", "Headers", "Cookies"] as const;
 type ResponseTab = (typeof RESPONSE_TABS)[number];
 
 function getStatusColor(status: number): string {
@@ -140,6 +140,23 @@ export function ResponsePanel() {
                 <span className="rp-header-value">{value}</span>
               </div>
             ))}
+          </div>
+        )}
+
+        {activeTab === "Cookies" && (
+          <div className="rp-headers-table">
+            {response.cookies && Object.keys(response.cookies).length > 0 ? (
+              Object.entries(response.cookies).map(([key, value]) => (
+                <div className="rp-header-row" key={key}>
+                  <span className="rp-header-key">{key}</span>
+                  <span className="rp-header-value">{value}</span>
+                </div>
+              ))
+            ) : (
+              <div className="rp-empty-state" style={{ paddingTop: '2rem' }}>
+                <p className="rp-empty-desc">{t("response.no_cookies")}</p>
+              </div>
+            )}
           </div>
         )}
       </div>

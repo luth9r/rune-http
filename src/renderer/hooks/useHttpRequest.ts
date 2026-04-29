@@ -26,6 +26,7 @@ export function useHttpRequest() {
             body: tab.body,
             bodyType: tab.bodyType,
             auth: tab.auth,
+            cookies: tab.cookies,
           },
           envVars
         )

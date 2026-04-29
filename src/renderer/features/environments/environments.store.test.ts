@@ -61,7 +61,7 @@ describe('env store', () => {
     useEnvStore.getState().updateEnvironment(environments[0].id, {
       BASE_URL: 'http://localhost:3000',
     })
-    useEnvStore.getState().setActiveEnv(environments[0].id)
+    useEnvStore.getState().setActivatedEnv(environments[0].id)
     const vars = useEnvStore.getState().getActiveVariables()
     expect(vars.BASE_URL).toBe('http://localhost:3000')
   })

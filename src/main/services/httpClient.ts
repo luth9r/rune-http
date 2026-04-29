@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import type { HttpRequest, HttpResponse, KeyValuePair } from '@/types'
 import { interpolate } from '@/utils'
+import { net } from 'electron';
 
 function resolveKV(
   kv: KeyValuePair,
@@ -43,6 +44,20 @@ function buildHeaders(
       result[resolved.key] = resolved.value
     })
   return result
+}
+
+function buildCookies(
+  cookies: KeyValuePair[] | undefined,
+  envVars: Record<string, any>
+): string {
+  if (!cookies || cookies.length === 0) return ''
+  return cookies
+    .filter(c => c.enabled && c.key)
+    .map(c => {
+      const resolved = resolveKV(c, envVars)
+      return `${resolved.key}=${resolved.value}`
+    })
+    .join('; ')
 }
 
 function applyAuth(
@@ -107,6 +122,11 @@ export async function executeRequest(
 
   applyAuth(headers, urlObj.searchParams, request, envVars)
 
+  const cookieString = buildCookies(request.cookies, envVars)
+  if (cookieString) {
+    headers['Cookie'] = cookieString
+  }
+
   const url = urlObj.toString()
 
   // 3. Body — только если метод позволяет и есть body
@@ -118,67 +138,48 @@ export async function executeRequest(
   if (hasBody) {
     if (request.bodyType === 'multipart') {
       const formData = new FormData()
-      request.body
-        .split('\n')
-        .filter(line => line.trim())
-        .forEach(line => {
-          try {
-            const kv: KeyValuePair = JSON.parse(line)
-            if (kv.enabled && kv.key) {
-              const resolved = resolveKV(kv, envVars)
-              if (kv.type === 'file' && resolved.value) {
-                const resolvedPath = interpolate(resolved.value, envVars)
-                if (fs.existsSync(resolvedPath)) {
-                  const buffer = fs.readFileSync(resolvedPath)
-                  const fileName = path.basename(resolvedPath)
-                  formData.append(resolved.key, new Blob([buffer]), fileName)
-                  console.log(
-                    'FormData content:',
-                    Array.from(formData.entries())
-                  )
-                }
-              } else {
-                formData.append(resolved.key, resolved.value)
-              }
+
+      // ✅ Парсим как массив
+      let fields: KeyValuePair[] = []
+      try {
+        fields = JSON.parse(request.body)
+      } catch { fields = [] }
+
+      fields
+        .filter(kv => kv.enabled && kv.key)
+        .forEach(kv => {
+          const resolved = resolveKV(kv, envVars)
+          if (kv.type === 'file' && resolved.value) {
+            // ⚠️ resolved.value уже интерполирован, не нужен повторный interpolate
+            const resolvedPath = resolved.value
+            if (fs.existsSync(resolvedPath)) {
+              const buffer = fs.readFileSync(resolvedPath)
+              formData.append(resolved.key, new Blob([buffer]), path.basename(resolvedPath))
             }
-          } catch {
-            const [key, value] = line.split('=')
-            if (key && value) {
-              const resolvedValue = interpolate(
-                decodeURIComponent(value),
-                envVars
-              )
-              const resolvedKey = interpolate(decodeURIComponent(key), envVars)
-              formData.append(resolvedKey, resolvedValue)
-            }
+          } else {
+            formData.append(resolved.key, resolved.value)
           }
         })
+
       body = formData
       delete headers['Content-Type']
     } else if (request.bodyType === 'urlencoded') {
       const formData = new URLSearchParams()
-      request.body
-        .split('\n')
-        .filter(line => line.trim())
-        .forEach(line => {
-          try {
-            const kv: KeyValuePair = JSON.parse(line)
-            if (kv.enabled && kv.key) {
-              const resolved = resolveKV(kv, envVars)
-              formData.append(resolved.key, resolved.value)
-            }
-          } catch {
-            const [key, value] = line.split('=')
-            if (key && value) {
-              const resolvedValue = interpolate(
-                decodeURIComponent(value),
-                envVars
-              )
-              const resolvedKey = interpolate(decodeURIComponent(key), envVars)
-              formData.append(resolvedKey, resolvedValue)
-            }
-          }
+      let fields: KeyValuePair[] = []
+      try {
+        fields = JSON.parse(request.body)
+      } catch {
+        // fallback для raw строки key=value&...
+        new URLSearchParams(request.body).forEach((v, k) => formData.append(k, v))
+      }
+
+      fields
+        .filter(kv => kv.enabled && kv.key)
+        .forEach(kv => {
+          const resolved = resolveKV(kv, envVars)
+          formData.append(resolved.key, resolved.value)
         })
+
       body = formData
       headers['Content-Type'] ??= 'application/x-www-form-urlencoded'
     } else if (request.bodyType === 'binary') {
@@ -210,8 +211,6 @@ export async function executeRequest(
     }
   }
 
-  console.log('Request:', { url, method: request.method, headers, body })
-
   const response = await fetch(url, {
     method: request.method,
     headers,
@@ -222,12 +221,35 @@ export async function executeRequest(
   const bodyText = await response.text()
 
   const responseHeaders: Record<string, string> = {}
-  response.headers.forEach((v, k) => (responseHeaders[k] = v))
+  const responseCookies: Record<string, string> = {}
+
+  response.headers.forEach((v, k) => {
+    responseHeaders[k] = v
+  })
+
+  // Better cookie parsing using getSetCookie if available
+  const setCookies = typeof response.headers.getSetCookie === 'function'
+    ? response.headers.getSetCookie()
+    : (responseHeaders['set-cookie'] ? [responseHeaders['set-cookie']] : [])
+
+  setCookies.forEach(v => {
+    const cookieParts = v.split(';')
+    if (cookieParts.length > 0) {
+      const firstPart = cookieParts[0]
+      const eqIdx = firstPart.indexOf('=')
+      if (eqIdx !== -1) {
+        const cookieKey = firstPart.substring(0, eqIdx).trim()
+        const cookieVal = firstPart.substring(eqIdx + 1).trim()
+        responseCookies[cookieKey] = cookieVal
+      }
+    }
+  })
 
   return {
     status: response.status,
     statusText: response.statusText,
     headers: responseHeaders,
+    cookies: responseCookies,
     body: bodyText,
     size: new TextEncoder().encode(bodyText).length,
     duration,

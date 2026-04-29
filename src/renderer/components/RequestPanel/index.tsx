@@ -117,6 +117,11 @@ export function RequestPanel() {
                 {getCount(tab.headers)}
               </span>
             )}
+            {tabName === 'Cookies' && getCount(tab.cookies || []) > 0 && (
+              <span className="request-panel__badge">
+                {getCount(tab.cookies || [])}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -145,6 +150,18 @@ export function RequestPanel() {
             onChange={headers => updateTab(tab.id, { headers })}
             placeholder={{ 
               key: t('request.header').toLowerCase(), 
+              value: t('request.value_placeholder') 
+            }}
+          />
+        )}
+
+        {activeTab === 'Cookies' && (
+          <KeyValueEditor
+            data={tab.cookies || []}
+            key={`${tab.id}-cookies`}
+            onChange={cookies => updateTab(tab.id, { cookies })}
+            placeholder={{ 
+              key: t('request.cookie_name'), 
               value: t('request.value_placeholder') 
             }}
           />

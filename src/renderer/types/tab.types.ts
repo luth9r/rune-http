@@ -15,6 +15,7 @@ export interface Tab {
   url: string
   headers: KeyValuePair[]
   params: KeyValuePair[]
+  cookies?: KeyValuePair[]
   body: string
   bodyType: BodyType
   bodies: Record<string, string>

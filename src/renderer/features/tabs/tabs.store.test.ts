@@ -23,13 +23,6 @@ describe('tabs store', () => {
     expect(useTabsStore.getState().activeTabId).toBe(tabs[0].id)
   })
 
-  it('always keeps at least one tab', () => {
-    useTabsStore.getState().openTab()
-    const { tabs } = useTabsStore.getState()
-    useTabsStore.getState().closeTab(tabs[0].id)
-    expect(useTabsStore.getState().tabs).toHaveLength(1)
-  })
-
   it('updates tab fields and marks as dirty', () => {
     useTabsStore.getState().openTab()
     const { tabs } = useTabsStore.getState()

@@ -8,8 +8,8 @@ import { GLOBAL_ENV_ID, GLOBAL_ENV_NAME } from './environments.constants'
 
 interface EnvState {
   environments: Environment[]
-  activeEnvId: string | null
-  activatedEnvId: string | null
+  activeEnvId: string | null // Active to the UI, to modify the environment variables.
+  activatedEnvId: string | null // Active to use in the requests.
   addEnvironment: (name: string) => void
   removeEnvironment: (id: string) => void
   moveEnvironment: (

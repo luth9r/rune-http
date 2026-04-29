@@ -10,7 +10,7 @@ export const BODY_OPTIONS = [
   { label: 'Binary File', value: 'binary' },
 ]
 
-export const REQUEST_TABS = ['Params', 'Headers', 'Body', 'Auth'] as const
+export const REQUEST_TABS = ['Params', 'Headers', 'Cookies', 'Body', 'Auth'] as const
 export type RequestTab = (typeof REQUEST_TABS)[number]
 
 export function getCount(items: KeyValuePair[]) {

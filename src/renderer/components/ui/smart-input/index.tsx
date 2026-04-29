@@ -5,6 +5,8 @@ import { cn } from '@/lib/utils'
 import { useEnvStore } from '@/features/environments/environments.store'
 import { GLOBAL_ENV_ID } from '@/features/environments/environments.constants'
 import './smart-input.css'
+import { DYNAMIC_VAR_HINTS } from 'renderer/utils'
+import { VAR_INCOMPLETE, VAR_PATTERN } from 'renderer/utils/varPattern'
 
 interface SmartInputProps {
   value: string
@@ -20,7 +22,7 @@ function useEnvVars(): Record<string, string> {
   const activatedEnvId = useEnvStore(s => s.activatedEnvId)
   const globalEnv = environments.find(e => e.id === GLOBAL_ENV_ID)
   const activeEnv = environments.find(e => e.id === activatedEnvId)
-  return { ...globalEnv?.variables, ...activeEnv?.variables }
+  return { ...DYNAMIC_VAR_HINTS,...globalEnv?.variables, ...activeEnv?.variables }
 }
 
 function escapeHtml(s: string) {
@@ -28,7 +30,7 @@ function escapeHtml(s: string) {
 }
 
 function toHtml(text: string, vars: Record<string, string>): string {
-  return text.replace(/\{\{([\w.-]+)\}\}/g, (_, name) => {
+   return text.replace(new RegExp(VAR_PATTERN.source, 'g'), (_, name) => {
     const cls = name in vars ? 'resolved' : 'unresolved'
     return `<span class="si-var ${cls}" contenteditable="false" data-varname="${escapeHtml(name)}">{{${escapeHtml(name)}}}</span>`
   })
@@ -197,7 +199,7 @@ export function SmartInput({
 
     if (!isPassword || showPassword) {
       const before = text.slice(0, caret)
-      const match = before.match(/\{\{([\w.-]*)$/)
+      const match = before.match(VAR_INCOMPLETE)
       if (match) {
         const query = match[1].toLowerCase()
         const matches = Object.keys(vars).filter(k =>

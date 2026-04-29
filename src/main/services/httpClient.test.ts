@@ -255,4 +255,38 @@ describe('httpClient interpolation', () => {
     // Should be inline (no pretty-print)
     expect(options.body).toBe('{"data": {"id":123}, "meta": "info"}')
   })
+
+  it('sends cookies in Cookie header and parses Set-Cookie in response', async () => {
+    mockFetch.mockResolvedValueOnce({
+      status: 200,
+      statusText: 'OK',
+      headers: new Headers({
+        'set-cookie': 'session_id=abc123; HttpOnly; Secure',
+      }),
+      text: () => Promise.resolve(''),
+    })
+
+    const request: any = {
+      method: 'GET',
+      url: 'http://api.com',
+      headers: [],
+      params: [],
+      cookies: [
+        { key: 'my_cookie', value: '{{COOKIE_VAL}}', enabled: true },
+        { key: 'disabled_cookie', value: 'ignore', enabled: false },
+      ],
+      auth: { type: 'none' },
+    }
+
+    const env = { COOKIE_VAL: '12345' }
+
+    const response = await executeRequest(request, env)
+
+    // Check request options
+    const options = mockFetch.mock.calls[0][1]
+    expect(options.headers['Cookie']).toBe('my_cookie=12345')
+
+    // Check response cookies parsing
+    expect(response.cookies?.['session_id']).toBe('abc123')
+  })
 })
