@@ -8,6 +8,7 @@ import {
   Edit2,
   MoreVertical,
   Check,
+  Download,
 } from 'lucide-react'
 import { useDraggable, useDroppable } from '@dnd-kit/core'
 import { SidebarItemBase } from 'renderer/components/Sidebar/components/SidebarLayout'
@@ -32,6 +33,7 @@ interface EnvSidebarItemProps {
   onActivate?: (id: string | null) => void
   onDelete: (env: Environment) => void
   onRename: (id: string, name: string) => void
+  onExport: (env: Environment) => void
 }
 
 export function EnvSidebarItem({
@@ -44,6 +46,7 @@ export function EnvSidebarItem({
   onActivate,
   onDelete,
   onRename,
+  onExport,
 }: EnvSidebarItemProps) {
   const { t } = useTranslation()
   const [_isHovered, setIsHovered] = useState(false)
@@ -188,6 +191,11 @@ export function EnvSidebarItem({
                 icon: <Edit2 size={14} />,
                 onClick: () => setIsRenaming(true),
                 disabled: isGlobal,
+              },
+              {
+                label: t('common.export') || 'Export',
+                icon: <Download size={14} />,
+                onClick: () => onExport(env),
               },
               {
                 label: t('sidebar.delete'),

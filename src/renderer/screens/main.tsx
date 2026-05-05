@@ -85,9 +85,6 @@ export function MainScreen() {
 
       {currentView === 'explorer' && <HttpScreen />}
       {currentView === 'env' && <EnvironmentsScreen />}
-      {currentView === 'database' && (
-        <div className="screen-coming-soon">Database Coming Soon</div>
-      )}
       {currentView === 'settings' && <SettingsScreen />}
 
       {isSaveModalOpen && activeTab && (

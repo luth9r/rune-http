@@ -1,5 +1,6 @@
 import type React from 'react'
 import { useState, useMemo } from 'react'
+import { Plus, Upload, Download } from 'lucide-react'
 import {
   DndContext,
   type DragEndEvent,
@@ -24,7 +25,10 @@ import { EnvSidebarItem } from './EnvSidebarItem'
 import type { Environment, DropPosition } from '@/types'
 import { useTranslation } from '@/i18n'
 import { GLOBAL_ENV_ID } from '@/features/environments/environments.constants'
+import { Logo } from 'renderer/components/shared/Logo'
+import { Search } from '../Sidebar/components/Search'
 import '@/components/Sidebar/sidebar.css'
+import { Button } from '../ui/button'
 
 interface EnvSidebarProps {
   onDelete: (env: Environment) => void
@@ -41,6 +45,8 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
     addEnvironment,
     renameEnvironment,
     moveEnvironment,
+    exportEnvironments,
+    importEnvironments,
   } = useEnvStore()
 
   const { size: width, startResizing } = useResizable({
@@ -60,6 +66,7 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
 
   const [isAddingMode, setIsAddingMode] = useState(false)
   const [newEnvName, setNewEnvName] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -115,6 +122,38 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
     }
   }
 
+  const handleImport = async () => {
+    const path = await window.api.utils.selectFile()
+    if (!path) return
+    try {
+      const content = await window.api.utils.readFile(path)
+      const data = JSON.parse(content)
+      if (Array.isArray(data)) {
+        importEnvironments(data)
+      } else if (typeof data === 'object' && data !== null) {
+        importEnvironments([data])
+      }
+    } catch (e) {
+      console.error('Failed to import environments', e)
+    }
+  }
+
+  const handleExportSingle = async (env: Environment) => {
+    await window.api.utils.saveFile(
+      JSON.stringify(env, null, 2),
+      `${env.name}.json`
+    )
+  }
+
+  const filteredEnvironments = useMemo(() => {
+    if (!searchQuery.trim()) return environments
+    const query = searchQuery.toLowerCase()
+    return environments.filter(env => 
+      env.name.toLowerCase().includes(query) || 
+      (env.id === GLOBAL_ENV_ID && t('env.global').toLowerCase().includes(query))
+    )
+  }, [environments, searchQuery, t])
+
   const draggedEnv = useMemo(
     () => environments.find(e => e.id === activeDragId),
     [environments, activeDragId]
@@ -122,7 +161,29 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
 
   return (
     <SidebarRoot onResizeMouseDown={startResizing} style={{ width }}>
-      <SidebarHeader onAdd={() => setIsAddingMode(true)} title={t('env.title')} />
+      <SidebarHeader>
+        <span className="sidebar-title font-semibold">{t('env.title')}</span>
+        <div className="flex items-center gap-1">
+          <Button 
+            onClick={handleImport} 
+            size="xs" 
+            variant="icon"
+            title={t('common.import')}
+          >
+            <Upload size={14} />
+          </Button>
+          <Button 
+            onClick={() => setIsAddingMode(true)} 
+            size="xs" 
+            variant="icon"
+            title={t('common.add')}
+          >
+            <Plus size={16} />
+          </Button>
+        </div>
+      </SidebarHeader>
+
+      <Search onChange={setSearchQuery} value={searchQuery} />
 
       {isAddingMode && (
         <SidebarInput
@@ -135,12 +196,12 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
       )}
 
       <SidebarList>
-        {environments.length === 0 && !isAddingMode && (
+        {filteredEnvironments.length === 0 && !isAddingMode && (
           <p style={s.emptyHint}>{t('env.no_envs')}</p>
         )}
 
         {/* Always show Global at the top, undraggable */}
-        {environments
+        {filteredEnvironments
           .filter(e => e.id === GLOBAL_ENV_ID)
           .map(env => (
             <EnvSidebarItem
@@ -152,6 +213,7 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
               onDelete={onDelete}
               onRename={renameEnvironment}
               onSelect={setActiveEnv}
+              onExport={handleExportSingle}
             />
           ))}
 
@@ -163,7 +225,7 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
           onDragStart={handleDragStart}
           sensors={sensors}
         >
-          {environments
+          {filteredEnvironments
             .filter(e => e.id !== GLOBAL_ENV_ID)
             .map(env => (
               <EnvSidebarItem
@@ -179,6 +241,7 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
                 onDelete={onDelete}
                 onRename={renameEnvironment}
                 onSelect={setActiveEnv}
+                onExport={handleExportSingle}
               />
             ))}
 
@@ -193,6 +256,7 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
                   onDelete={() => {}}
                   onRename={() => {}}
                   onSelect={() => {}}
+                  onExport={() => {}}
                 />
               </div>
             ) : null}

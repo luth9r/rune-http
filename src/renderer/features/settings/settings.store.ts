@@ -11,7 +11,6 @@ interface SettingsState {
   showScaleIndicator: boolean
   zoomLevel: number
   resizingValue: string | null
-  dataStoragePath: string | null
   language: 'en' | 'ua'
   sidebarVisible: boolean
   responsePanelVisible: boolean
@@ -24,7 +23,6 @@ interface SettingsState {
   setShowScaleIndicator: (show: boolean) => void
   setZoomLevel: (zoom: number) => void
   setResizingValue: (value: string | null) => void
-  setDataStoragePath: (path: string | null) => void
   setSidebarVisible: (visible: boolean) => void
   setResponsePanelVisible: (visible: boolean) => void
   setShortcut: (action: string, shortcut: string) => void
@@ -40,7 +38,6 @@ export const useSettingsStore = create<SettingsState>()(
       showScaleIndicator: true,
       zoomLevel: 1.0,
       resizingValue: null,
-      dataStoragePath: null,
       language: 'en',
 
       setTheme: theme =>
@@ -75,7 +72,7 @@ export const useSettingsStore = create<SettingsState>()(
 
       setZoomLevel: zoom =>
         set(state => {
-          state.zoomLevel = zoom
+          state.zoomLevel = Number(zoom.toFixed(2))
         }),
 
       setResizingValue: value =>
@@ -83,10 +80,6 @@ export const useSettingsStore = create<SettingsState>()(
           state.resizingValue = value
         }),
 
-      setDataStoragePath: path =>
-        set(state => {
-          state.dataStoragePath = path
-        }),
 
       sidebarVisible: true,
       responsePanelVisible: true,

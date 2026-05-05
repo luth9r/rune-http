@@ -29,7 +29,7 @@ export function SidebarRoot({
 
 // ─── Sidebar Header ───────────────────────────────────────────────────────────
 interface SidebarHeaderProps {
-  title: string
+  title?: string
   onAdd?: () => void
   children?: React.ReactNode
 }
@@ -39,7 +39,7 @@ export function SidebarHeader({ title, onAdd, children }: SidebarHeaderProps) {
     <div className="sidebar-header">
       {children || (
         <>
-          <span className="sidebar-title">{title}</span>
+          {title ? <span className="sidebar-title">{title}</span> : null}
           {onAdd && (
             <Button onClick={onAdd} size="xs" variant="icon">
               <Plus size={14} />

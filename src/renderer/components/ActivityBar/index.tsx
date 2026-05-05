@@ -32,16 +32,6 @@ export function ActivityBar({ currentView, setView }: ActivityBarProps) {
         >
           <Globe size={20} />
         </Button>
-
-        <Button
-          active={currentView === 'database'}
-          className="activity-btn"
-          onClick={() => setView('database')}
-          title={t('activity.database') || 'Storage'}
-          variant="tab"
-        >
-          <Database size={20} />
-        </Button>
       </div>
 
       <div className="activity-bar-bottom">

@@ -244,6 +244,12 @@ export const useCollectionsStore = create<CollectionsState>()(
     {
       name: 'rune-collections',
       storage: createJSONStorage(() => electronStorage),
+      partialize: state => ({
+        collections: state.collections.map(col => {
+          const { isOpen: _, ...rest } = col
+          return rest
+        }),
+      }),
       onRehydrateStorage: () => {
         console.log('Hydration starting...')
         return (_state, error) => {

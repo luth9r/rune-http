@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react'
-import { Folder, Type, Palette, Languages, Keyboard, RotateCcw } from 'lucide-react'
+import { Type, Palette, Languages, Keyboard, RotateCcw } from 'lucide-react'
 import { useSettingsStore } from '@/features/settings/settings.store'
 import { useTranslation } from '@/i18n'
 import { Button } from '../components/ui/button'
@@ -110,7 +110,6 @@ export function SettingsScreen() {
     monoFontFamily,
     showScaleIndicator,
     zoomLevel,
-    dataStoragePath,
     language,
     shortcuts,
     setTheme,
@@ -119,7 +118,6 @@ export function SettingsScreen() {
     setMonoFontFamily,
     setShowScaleIndicator,
     setZoomLevel,
-    setDataStoragePath,
     setLanguage,
     setShortcut,
   } = useSettingsStore()
@@ -135,16 +133,6 @@ export function SettingsScreen() {
     })
   }, [])
 
-  const handleSelectDir = useCallback(async () => {
-    const path = await window.api.utils.selectDirectory()
-    if (path) {
-      setDataStoragePath(path)
-    }
-  }, [setDataStoragePath])
-
-  const handleResetDir = useCallback(() => {
-    setDataStoragePath(null)
-  }, [setDataStoragePath])
 
   const defaultShortcuts: Record<string, string> = {
     toggleSidebar: 'CommandOrControl+\\',
@@ -377,41 +365,6 @@ export function SettingsScreen() {
                     ]}
                     value={theme}
                   />
-                </div>
-              </section>
-
-              {/* Data Section */}
-              <section className="settings-section">
-                <div className="settings-section-header">
-                  <Folder size={18} />
-                  <h2 className="settings-section-title">
-                    {t('settings.data_management')}
-                  </h2>
-                </div>
-                <div className="settings-field">
-                  <div className="settings-field-info">
-                    <label className="settings-label">
-                      {t('settings.storage_location')}
-                    </label>
-                    <span className="settings-description">
-                      {t('settings.storage_location_desc')}
-                    </span>
-                  </div>
-                  <div className="settings-storage-controls">
-                    <div className="settings-path-display">
-                      {dataStoragePath || t('settings.default_storage')}
-                    </div>
-                    <div className="settings-action-buttons">
-                      <Button onClick={handleSelectDir} size="sm">
-                        {t('settings.change')}
-                      </Button>
-                      {dataStoragePath && (
-                        <Button onClick={handleResetDir} size="sm" variant="ghost">
-                          {t('settings.reset')}
-                        </Button>
-                      )}
-                    </div>
-                  </div>
                 </div>
               </section>
             </>

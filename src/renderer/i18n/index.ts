@@ -20,10 +20,11 @@ const translations = {
       request_item: "Request",
       environment_item: "Environment",
       new_collection_placeholder: "Collection name...",
+      export_all: "Export All",
     },
     activity: {
       explorer: "Collections",
-      env: "Environments",
+      env: "Env",
       database: "Storage",
     },
     request: {
@@ -97,6 +98,8 @@ const translations = {
       invalid_json: "Invalid JSON",
       unsaved_changes: "Unsaved changes",
       save: "Save",
+      import: "Import Environments",
+      export: "Export Environments",
     },
     settings: {
       title: "Settings",
@@ -173,6 +176,8 @@ const translations = {
       delete_confirm: "Are you sure you want to delete",
       delete_warning: "This action cannot be undone.",
       new_request: "New Request",
+      import: "Import",
+      export: "Export",
     },
     empty: {
       new_request: "New Request",
@@ -206,6 +211,7 @@ const translations = {
       request_item: "Запит",
       environment_item: "Середовище",
       new_collection_placeholder: "Назва колекції...",
+      export_all: "Експортувати все",
     },
     activity: {
       explorer: "Колекції",
@@ -284,6 +290,8 @@ const translations = {
       invalid_json: "Некоректний JSON",
       unsaved_changes: "Незбережені зміни",
       save: "Зберегти",
+      import: "Імпортувати середовища",
+      export: "Експортувати середовища",
     },
     settings: {
       title: "Налаштування",
@@ -361,6 +369,8 @@ const translations = {
       delete_confirm: "Ви впевнені, що хочете видалити",
       delete_warning: "Цю дію неможливо скасувати.",
       new_request: "Новий запит",
+      import: "Імпорт",
+      export: "Експорт",
     },
     empty: {
       new_request: "Новий запит",

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useCallback } from 'react'
-import { Plus, Upload } from 'lucide-react'
+import { Plus, Upload, Download } from 'lucide-react'
 import { useCollectionsStore } from '@/features/collections/collections.store'
 import { detectAndImport } from '@/features/collections/importers'
 import { Logo } from 'renderer/components/shared/Logo'
@@ -286,13 +286,23 @@ export function Sidebar() {
 
   return (
     <SidebarRoot onResizeMouseDown={startResizing} style={{ width }}>
-      <SidebarHeader title="">
+      <SidebarHeader title={t('sidebar.collections')}>
         <Logo size="sm" />
         <div className="flex items-center gap-1">
-          <Button onClick={handleImport} size="xs" variant="icon">
+          <Button 
+            onClick={handleImport} 
+            size="xs" 
+            variant="icon"
+            title={t('common.import')}
+          >
             <Upload size={14} />
           </Button>
-          <Button onClick={() => setIsAddingCol(true)} size="xs" variant="icon">
+          <Button 
+            onClick={() => setIsAddingCol(true)} 
+            size="xs" 
+            variant="icon"
+            title={t('common.add')}
+          >
             <Plus size={16} />
           </Button>
         </div>

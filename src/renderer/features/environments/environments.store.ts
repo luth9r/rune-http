@@ -25,6 +25,8 @@ interface EnvState {
   setDirty: (id: string, isDirty: boolean) => void
   saveEnvironment: (id: string, variables: Record<string, any>) => void
   updateDraft: (id: string, draft: string | null) => void
+  importEnvironments: (envs: Environment[]) => void
+  exportEnvironments: () => Environment[]
 }
 
 export const useEnvStore = create<EnvState>()(
@@ -124,10 +126,30 @@ export const useEnvStore = create<EnvState>()(
             env.draftValue = draft ?? undefined
           }
         }),
+      importEnvironments: envs =>
+        set(state => {
+          envs.forEach(env => {
+            state.environments.push({
+              ...env,
+              id: uuid(),
+              isActive: false,
+            })
+          })
+        }),
+      exportEnvironments: () => {
+        return get().environments
+      },
     })),
     {
       name: 'rune-environments',
       storage: createJSONStorage(() => electronStorage),
+      partialize: state => ({
+        environments: state.environments.map(env => {
+          const { isDirty: _, draftValue: __, ...rest } = env
+          return rest
+        }),
+        activatedEnvId: state.activatedEnvId,
+      }),
       onRehydrateStorage: () => state => {
         if (state && state.environments.length === 0) {
           state.environments.push({

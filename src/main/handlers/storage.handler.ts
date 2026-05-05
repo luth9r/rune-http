@@ -4,27 +4,8 @@ import path from 'node:path'
 
 const DEFAULT_DATA_DIR = app.getPath('userData')
 
-function getDataDir() {
-  try {
-    const settingsPath = path.join(DEFAULT_DATA_DIR, 'rune-settings.json')
-    const settings = JSON.parse(
-      require('node:fs').readFileSync(settingsPath, 'utf-8')
-    )
-    if (settings?.dataStoragePath) {
-      return settings.dataStoragePath
-    }
-  } catch {
-    // If settings don't exist or are invalid, use default
-  }
-  return DEFAULT_DATA_DIR
-}
-
 function filePath(name: string) {
-  // Always store settings in the default location to avoid chicken-and-egg problem
-  if (name === 'rune-settings') {
-    return path.join(DEFAULT_DATA_DIR, `${name}.json`)
-  }
-  return path.join(getDataDir(), `${name}.json`)
+  return path.join(DEFAULT_DATA_DIR, `${name}.json`)
 }
 
 async function readFile<T>(name: string, fallback: T): Promise<T> {
@@ -37,8 +18,7 @@ async function readFile<T>(name: string, fallback: T): Promise<T> {
 }
 
 async function writeFile(name: string, data: unknown): Promise<void> {
-  const dir = name === 'rune-settings' ? DEFAULT_DATA_DIR : getDataDir()
-  await fs.mkdir(dir, { recursive: true })
+  await fs.mkdir(DEFAULT_DATA_DIR, { recursive: true })
   await fs.writeFile(filePath(name), JSON.stringify(data, null, 2), 'utf-8')
 }
 

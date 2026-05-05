@@ -41,6 +41,7 @@ export function SaveRequestModal({
       url: tab.url,
       headers: tab.headers,
       params: tab.params,
+      cookies: tab.cookies,
       body: tab.body,
       bodyType: tab.bodyType,
       auth: tab.auth,

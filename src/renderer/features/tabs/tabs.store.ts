@@ -250,6 +250,7 @@ export const useTabsStore = create<TabsState>()(
           url: tab.url,
           headers: tab.headers,
           params: tab.params,
+          cookies: tab.cookies,
           body: finalBody,
           bodyType: tab.bodyType,
           bodies: tab.bodies,
@@ -276,6 +277,13 @@ export const useTabsStore = create<TabsState>()(
     {
       name: 'rune-tabs-history',
       storage: createJSONStorage(() => electronStorage),
+      partialize: state => ({
+        tabs: state.tabs.map(tab => {
+          const { isLoading: _, error: __, isDirty: ___, savedState: ____, ...rest } = tab
+          return rest
+        }),
+        activeTabId: state.activeTabId,
+      }),
     }
   )
 )
