@@ -139,8 +139,9 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
   }
 
   const handleExportSingle = async (env: Environment) => {
+    const { id: _, isDirty: __, draftValue: ___, ...rest } = env
     await window.api.utils.saveFile(
-      JSON.stringify(env, null, 2),
+      JSON.stringify(rest, null, 2),
       `${env.name}.json`
     )
   }

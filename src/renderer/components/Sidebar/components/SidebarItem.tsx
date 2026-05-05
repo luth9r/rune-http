@@ -13,7 +13,8 @@ import {
 import { SidebarItemBase } from 'renderer/components/Sidebar/components/SidebarLayout'
 import { Button } from '@/components/ui/button'
 import { useCollectionsStore } from '@/features/collections/collections.store'
-import type { CollectionItem } from '@/types'
+import type { CollectionItem, HttpRequest } from '@/types'
+import { v4 as uuid } from 'uuid'
 import { detectAndImport } from '@/features/collections/importers'
 import {
   ContextMenu,
@@ -21,6 +22,7 @@ import {
 } from '@/components/shared/ContextMenu'
 import { cn } from '@/lib/utils'
 import { useTranslation } from '@/i18n'
+import { getUniqueName } from '@/utils/naming'
 
 interface SidebarItemProps {
   item: CollectionItem | any
@@ -29,7 +31,7 @@ interface SidebarItemProps {
   onClick?: () => void
   onRemove?: () => void
   onDuplicate?: () => void
-  onExport?: (format: 'json' | 'postman' | 'insomnia') => void
+  onExport?: () => void
   onRename?: (newName: string) => void
   onAddRequest?: () => void
   onToggle?: () => void
@@ -50,7 +52,7 @@ export function SidebarItem({
   level = 0,
 }: SidebarItemProps) {
   const { t } = useTranslation()
-  const { importIntoCollection } = useCollectionsStore()
+  const { importIntoCollection, collections } = useCollectionsStore()
   const [contextMenu, setContextMenu] = React.useState<{
     x: number
     y: number
@@ -78,10 +80,28 @@ export function SidebarItem({
       if (!path) return
 
       const content = await window.api.utils.readFile(path)
-      const imported = detectAndImport(content)
+      const result = detectAndImport(content)
+      if (!result) return
 
-      if (imported) {
-        importIntoCollection(item.id, imported.items)
+      if (result.type === 'request') {
+        const request = result.data as HttpRequest
+        const requestId = uuid()
+        
+        // Find existing names in this collection
+        const col = collections.find(c => c.id === item.id)
+        const existingNames = col?.items.map(i => i.name) || []
+        const uniqueName = getUniqueName(request.name || 'Imported Request', existingNames)
+
+        importIntoCollection(item.id, [
+          {
+            id: requestId,
+            type: 'request',
+            name: uniqueName,
+            request: { ...request, id: requestId, name: uniqueName },
+          },
+        ])
+      } else {
+        console.warn('Cannot import a full collection into another collection')
       }
     } catch (e) {
       console.error('Failed to import into collection', e)
@@ -109,20 +129,7 @@ export function SidebarItem({
     {
       label: t('sidebar.export'),
       icon: <Download size={14} />,
-      submenu: [
-        {
-          label: 'JSON',
-          onClick: () => onExport?.('json'),
-        },
-        {
-          label: 'Postman',
-          onClick: () => onExport?.('postman'),
-        },
-        {
-          label: 'Insomnia',
-          onClick: () => onExport?.('insomnia'),
-        },
-      ],
+      onClick: () => onExport?.(),
     },
     {
       type: 'separator',

@@ -74,10 +74,9 @@ export function registerUtilsIpc(): void {
   ipcMain.handle(
     UTILS_CHANNELS.SAVE_FILE,
     async (_event, content: string, defaultPath?: string) => {
-      const window = BrowserWindow.getAllWindows()[0]
-      if (!window) return null
 
-      const { canceled, filePath } = await dialog.showSaveDialog(window, {
+      const { canceled, filePath } = await dialog.showSaveDialog({
+        title: 'Save Export',
         defaultPath,
         filters: [{ name: 'JSON', extensions: ['json'] }],
       })

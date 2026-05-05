@@ -1,48 +1,58 @@
-import { importPostman } from "./postman";
-import { importInsomnia } from "./insomnia";
-import type { Collection } from "@/types";
+import type { Collection, HttpRequest } from "@/types";
 import { v4 as uuid } from 'uuid';
 
-export function detectAndImport(content: string): Collection | null {
+export type ImportType = 'collection' | 'request';
+
+export interface ImportResult {
+  type: ImportType;
+  data: Collection | HttpRequest;
+}
+
+export function detectAndImport(content: string): ImportResult | null {
   try {
     const data = JSON.parse(content);
 
-    // Postman Detection (v2.1)
-    if (data.info && data.info.schema && data.info.schema.includes("postman")) {
-      return importPostman(data);
-    }
-
-    // Insomnia Detection
-    if (
-      data._type === "export" ||
-      (Array.isArray(data.resources) &&
-        data.resources.some(
-          (r: any) => r._type && r._type.startsWith("request"),
-        ))
-    ) {
-      return importInsomnia(data);
-    }
-
     // Native Rune Collection Detection
-    if (data.id && Array.isArray(data.items)) {
-      return data as Collection;
+    if (Array.isArray(data.items)) {
+      const rawCollection = data as Collection;
+      const collection: Collection = {
+        ...rawCollection,
+        id: uuid(), // Always new ID for collection
+        items: rawCollection.items.map(item => {
+          const itemId = uuid();
+          const newItem = {
+            ...item,
+            id: itemId,
+          };
+          if (newItem.type === 'request' && newItem.request) {
+            newItem.request = {
+              ...newItem.request,
+              id: itemId, // Match item ID
+            };
+            normalizeRequest(newItem.request);
+          }
+          return newItem;
+        }),
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
+      return { type: 'collection', data: collection };
     }
 
     // Single Request Detection (Rune/Generic)
     if (data.method && data.url) {
       const id = uuid();
-      return {
-        id: uuid(),
-        name: data.name || 'Imported Request',
-        items: [{
-          id,
-          type: 'request',
-          name: data.name || 'Imported Request',
-          request: { ...data, id }
-        }],
-        createdAt: Date.now(),
-        updatedAt: Date.now()
-      } as Collection;
+      const request: HttpRequest = {
+        headers: [],
+        params: [],
+        cookies: [],
+        body: '',
+        auth: { type: 'none' },
+        ...data,
+        id,
+      };
+      normalizeRequest(request);
+      return { type: 'request', data: request };
     }
 
     return null;
@@ -50,4 +60,12 @@ export function detectAndImport(content: string): Collection | null {
     console.error("Failed to parse collection content", e);
     return null;
   }
+}
+
+function normalizeRequest(req: HttpRequest) {
+  req.headers = req.headers || [];
+  req.params = req.params || [];
+  req.cookies = req.cookies || [];
+  req.body = req.body || '';
+  req.auth = req.auth || { type: 'none' };
 }

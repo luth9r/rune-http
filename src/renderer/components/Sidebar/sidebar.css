@@ -114,6 +114,25 @@
   height: 100%;
 }
 
+.sidebar-item-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-left: -4px;
+  color: var(--eos-muted);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s;
+  padding: 4px;
+}
+
+.sidebar-item-chevron:hover {
+  color: var(--eos-text);
+  background: var(--eos-surface-3);
+}
+
 .sidebar-item-name {
   flex: 1;
   overflow: hidden;

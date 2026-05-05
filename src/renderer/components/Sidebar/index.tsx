@@ -34,6 +34,7 @@ import {
 } from 'renderer/components/Sidebar/components/SidebarLayout'
 import { useResizable } from '@/hooks/useResizable'
 import { useTranslation } from '@/i18n'
+import { getUniqueName } from '@/utils/naming'
 import './sidebar.css'
 
 export function Sidebar() {
@@ -264,12 +265,17 @@ export function Sidebar() {
 
     try {
       const content = await window.api.utils.readFile(path)
-      const collection = detectAndImport(content)
+      const result = detectAndImport(content)
 
-      if (collection) {
+      if (result && result.type === 'collection') {
+        const collection = result.data as any
+        const existingNames = collections.map(c => c.name)
+        collection.name = getUniqueName(collection.name, existingNames)
         importCollection(collection)
+      } else if (result && result.type === 'request') {
+        // Maybe show an error toast? For now console.warn
+        console.warn('Cannot import a single request as a root collection')
       } else {
-        // Maybe show an error toast? For now console.error
         console.error('Invalid collection format')
       }
     } catch (e) {

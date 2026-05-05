@@ -129,15 +129,33 @@ export const useEnvStore = create<EnvState>()(
       importEnvironments: envs =>
         set(state => {
           envs.forEach(env => {
+            if (env.id === GLOBAL_ENV_ID) return // Skip importing global env as a new env
+
+            const existingNames = state.environments.map(e => e.name)
+            let finalName = env.name
+            if (existingNames.includes(finalName)) {
+              let counter = 1
+              while (existingNames.includes(`${env.name} (${counter})`)) {
+                counter++
+              }
+              finalName = `${env.name} (${counter})`
+            }
+
             state.environments.push({
               ...env,
               id: uuid(),
+              name: finalName,
               isActive: false,
+              isDirty: false,
+              draftValue: undefined,
             })
           })
         }),
       exportEnvironments: () => {
-        return get().environments
+        return get().environments.map(env => {
+          const { id: _, isDirty: __, draftValue: ___, ...rest } = env
+          return rest as Environment
+        })
       },
     })),
     {

@@ -99,12 +99,22 @@ export function DraggableRow({
             if (isCollection) duplicateCollection(item.id)
             else if (collectionId) duplicateRequest(collectionId, item.id)
           }}
-          onExport={format => {
-            const content = isCollection
-              ? exportCollection(item, format)
-              : exportRequest(item, format)
-            const fileName = `${item.name}.${format === 'json' ? 'json' : format + '.json'}`
-            window.api.utils.saveFile(content, fileName)
+          onExport={() => {
+            try {
+              const content = isCollection
+                ? exportCollection(item)
+                : exportRequest(item)
+              
+              if (!content) {
+                console.error('Export failed: No content generated')
+                return
+              }
+
+              const fileName = `${item.name || 'export'}.json`
+              window.api.utils.saveFile(content, fileName)
+            } catch (err) {
+              console.error('Export error', err)
+            }
           }}
           onRename={newName => {
             if (isCollection) renameCollection(item.id, newName)
