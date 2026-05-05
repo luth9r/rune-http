@@ -85,6 +85,8 @@
 
 .sel--method {
   min-width: 110px;
+  height: 32px;
+  max-height: 32px;
 }
 
 .sel__sizer {

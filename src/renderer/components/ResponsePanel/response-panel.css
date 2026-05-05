@@ -77,8 +77,13 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .rp-status-bar {
@@ -140,12 +145,15 @@
 .rp-content {
   position: relative;
   flex: 1;
-  overflow: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .rp-body-wrapper {
   position: relative;
-  min-height: 100%;
+  flex: 1;
+  overflow: auto;
 }
 
 .rp-copy-btn {
@@ -193,6 +201,8 @@
 }
 
 .rp-headers-table {
+  flex: 1;
+  overflow: auto;
   padding: 8px 0;
 }
 

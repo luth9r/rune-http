@@ -15,10 +15,6 @@ declare global {
           envVars: Record<string, string>
         ) => Promise<IpcResponse<HttpResponse>>
       }
-      collections: {
-        getAll: () => Promise<Collection[]>
-        saveAll: (collections: Collection[]) => Promise<boolean>
-      }
       webFrame: {
         setZoomFactor: (factor: number) => void
         getZoomFactor: () => number

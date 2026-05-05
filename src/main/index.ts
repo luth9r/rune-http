@@ -6,7 +6,6 @@ import { loadReactDevtools } from 'lib/electron-app/utils'
 import { ENVIRONMENT } from 'shared/constants'
 import { MainWindow } from './windows/main'
 import { waitFor } from 'shared/utils'
-import { registerCollectionsIpc } from './ipc/collections.ipc'
 import { registerHttpIpc } from './ipc/http.ipc'
 import { registerUtilsIpc } from './ipc/utils.ipc'
 import { registerStorageHandlers } from './handlers/storage.handler'
@@ -16,7 +15,6 @@ makeAppWithSingleInstanceLock(async () => {
   registerStorageHandlers()
   registerHttpIpc()
   registerUtilsIpc()
-  registerCollectionsIpc()
 
   const window = await makeAppSetup(MainWindow)
 

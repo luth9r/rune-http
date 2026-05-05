@@ -114,7 +114,7 @@ export function ResponsePanel() {
       {/* Content */}
       <div className="rp-content">
         {activeTab === "Body" && (
-          <div className="rp-body-wrapper">
+          <>
             <button
               className={cn("rp-copy-btn", copied && "success")}
               onClick={handleCopy}
@@ -122,14 +122,16 @@ export function ResponsePanel() {
             >
               {copied ? <Check size={14} /> : <Copy size={14} />}
             </button>
-            <div className="rp-body-content">
-              {parsedBody ? (
-                <JsonViewer src={parsedBody} />
-              ) : (
-                <pre className="rp-body">{response.body}</pre>
-              )}
+            <div className="rp-body-wrapper">
+              <div className="rp-body-content">
+                {parsedBody ? (
+                  <JsonViewer src={parsedBody} />
+                ) : (
+                  <pre className="rp-body">{response.body}</pre>
+                )}
+              </div>
             </div>
-          </div>
+          </>
         )}
 
         {activeTab === "Headers" && (

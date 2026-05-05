@@ -21,9 +21,7 @@ export async function MainWindow() {
     center: true,
     movable: true,
     resizable: true,
-    alwaysOnTop: true,
     autoHideMenuBar: true,
-    backgroundColor: '#1D1F21',
 
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
