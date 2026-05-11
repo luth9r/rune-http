@@ -30,26 +30,9 @@ const mockCollection: Collection = {
 
 describe('exportCollection', () => {
   it('should export native Rune JSON and strip isOpen', () => {
-    const result = JSON.parse(exportCollection(mockCollection, 'json'))
-    expect(result.id).toBe('col-123')
+    const result = JSON.parse(exportCollection(mockCollection))
+    expect(result.id).toBeUndefined()
     expect(result.isOpen).toBeUndefined()
     expect(result.items.length).toBe(1)
-  })
-
-  it('should export to Postman v2.1 format', () => {
-    const result = JSON.parse(exportCollection(mockCollection, 'postman'))
-    expect(result.info.name).toBe('Test Collection')
-    expect(result.info.schema).toContain('postman.com/json/collection/v2.1.0')
-    expect(result.item.length).toBe(1)
-    expect(result.item[0].request.method).toBe('GET')
-  })
-
-  it('should export to Insomnia v4 format', () => {
-    const result = JSON.parse(exportCollection(mockCollection, 'insomnia'))
-    expect(result._type).toBe('export')
-    expect(result.__export_format).toBe(4)
-    const req = result.resources.find((r: any) => r._type === 'request')
-    expect(req.name).toBe('Get Data')
-    expect(req.method).toBe('GET')
   })
 })

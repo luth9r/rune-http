@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Type, Palette, Languages, Keyboard, RotateCcw } from 'lucide-react'
 import { useSettingsStore } from '@/features/settings/settings.store'
 import { useTranslation } from '@/i18n'
@@ -6,7 +6,6 @@ import { Button } from '../components/ui/button'
 import { Select } from '../components/ui/select'
 import { NumberInput } from '../components/ui/NumberInput'
 import { formatShortcut } from '../utils/shortcuts'
-import './settings-screen.css'
 
 function ShortcutRecorder({
   action,
@@ -34,7 +33,6 @@ function ShortcutRecorder({
       if (e.altKey) keys.push('Alt')
       if (e.metaKey) keys.push('Meta')
 
-      // Key code normalization
       let key = e.key.toUpperCase()
       if (e.code.startsWith('Key')) {
         key = e.code.replace('Key', '')
@@ -44,7 +42,6 @@ function ShortcutRecorder({
         key = '\\'
       }
 
-      // Avoid adding only modifiers
       const isModifier = ['CONTROL', 'SHIFT', 'ALT', 'META'].includes(key)
       if (!isModifier && !keys.includes(key)) {
         keys.push(key)
@@ -52,9 +49,7 @@ function ShortcutRecorder({
 
       setRecordedKeys(keys)
 
-      // Auto-save if a non-modifier key is pressed
       if (!isModifier && keys.length > 0) {
-        // Special case: replace Meta/Control with CommandOrControl if it's the primary modifier
         const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
         const finalKeys = keys.map(k => {
           if (isMac && k === 'Meta') return 'CommandOrControl'
@@ -77,14 +72,17 @@ function ShortcutRecorder({
   }, [isRecording, handleKeyDown])
 
   return (
-    <div className="shortcut-recorder-container">
+    <div style={s.shortcutRecorderContainer}>
       <div
-        className={`shortcut-recorder-box ${isRecording ? 'recording' : ''}`}
         onClick={() => {
           setIsRecording(true)
           setRecordedKeys([])
         }}
         ref={recorderRef}
+        style={{
+          ...s.shortcutRecorderBox,
+          ...(isRecording ? s.shortcutRecorderBoxRecording : {}),
+        }}
       >
         {isRecording
           ? recordedKeys.length > 0
@@ -133,7 +131,6 @@ export function SettingsScreen() {
     })
   }, [])
 
-
   const defaultShortcuts: Record<string, string> = {
     toggleSidebar: 'CommandOrControl+\\',
     toggleResponsePanel: 'CommandOrControl+J',
@@ -145,22 +142,28 @@ export function SettingsScreen() {
   }
 
   return (
-    <div className="settings-root">
-      <aside className="settings-sidebar">
-        <div className="settings-nav-header">
-          <h2 className="settings-nav-title">{t('settings.title')}</h2>
+    <div style={s.settingsRoot}>
+      <aside style={s.settingsSidebar}>
+        <div style={s.settingsNavHeader}>
+          <h2 style={s.settingsNavTitle}>{t('settings.title')}</h2>
         </div>
-        <nav className="settings-nav-list">
+        <nav style={s.settingsNavList}>
           <div
-            className={`settings-nav-item ${activeTab === 'general' ? 'active' : ''}`}
             onClick={() => setActiveTab('general')}
+            style={{
+              ...s.settingsNavItem,
+              ...(activeTab === 'general' ? s.settingsNavItemActive : {}),
+            }}
           >
             <Palette size={16} />
             {t('settings.general')}
           </div>
           <div
-            className={`settings-nav-item ${activeTab === 'shortcuts' ? 'active' : ''}`}
             onClick={() => setActiveTab('shortcuts')}
+            style={{
+              ...s.settingsNavItem,
+              ...(activeTab === 'shortcuts' ? s.settingsNavItemActive : {}),
+            }}
           >
             <Keyboard size={16} />
             {t('settings.shortcuts_tab')}
@@ -168,31 +171,31 @@ export function SettingsScreen() {
         </nav>
       </aside>
 
-      <main className="settings-main">
-        <header className="settings-header">
-          <h1 className="settings-section-title">
+      <main style={s.settingsMain}>
+        <header style={s.settingsHeader}>
+          <h1 style={s.settingsSectionTitle}>
             {activeTab === 'general'
               ? t('settings.general')
               : t('settings.shortcuts_tab')}
           </h1>
         </header>
 
-        <div className="settings-content">
+        <div style={s.settingsContent}>
           {activeTab === 'general' && (
             <>
               {/* Appearance Section */}
-              <section className="settings-section">
-                <div className="settings-section-header">
+              <section style={s.settingsSection}>
+                <div style={s.settingsSectionHeader}>
                   <Type size={18} />
-                  <h2 className="settings-section-title">
+                  <h2 style={s.settingsSectionTitle}>
                     {t('settings.appearance')}
                   </h2>
                 </div>
 
-                <div className="settings-field">
-                  <div className="settings-field-info">
-                    <label className="settings-label">{t('settings.font_size')}</label>
-                    <span className="settings-description">
+                <div style={s.settingsField}>
+                  <div style={s.settingsFieldInfo}>
+                    <label style={s.settingsLabel}>{t('settings.font_size')}</label>
+                    <span style={s.settingsDescription}>
                       {t('settings.font_size_desc')}
                     </span>
                   </div>
@@ -206,10 +209,10 @@ export function SettingsScreen() {
                   />
                 </div>
 
-                <div className="settings-field">
-                  <div className="settings-field-info">
-                    <label className="settings-label">{t('settings.zoom')}</label>
-                    <span className="settings-description">
+                <div style={s.settingsField}>
+                  <div style={s.settingsFieldInfo}>
+                    <label style={s.settingsLabel}>{t('settings.zoom')}</label>
+                    <span style={s.settingsDescription}>
                       {t('settings.zoom_desc')}
                     </span>
                   </div>
@@ -224,10 +227,10 @@ export function SettingsScreen() {
                   />
                 </div>
 
-                <div className="settings-field">
-                  <div className="settings-field-info">
-                    <label className="settings-label">{t('settings.ui_font')}</label>
-                    <span className="settings-description">
+                <div style={s.settingsField}>
+                  <div style={s.settingsFieldInfo}>
+                    <label style={s.settingsLabel}>{t('settings.ui_font')}</label>
+                    <span style={s.settingsDescription}>
                       {t('settings.ui_font_desc')}
                     </span>
                   </div>
@@ -254,10 +257,10 @@ export function SettingsScreen() {
                   />
                 </div>
 
-                <div className="settings-field">
-                  <div className="settings-field-info">
-                    <label className="settings-label">{t('settings.mono_font')}</label>
-                    <span className="settings-description">
+                <div style={s.settingsField}>
+                  <div style={s.settingsFieldInfo}>
+                    <label style={s.settingsLabel}>{t('settings.mono_font')}</label>
+                    <span style={s.settingsDescription}>
                       {t('settings.mono_font_desc')}
                     </span>
                   </div>
@@ -296,36 +299,36 @@ export function SettingsScreen() {
                   />
                 </div>
 
-                <div className="settings-field">
-                  <div className="settings-field-info">
-                    <label className="settings-label">{t('settings.feedback')}</label>
-                    <span className="settings-description">
+                <div style={s.settingsField}>
+                  <div style={s.settingsFieldInfo}>
+                    <label style={s.settingsLabel}>{t('settings.feedback')}</label>
+                    <span style={s.settingsDescription}>
                       {t('settings.feedback_desc')}
                     </span>
                   </div>
                   <input
                     checked={showScaleIndicator}
-                    className="settings-checkbox"
                     onChange={e => setShowScaleIndicator(e.target.checked)}
+                    style={s.settingsCheckbox}
                     type="checkbox"
                   />
                 </div>
               </section>
 
               {/* Language Section */}
-              <section className="settings-section">
-                <div className="settings-section-header">
+              <section style={s.settingsSection}>
+                <div style={s.settingsSectionHeader}>
                   <Languages size={18} />
-                  <h2 className="settings-section-title">
+                  <h2 style={s.settingsSectionTitle}>
                     {t('settings.language')}
                   </h2>
                 </div>
-                <div className="settings-field">
-                  <div className="settings-field-info">
-                    <label className="settings-label">
+                <div style={s.settingsField}>
+                  <div style={s.settingsFieldInfo}>
+                    <label style={s.settingsLabel}>
                       {t('settings.language_select')}
                     </label>
-                    <span className="settings-description">
+                    <span style={s.settingsDescription}>
                       {t('settings.language_desc')}
                     </span>
                   </div>
@@ -341,17 +344,17 @@ export function SettingsScreen() {
               </section>
 
               {/* Theme Section */}
-              <section className="settings-section">
-                <div className="settings-section-header">
+              <section style={s.settingsSection}>
+                <div style={s.settingsSectionHeader}>
                   <Palette size={18} />
-                  <h2 className="settings-section-title">{t('settings.theme')}</h2>
+                  <h2 style={s.settingsSectionTitle}>{t('settings.theme')}</h2>
                 </div>
-                <div className="settings-field">
-                  <div className="settings-field-info">
-                    <label className="settings-label">
+                <div style={s.settingsField}>
+                  <div style={s.settingsFieldInfo}>
+                    <label style={s.settingsLabel}>
                       {t('settings.theme_select')}
                     </label>
-                    <span className="settings-description">
+                    <span style={s.settingsDescription}>
                       {t('settings.theme_desc')}
                     </span>
                   </div>
@@ -371,20 +374,20 @@ export function SettingsScreen() {
           )}
 
           {activeTab === 'shortcuts' && (
-            <section className="settings-section">
-              <div className="settings-section-header">
+            <section style={s.settingsSection}>
+              <div style={s.settingsSectionHeader}>
                 <Keyboard size={18} />
-                <h2 className="settings-section-title">{t('settings.shortcuts')}</h2>
+                <h2 style={s.settingsSectionTitle}>{t('settings.shortcuts')}</h2>
               </div>
-              <div className="shortcut-list">
+              <div style={s.shortcutList}>
                 {Object.keys(shortcuts).map(action => (
-                  <div className="shortcut-item" key={action}>
-                    <div className="shortcut-info">
-                      <span className="shortcut-label">
+                  <div style={s.shortcutItem} key={action}>
+                    <div style={s.shortcutInfo}>
+                      <span style={s.shortcutLabel}>
                         {t(`settings.shortcut_actions.${action}`)}
                       </span>
                     </div>
-                    <div className="shortcut-recorder-container">
+                    <div style={s.shortcutRecorderContainer}>
                       <ShortcutRecorder
                         action={action}
                         currentShortcut={shortcuts[action]}
@@ -407,4 +410,161 @@ export function SettingsScreen() {
       </main>
     </div>
   )
+}
+
+const s: Record<string, React.CSSProperties> = {
+  settingsRoot: {
+    display: 'flex',
+    width: '100%',
+    height: '100%',
+    overflow: 'hidden',
+    color: 'var(--eos-text)',
+    background: 'var(--eos-bg)',
+  },
+  settingsSidebar: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: '200px',
+    maxWidth: '240px',
+    borderRight: '1px solid var(--eos-border)',
+    background: 'var(--eos-surface)',
+  },
+  settingsNavHeader: {
+    padding: '24px 20px',
+  },
+  settingsNavTitle: {
+    margin: 0,
+    fontSize: 'calc(var(--font-size-base) + 3px)',
+    fontWeight: 600,
+  },
+  settingsNavList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+    padding: '0 12px',
+  },
+  settingsNavItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    padding: '8px 12px',
+    fontSize: 'calc(var(--font-size-base) - 1px)',
+    fontWeight: 500,
+    color: 'var(--eos-muted)',
+    cursor: 'pointer',
+    borderRadius: '6px',
+    transition: 'all 0.2s ease',
+  },
+  settingsNavItemActive: {
+    color: 'var(--eos-accent)',
+    background: 'var(--eos-accent-dim)',
+  },
+  settingsMain: {
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column',
+    height: '100%',
+    overflow: 'hidden',
+  },
+  settingsHeader: {
+    padding: '24px 32px',
+    borderBottom: '1px solid var(--eos-border)',
+  },
+  settingsContent: {
+    flex: 1,
+    width: '100%',
+    maxWidth: '800px',
+    padding: '32px',
+    margin: 0,
+    overflowY: 'auto',
+  },
+  settingsSection: {
+    marginBottom: '48px',
+  },
+  settingsSectionHeader: {
+    display: 'flex',
+    gap: '12px',
+    alignItems: 'center',
+    marginBottom: '24px',
+    color: 'var(--eos-accent)',
+  },
+  settingsSectionTitle: {
+    margin: 0,
+    fontSize: 'calc(var(--font-size-base) + 5px)',
+    fontWeight: 600,
+  },
+  settingsField: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '16px 0',
+    borderBottom: '1px solid var(--eos-border-2)',
+  },
+  settingsFieldInfo: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+  },
+  settingsLabel: {
+    fontSize: 'calc(var(--font-size-base) + 1px)',
+    fontWeight: 500,
+  },
+  settingsDescription: {
+    fontSize: 'calc(var(--font-size-base) - 2px)',
+    color: 'var(--eos-muted)',
+  },
+  settingsCheckbox: {
+    width: '18px',
+    height: '18px',
+    accentColor: 'var(--eos-accent)',
+    cursor: 'pointer',
+  },
+  shortcutList: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  shortcutItem: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '10px 0',
+    borderBottom: '1px solid var(--eos-border-2)',
+  },
+  shortcutInfo: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1px',
+  },
+  shortcutLabel: {
+    fontWeight: 500,
+    fontSize: 'calc(var(--font-size-base) + 0px)',
+    color: 'var(--eos-text)',
+  },
+  shortcutRecorderContainer: {
+    display: 'flex',
+    gap: '8px',
+    alignItems: 'center',
+  },
+  shortcutRecorderBox: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: '120px',
+    height: '28px',
+    padding: '0 12px',
+    fontFamily: 'var(--font-mono)',
+    fontSize: '11px',
+    color: 'var(--eos-muted)',
+    background: 'var(--eos-surface-2)',
+    border: '1px solid var(--eos-border)',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+  },
+  shortcutRecorderBoxRecording: {
+    color: 'var(--white)',
+    background: 'var(--eos-accent)',
+    borderColor: 'var(--eos-accent)',
+    boxShadow: '0 0 0 2px var(--eos-accent-20)',
+  },
 }

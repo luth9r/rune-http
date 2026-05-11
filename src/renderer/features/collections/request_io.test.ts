@@ -23,23 +23,9 @@ const mockRequestItem: CollectionItem = {
 describe('Request I/O', () => {
   describe('exportRequest', () => {
     it('should export single request as native JSON', () => {
-      const result = JSON.parse(exportRequest(mockRequestItem, 'json'))
+      const result = JSON.parse(exportRequest(mockRequestItem))
       expect(result.method).toBe('POST')
       expect(result.body).toBe('test body')
-    })
-
-    it('should export single request wrapped for Postman', () => {
-      const result = JSON.parse(exportRequest(mockRequestItem, 'postman'))
-      expect(result.info.name).toBe('Single Request')
-      expect(result.item.length).toBe(1)
-      expect(result.item[0].request.method).toBe('POST')
-    })
-
-    it('should export single request wrapped for Insomnia', () => {
-      const result = JSON.parse(exportRequest(mockRequestItem, 'insomnia'))
-      expect(result._type).toBe('export')
-      const req = result.resources.find((r: any) => r._type === 'request')
-      expect(req.name).toBe('Single Request')
     })
   })
 
@@ -49,9 +35,10 @@ describe('Request I/O', () => {
       const result = detectAndImport(singleRequestContent)
       
       expect(result).not.toBeNull()
-      expect(result?.name).toBe('Single Request')
-      expect(result?.items.length).toBe(1)
-      expect(result?.items[0].request?.method).toBe('POST')
+      expect(result?.type).toBe('request')
+      const data = result?.data as any
+      expect(data?.name).toBe('Single Request')
+      expect(data?.method).toBe('POST')
     })
   })
 })

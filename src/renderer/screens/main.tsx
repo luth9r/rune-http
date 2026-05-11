@@ -11,7 +11,6 @@ import { SettingsScreen } from './SettingsScreen'
 import { FontScaleIndicator } from '../components/shared/ScaleIndicator'
 import { useSettingsStore } from '../features/settings/settings.store'
 import { useEffect } from 'react'
-import './screens.css'
 
 export function MainScreen() {
   const [currentView, setView] = useState<
@@ -77,7 +76,7 @@ export function MainScreen() {
   const setSaveModalOpen = useTabsStore(s => s.setSaveModalOpen)
 
   return (
-    <main className="screen-root">
+    <main style={s.screenRoot}>
       <ActivityBar
         currentView={currentView}
         setView={val => setView(val as any)}
@@ -97,4 +96,16 @@ export function MainScreen() {
       <FontScaleIndicator />
     </main>
   )
+}
+
+const s: Record<string, React.CSSProperties> = {
+  screenRoot: {
+    position: 'relative',
+    display: 'flex',
+    width: '100vw',
+    height: '100vh',
+    overflow: 'hidden',
+    color: 'var(--eos-text)',
+    background: 'var(--eos-bg)',
+  },
 }

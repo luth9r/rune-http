@@ -16,47 +16,11 @@ describe('detectAndImport', () => {
       ]
     }
     const result = detectAndImport(JSON.stringify(nativeCollection))
-    expect(result).toEqual(nativeCollection)
-  })
-
-  it('should detect and import Postman v2.1 format', () => {
-    const postmanCollection = {
-      info: {
-        name: 'Postman Collection',
-        schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
-      },
-      item: [
-        {
-          name: 'First Request',
-          request: {
-            method: 'POST',
-            url: { raw: 'https://api.example.com' }
-          }
-        }
-      ]
-    }
-    const result = detectAndImport(JSON.stringify(postmanCollection))
-    expect(result?.name).toBe('Postman Collection')
-    expect(result?.items.length).toBe(1)
-    expect(result?.items[0].name).toBe('First Request')
-  })
-
-  it('should detect and import Insomnia export format', () => {
-    const insomniaExport = {
-      _type: 'export',
-      resources: [
-        {
-          _type: 'request',
-          name: 'Insomnia Request',
-          method: 'PUT',
-          url: 'https://insomnia.rest'
-        }
-      ]
-    }
-    const result = detectAndImport(JSON.stringify(insomniaExport))
-    expect(result?.name).toBe('Imported Insomnia Collection')
-    expect(result?.items.length).toBe(1)
-    expect(result?.items[0].name).toBe('Insomnia Request')
+    expect(result).not.toBeNull()
+    expect(result?.type).toBe('collection')
+    const data = result?.data as any
+    expect(data.name).toBe('Rune Collection')
+    expect(data.items.length).toBe(1)
   })
 
   it('should return null for invalid JSON', () => {

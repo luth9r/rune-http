@@ -159,8 +159,11 @@ export const useTabsStore = create<TabsState>()(
           }
 
           // If body is changing, save it to the current bodies slot
-          if (patch.body !== undefined && tab.bodyType !== 'none') {
-            tab.bodies[tab.bodyType] = patch.body
+          if (patch.body !== undefined) {
+            const targetType = patch.bodyType || tab.bodyType
+            if (targetType !== 'none') {
+              tab.bodies[targetType] = patch.body
+            }
           }
 
           // Clear error when request data changes

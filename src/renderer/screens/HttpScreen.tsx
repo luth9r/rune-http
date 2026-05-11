@@ -7,9 +7,8 @@ import { ResponsePanel } from '@/components/ResponsePanel'
 import { selectActiveTab, useTabsStore } from '@/features/tabs/tabs.store'
 import { useSettingsStore } from '@/features/settings/settings.store'
 import { EmptyState } from '@/components/EmptyState'
- import { useResizable } from '@/hooks/useResizable'
+import { useResizable } from '@/hooks/useResizable'
 import { Resizer } from '@/components/ui/Resizer'
-import './screens.css'
 
 export function HttpScreen() {
   const activeTab = useTabsStore(selectActiveTab)
@@ -34,8 +33,11 @@ export function HttpScreen() {
     <>
       {!sidebarVisible && (
         <button
-          className="expand-panel-btn expand-panel-btn-left"
           onClick={() => setSidebarVisible(true)}
+          style={{
+            ...s.expandPanelBtn,
+            ...s.expandPanelBtnLeft,
+          }}
           title="Show Sidebar"
         >
           <ChevronRight size={20} />
@@ -44,12 +46,12 @@ export function HttpScreen() {
 
       {sidebarVisible && <Sidebar />}
 
-      <div className="screen-main">
+      <div style={s.screenMain}>
         <TabBar />
-        <div className="screen-panels">
+        <div style={s.screenPanels}>
           {activeTab ? (
             <>
-              <div className="screen-request-panel">
+              <div style={s.screenRequestPanel}>
                 <RequestPanel />
               </div>
               {responsePanelVisible && (
@@ -59,8 +61,7 @@ export function HttpScreen() {
                     onMouseDown={startResizingResponse}
                   />
                   <div
-                    className="screen-response-panel"
-                    style={{ width: responseWidth, flex: 'none' }}
+                    style={{ ...s.screenResponsePanel, width: responseWidth, flex: 'none' }}
                   >
                     <ResponsePanel />
                   </div>
@@ -69,8 +70,11 @@ export function HttpScreen() {
 
               {!responsePanelVisible && (
                 <button
-                  className="expand-panel-btn expand-panel-btn-right"
                   onClick={() => setResponsePanelVisible(true)}
+                  style={{
+                    ...s.expandPanelBtn,
+                    ...s.expandPanelBtnRight,
+                  }}
                   title="Show Response Panel"
                 >
                   <ChevronLeft size={20} />
@@ -84,4 +88,59 @@ export function HttpScreen() {
       </div>
     </>
   )
+}
+
+const s: Record<string, React.CSSProperties> = {
+  screenMain: {
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column',
+    overflow: 'hidden',
+  },
+  screenPanels: {
+    display: 'flex',
+    flex: 1,
+    overflow: 'hidden',
+  },
+  screenRequestPanel: {
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column',
+    minWidth: '300px',
+    overflow: 'hidden',
+    borderRight: '1px solid var(--eos-border)',
+  },
+  screenResponsePanel: {
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
+  },
+  expandPanelBtn: {
+    position: 'absolute',
+    zIndex: 100,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '32px',
+    height: '32px',
+    padding: 0,
+    color: 'var(--white)',
+    background: 'var(--eos-accent)',
+    border: 'none',
+    borderRadius: '50%',
+    cursor: 'pointer',
+    boxShadow: '0 4px 12px var(--black-40)',
+    opacity: 0.6,
+    transition: 'all 0.2s ease',
+  },
+  expandPanelBtnLeft: {
+    top: '50%',
+    left: '8px',
+    transform: 'translateY(-50%)',
+  },
+  expandPanelBtnRight: {
+    top: '50%',
+    right: '8px',
+    transform: 'translateY(-50%)',
+  },
 }
