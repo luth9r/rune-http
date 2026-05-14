@@ -54,7 +54,6 @@ export function formatXml(xmlString: string): string {
 
     return formatted.trim()
   } catch (e) {
-    console.error('XML Format error:', e)
     return xmlString.trim()
   }
 }

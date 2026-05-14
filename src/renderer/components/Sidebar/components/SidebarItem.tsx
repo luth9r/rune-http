@@ -86,7 +86,7 @@ export function SidebarItem({
       if (result.type === 'request') {
         const request = result.data as HttpRequest
         const requestId = uuid()
-        
+
         // Find existing names in this collection
         const col = collections.find(c => c.id === item.id)
         const existingNames = col?.items.map(i => i.name) || []
@@ -101,10 +101,8 @@ export function SidebarItem({
           },
         ])
       } else {
-        console.warn('Cannot import a full collection into another collection')
       }
     } catch (e) {
-      console.error('Failed to import into collection', e)
     }
   }
 

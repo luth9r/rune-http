@@ -66,7 +66,6 @@ export function registerUtilsIpc(): void {
         'monospace',
       ].sort()
     } catch (error) {
-      console.error('Failed to get system fonts:', error)
       return ['Inter', 'monospace']
     }
   })

@@ -134,7 +134,6 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
         importEnvironments([data])
       }
     } catch (e) {
-      console.error('Failed to import environments', e)
     }
   }
 
@@ -149,8 +148,8 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
   const filteredEnvironments = useMemo(() => {
     if (!searchQuery.trim()) return environments
     const query = searchQuery.toLowerCase()
-    return environments.filter(env => 
-      env.name.toLowerCase().includes(query) || 
+    return environments.filter(env =>
+      env.name.toLowerCase().includes(query) ||
       (env.id === GLOBAL_ENV_ID && t('env.global').toLowerCase().includes(query))
     )
   }, [environments, searchQuery, t])
@@ -165,17 +164,17 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
       <SidebarHeader>
         <span className="sidebar-title font-semibold">{t('env.title')}</span>
         <div className="flex items-center gap-1">
-          <Button 
-            onClick={handleImport} 
-            size="xs" 
+          <Button
+            onClick={handleImport}
+            size="xs"
             variant="icon"
             title={t('common.import')}
           >
             <Upload size={14} />
           </Button>
-          <Button 
-            onClick={() => setIsAddingMode(true)} 
-            size="xs" 
+          <Button
+            onClick={() => setIsAddingMode(true)}
+            size="xs"
             variant="icon"
             title={t('common.add')}
           >
@@ -253,11 +252,11 @@ export function EnvSidebar({ onDelete }: EnvSidebarProps) {
                   env={draggedEnv}
                   isActive={activeEnvId === draggedEnv.id}
                   isActivated={activatedEnvId === draggedEnv.id}
-                  onActivate={() => {}}
-                  onDelete={() => {}}
-                  onRename={() => {}}
-                  onSelect={() => {}}
-                  onExport={() => {}}
+                  onActivate={() => { }}
+                  onDelete={() => { }}
+                  onRename={() => { }}
+                  onSelect={() => { }}
+                  onExport={() => { }}
                 />
               </div>
             ) : null}

@@ -86,7 +86,7 @@ export function MainScreen() {
       {currentView === 'env' && <EnvironmentsScreen />}
       {currentView === 'settings' && <SettingsScreen />}
 
-      {isSaveModalOpen && activeTab && (
+      {isSaveModalOpen && currentView === 'explorer' && activeTab && (
         <SaveRequestModal
           isOpen={isSaveModalOpen}
           onClose={() => setSaveModalOpen(false)}

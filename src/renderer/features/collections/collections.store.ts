@@ -9,7 +9,7 @@ import { useTabsStore } from '../tabs/tabs.store'
 
 interface CollectionsState {
   collections: Collection[]
-  addCollection: (name: string) => void
+  addCollection: (name: string) => string
   removeCollection: (id: string) => void
   renameCollection: (id: string, name: string) => void
   toggleCollection: (id: string) => void
@@ -33,21 +33,25 @@ export const useCollectionsStore = create<CollectionsState>()(
     immer(set => ({
       collections: [],
 
-      addCollection: name =>
+      addCollection: name => {
+        const id = uuid()
         set(state => {
           state.collections.push({
-            id: uuid(),
+            id,
             name,
             items: [],
             isOpen: true,
             createdAt: Date.now(),
             updatedAt: Date.now(),
           })
-        }),
+        })
+        return id
+      },
 
       removeCollection: id =>
         set(state => {
           state.collections = state.collections.filter(c => c.id !== id)
+          useTabsStore.getState().detachTabsByCollectionId(id)
         }),
 
       renameCollection: (id, name) =>
@@ -160,6 +164,7 @@ export const useCollectionsStore = create<CollectionsState>()(
           if (!col) return
           col.items = col.items.filter(i => i.id !== itemId)
           col.updatedAt = Date.now()
+          useTabsStore.getState().detachTabsByRequestId(itemId)
         }),
 
       importCollection: collection =>
@@ -186,10 +191,10 @@ export const useCollectionsStore = create<CollectionsState>()(
                 id: newItemId,
                 request: item.request
                   ? {
-                      ...item.request,
-                      id: newItemId,
-                      name: item.request.name, // Keep original request name inside
-                    }
+                    ...item.request,
+                    id: newItemId,
+                    name: item.request.name, // Keep original request name inside
+                  }
                   : undefined,
               }
             }),
@@ -215,10 +220,10 @@ export const useCollectionsStore = create<CollectionsState>()(
             name: `${original.name} Copy`,
             request: original.request
               ? {
-                  ...original.request,
-                  id: newId,
-                  name: `${original.request.name} Copy`,
-                }
+                ...original.request,
+                id: newId,
+                name: `${original.request.name} Copy`,
+              }
               : undefined,
           }
 
@@ -245,11 +250,7 @@ export const useCollectionsStore = create<CollectionsState>()(
       name: 'rune-collections',
       storage: createJSONStorage(() => electronStorage),
       onRehydrateStorage: () => {
-        console.log('Hydration starting...')
-        return (_state, error) => {
-          if (error) console.error('Hydration error', error)
-          else console.log('Hydration finished')
-        }
+        return (_state, error) => { }
       },
     }
   )

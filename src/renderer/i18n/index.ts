@@ -160,6 +160,7 @@ const translations = {
       request_name_placeholder: "e.g. Get User Profile",
       select_location_label: "Select Location",
       save_request_btn: "Save Request",
+      new_collection: "New Collection",
     },
     common: {
       error: "Error",
@@ -353,6 +354,7 @@ const translations = {
       request_name_placeholder: "напр. Отримати профілі користувачів",
       select_location_label: "Оберіть місце",
       save_request_btn: "Зберегти запит",
+      new_collection: "Нова колекція",
     },
     common: {
       error: "Помилка",

@@ -77,16 +77,16 @@ export function DraggableRow({
           onAddRequest={
             isCollection
               ? () =>
-                  addRequest(item.id, {
-                    name: 'New Request',
-                    method: 'GET',
-                    url: '',
-                    headers: [],
-                    params: [],
-                    body: '',
-                    bodyType: 'none',
-                    auth: { type: 'none' },
-                  })
+                addRequest(item.id, {
+                  name: 'New Request',
+                  method: 'GET',
+                  url: '',
+                  headers: [],
+                  params: [],
+                  body: '',
+                  bodyType: 'none',
+                  auth: { type: 'none' },
+                })
               : undefined
           }
           onClick={() =>
@@ -104,16 +104,14 @@ export function DraggableRow({
               const content = isCollection
                 ? exportCollection(item)
                 : exportRequest(item)
-              
+
               if (!content) {
-                console.error('Export failed: No content generated')
                 return
               }
 
               const fileName = `${item.name || 'export'}.json`
               window.api.utils.saveFile(content, fileName)
             } catch (err) {
-              console.error('Export error', err)
             }
           }}
           onRename={newName => {

@@ -273,13 +273,9 @@ export function Sidebar() {
         collection.name = getUniqueName(collection.name, existingNames)
         importCollection(collection)
       } else if (result && result.type === 'request') {
-        // Maybe show an error toast? For now console.warn
-        console.warn('Cannot import a single request as a root collection')
       } else {
-        console.error('Invalid collection format')
       }
     } catch (e) {
-      console.error('Failed to import collection', e)
     }
   }
 
@@ -295,17 +291,17 @@ export function Sidebar() {
       <SidebarHeader title={t('sidebar.collections')}>
         <Logo size="sm" />
         <div className="flex items-center gap-1">
-          <Button 
-            onClick={handleImport} 
-            size="xs" 
+          <Button
+            onClick={handleImport}
+            size="xs"
             variant="icon"
             title={t('common.import')}
           >
             <Upload size={14} />
           </Button>
-          <Button 
-            onClick={() => setIsAddingCol(true)} 
-            size="xs" 
+          <Button
+            onClick={() => setIsAddingCol(true)}
+            size="xs"
             variant="icon"
             title={t('common.add')}
           >

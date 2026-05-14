@@ -52,6 +52,8 @@ interface TabsState {
   ) => void
   markClean: (id: string) => void
   saveTab: (id: string, updateRequestFn: any) => void
+  detachTabsByRequestId: (requestId: string) => void
+  detachTabsByCollectionId: (collectionId: string) => void
   isSaveModalOpen: boolean
   setSaveModalOpen: (open: boolean) => void
 }
@@ -234,7 +236,6 @@ export const useTabsStore = create<TabsState>()(
             try {
               finalBody = formatJson(tab.body)
             } catch (_e) {
-              console.warn('Invalid JSON, skipping format')
             }
           } else if (tab.bodyType === 'xml') {
             finalBody = formatXml(tab.body)
@@ -270,6 +271,28 @@ export const useTabsStore = create<TabsState>()(
           }
         })
       },
+
+      detachTabsByRequestId: requestId =>
+        set(state => {
+          state.tabs.forEach(tab => {
+            if (tab.requestId === requestId) {
+              tab.requestId = undefined
+              tab.collectionId = undefined
+              tab.isDirty = true
+            }
+          })
+        }),
+
+      detachTabsByCollectionId: collectionId =>
+        set(state => {
+          state.tabs.forEach(tab => {
+            if (tab.collectionId === collectionId) {
+              tab.requestId = undefined
+              tab.collectionId = undefined
+              tab.isDirty = true
+            }
+          })
+        }),
 
       isSaveModalOpen: false,
       setSaveModalOpen: open =>

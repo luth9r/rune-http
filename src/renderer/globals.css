@@ -40,32 +40,69 @@ pre {
 /* Resizer Handle */
 .resizer-handle {
   position: relative;
-  z-index: 100;
+  z-index: 1000;
   background-color: transparent;
+  flex-shrink: 0;
+  transition: background-color 0.2s;
 }
 
 .resizer-h {
-  width: 4px;
-  margin-right: -2px;
-  margin-left: -2px;
+  width: 10px;
+  margin-right: -5px;
+  margin-left: -5px;
   cursor: col-resize;
 }
 
-.resizer-h:hover,
-.resizer-h:active {
-  background-color: var(--eos-accent, #3b82f6);
-  opacity: 0.5;
+.resizer-h::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+  background-color: var(--eos-border);
+  transform: translateX(-50%);
+  transition: background-color 0.2s, width 0.2s;
+}
+
+.resizer-h:hover::after,
+.resizer-handle:active::after {
+  width: 2px;
+  background-color: var(--eos-accent);
 }
 
 .resizer-v {
-  height: 6px;
-  margin-top: -3px;
-  margin-bottom: -3px;
+  height: 10px;
+  margin-top: -5px;
+  margin-bottom: -5px;
   cursor: row-resize;
 }
 
-.resizer-v:hover,
-.resizer-v:active {
-  background-color: var(--eos-accent, #3b82f6);
-  opacity: 0.5;
+.resizer-v::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  width: 100%;
+  background-color: var(--eos-border);
+  transform: translateY(-50%);
+  transition: background-color 0.2s, height 0.2s;
+}
+
+.resizer-v:hover::after,
+.resizer-v:active::after {
+  height: 2px;
+  background-color: var(--eos-accent);
+}
+
+/* Global Resize Shield */
+body.is-resizing::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  cursor: inherit;
 }

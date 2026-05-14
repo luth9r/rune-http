@@ -91,7 +91,7 @@ export function useShortcuts(currentView?: string) {
       }
 
       // Save Request
-      if (matches('saveRequest')) {
+      if (matches('saveRequest') && currentView === 'explorer') {
         e.preventDefault()
         const state = useTabsStore.getState()
         if (state.activeTabId) {

@@ -57,7 +57,6 @@ export function detectAndImport(content: string): ImportResult | null {
 
     return null;
   } catch (e) {
-    console.error("Failed to parse collection content", e);
     return null;
   }
 }

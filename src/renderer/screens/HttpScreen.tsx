@@ -106,13 +106,14 @@ const s: Record<string, React.CSSProperties> = {
     display: 'flex',
     flex: 1,
     flexDirection: 'column',
-    minWidth: '300px',
+    minWidth: '400px',
     overflow: 'hidden',
     borderRight: '1px solid var(--eos-border)',
   },
   screenResponsePanel: {
     display: 'flex',
     flexDirection: 'column',
+    minWidth: 0,
     overflow: 'hidden',
   },
   expandPanelBtn: {

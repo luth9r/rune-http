@@ -188,6 +188,7 @@
 
 .rp-body-content {
   padding: 12px;
+  min-width: 0;
 }
 
 .rp-body {
@@ -219,12 +220,14 @@
 }
 
 .rp-header-key {
-  flex-shrink: 0;
-  width: 180px;
+  flex-shrink: 1;
+  min-width: 100px;
+  max-width: 250px;
   font-family: var(--font-mono);
   color: var(--eos-accent);
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
   user-select: text;
 }
 

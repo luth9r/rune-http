@@ -68,12 +68,14 @@ export function useResizable({
     if (isResizing) {
       window.addEventListener('mousemove', resize)
       window.addEventListener('mouseup', stopResizing)
+      document.body.classList.add('is-resizing')
       document.body.style.cursor =
         direction === 'horizontal' ? 'col-resize' : 'row-resize'
       document.body.style.userSelect = 'none'
     } else {
       window.removeEventListener('mousemove', resize)
       window.removeEventListener('mouseup', stopResizing)
+      document.body.classList.remove('is-resizing')
       document.body.style.cursor = ''
       document.body.style.userSelect = ''
       localStorage.setItem(persistenceKey, size.toString())
@@ -82,6 +84,7 @@ export function useResizable({
     return () => {
       window.removeEventListener('mousemove', resize)
       window.removeEventListener('mouseup', stopResizing)
+      document.body.classList.remove('is-resizing')
       document.body.style.cursor = ''
       document.body.style.userSelect = ''
     }

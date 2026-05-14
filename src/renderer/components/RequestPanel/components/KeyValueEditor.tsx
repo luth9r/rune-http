@@ -87,7 +87,6 @@ function KeyValueRow({
         onChange({ value: path })
       }
     } catch (err) {
-      console.error('Failed to select file', err)
     }
   }
 

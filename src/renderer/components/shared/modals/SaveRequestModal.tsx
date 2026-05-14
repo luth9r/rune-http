@@ -1,5 +1,5 @@
-import { FolderTree } from 'lucide-react'
-import { useState } from 'react'
+import { FolderTree, Plus, Check, X } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
 import { CollectionTree } from '@/components/shared/CollectionTree'
 import { Modal } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
@@ -20,6 +20,7 @@ export function SaveRequestModal({
 }) {
   const collections = useCollectionsStore(s => s.collections)
   const addRequest = useCollectionsStore(s => s.addRequest)
+  const addCollection = useCollectionsStore(s => s.addCollection)
   const { tabs, markClean, updateTab } = useTabsStore()
   const { t } = useTranslation()
 
@@ -30,6 +31,15 @@ export function SaveRequestModal({
     colId: string
     folderId?: string
   } | null>(null)
+  const [isAddingCol, setIsAddingCol] = useState(false)
+  const [newColName, setNewColName] = useState('')
+  const newColInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (isAddingCol) {
+      newColInputRef.current?.focus()
+    }
+  }, [isAddingCol])
 
   const handleSave = () => {
     if (!selectedLocation || !tab) return
@@ -55,6 +65,16 @@ export function SaveRequestModal({
 
     markClean(tabId)
     onClose()
+  }
+
+  const handleCreateCollection = () => {
+    const trimmed = newColName.trim()
+    if (!trimmed) return
+
+    const newId = addCollection(trimmed)
+    setSelectedLocation({ colId: newId })
+    setIsAddingCol(false)
+    setNewColName('')
   }
 
   const isColSelected = (colId: string) =>
@@ -108,6 +128,49 @@ export function SaveRequestModal({
                 />
               </div>
             ))}
+
+            {!isAddingCol ? (
+              <Button
+                className="save-modal-new-col-trigger"
+                onClick={() => setIsAddingCol(true)}
+                variant="ghost"
+              >
+                <Plus size={14} />
+                <span>{t('modal.new_collection')}</span>
+              </Button>
+            ) : (
+              <div className="save-modal-new-col-form">
+                <input
+                  className="save-modal-new-col-input"
+                  onChange={e => setNewColName(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') handleCreateCollection()
+                    if (e.key === 'Escape') setIsAddingCol(false)
+                  }}
+                  placeholder={t('sidebar.new_collection_placeholder')}
+                  ref={newColInputRef}
+                  value={newColName}
+                />
+                <div className="save-modal-new-col-actions">
+                  <Button
+                    className="save-modal-new-col-btn"
+                    onClick={handleCreateCollection}
+                    size="xs"
+                    variant="icon"
+                  >
+                    <Check size={14} />
+                  </Button>
+                  <Button
+                    className="save-modal-new-col-btn"
+                    onClick={() => setIsAddingCol(false)}
+                    size="xs"
+                    variant="icon"
+                  >
+                    <X size={14} />
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

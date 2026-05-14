@@ -136,9 +136,9 @@ export function RequestPanel() {
               const newUrl = updateUrlWithParams(tab.url, params)
               updateTab(tab.id, { params, url: newUrl })
             }}
-            placeholder={{ 
-              key: t('request.param_placeholder'), 
-              value: t('request.value_placeholder') 
+            placeholder={{
+              key: t('request.param_placeholder'),
+              value: t('request.value_placeholder')
             }}
           />
         )}
@@ -148,9 +148,9 @@ export function RequestPanel() {
             data={tab.headers}
             key={`${tab.id}-headers`}
             onChange={headers => updateTab(tab.id, { headers })}
-            placeholder={{ 
-              key: t('request.header').toLowerCase(), 
-              value: t('request.value_placeholder') 
+            placeholder={{
+              key: t('request.header').toLowerCase(),
+              value: t('request.value_placeholder')
             }}
           />
         )}
@@ -160,9 +160,9 @@ export function RequestPanel() {
             data={tab.cookies || []}
             key={`${tab.id}-cookies`}
             onChange={cookies => updateTab(tab.id, { cookies })}
-            placeholder={{ 
-              key: t('request.cookie_name'), 
-              value: t('request.value_placeholder') 
+            placeholder={{
+              key: t('request.cookie_name'),
+              value: t('request.value_placeholder')
             }}
           />
         )}
@@ -208,19 +208,19 @@ export function RequestPanel() {
 
               {(tab.bodyType === 'urlencoded' ||
                 tab.bodyType === 'multipart') && (
-                <div className="request-panel__form-editor">
-                  <KeyValueEditor
-                    allowFileSelection={tab.bodyType === 'multipart'}
-                    data={formData}
-                    key={`${tab.id}-body-form`}
-                    onChange={handleFormDataChange}
-                    placeholder={{ 
-                      key: t('request.field_placeholder'), 
-                      value: t('request.value_placeholder') 
-                    }}
-                  />
-                </div>
-              )}
+                  <div className="request-panel__form-editor">
+                    <KeyValueEditor
+                      allowFileSelection={tab.bodyType === 'multipart'}
+                      data={formData}
+                      key={`${tab.id}-body-form`}
+                      onChange={handleFormDataChange}
+                      placeholder={{
+                        key: t('request.field_placeholder'),
+                        value: t('request.value_placeholder')
+                      }}
+                    />
+                  </div>
+                )}
 
               {tab.bodyType === 'binary' && (
                 <div className="body-panel__binary">
@@ -247,7 +247,6 @@ export function RequestPanel() {
                           updateTab(tab.id, { body: path })
                         }
                       } catch (err) {
-                        console.error('Failed to select file', err)
                       }
                     }}
                     variant="secondary"

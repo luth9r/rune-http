@@ -103,8 +103,6 @@ export async function executeRequest(
 ): Promise<HttpResponse> {
   const startTime = Date.now()
 
-  console.log('EnvVars inside execute:', envVars)
-
   // 1. Prepare Headers
   const headers = buildHeaders(request.headers, envVars)
 
